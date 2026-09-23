@@ -6,6 +6,13 @@ import toast from 'react-hot-toast'
 import { useAdminStore, type AdminStoreState } from '../lib/admin.store'
 import { trackEvent } from '../lib/analytics'
 import { createClient, createProject, uploadProjectFileToStorage, type VrLocationPreference, type VrPackagePreference } from '../lib/interiors'
+import {
+  MAX_INSPIRATION_IMAGES,
+  MAX_PROJECT_FILE_SIZE_BYTES,
+  isValidInspirationFileState,
+  selectInspirationFiles,
+  type InspirationFileRejections,
+} from '../lib/interiorsInspirationFiles'
 import { UploadProgress } from './UploadProgress'
 
 export interface StolarOption {
@@ -135,12 +142,16 @@ export function InteriorsClientForm({ stolars: _stolarsUnused, onSubmit, languag
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedPlanFileNames, setSelectedPlanFileNames] = useState<string[]>([])
   const [selectedPhotoFileNames, setSelectedPhotoFileNames] = useState<string[]>([])
-  const [selectedInspirationFileNames, setSelectedInspirationFileNames] = useState<string[]>([])
   const [inspirationFiles, setInspirationFiles] = useState<File[]>([])
   const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [currentFile, setCurrentFile] = useState<string>()
   const [currentFileIndex, setCurrentFileIndex] = useState(1)
+  const selectedInspirationFileNames = inspirationFiles.map((file) => file.name)
+  const maxInspirationFileSizeMiB =
+    MAX_PROJECT_FILE_SIZE_BYTES / (1024 * 1024)
+  const inspirationLimitReached =
+    inspirationFiles.length >= MAX_INSPIRATION_IMAGES
 
   useEffect(() => {
     setSelectedPhotoFileNames(values.photoFiles.map((f) => f.name))
@@ -273,10 +284,53 @@ export function InteriorsClientForm({ stolars: _stolarsUnused, onSubmit, languag
     }))
   }
 
+  function clearInspirationFileError() {
+    setErrors((prev) => {
+      if (!prev.inspirationFiles) return prev
+      const next = { ...prev }
+      delete next.inspirationFiles
+      return next
+    })
+  }
+
+  function showInspirationFileFeedback(rejections: InspirationFileRejections) {
+    const messages: string[] = []
+    if (rejections.overLimit.length > 0) {
+      messages.push(
+        language === 'hr'
+          ? `Dopušteno je najviše ${MAX_INSPIRATION_IMAGES} inspiracijskih fotografija. Dodano je samo onoliko novih fotografija koliko je bilo slobodnih mjesta.`
+          : `A maximum of ${MAX_INSPIRATION_IMAGES} inspiration images is allowed. Only the images that fit the remaining slots were added.`
+      )
+    }
+    if (rejections.unsupportedType.length > 0) {
+      messages.push(
+        language === 'hr'
+          ? 'Neke datoteke nisu dodane. Podržani su samo JPG, JPEG i PNG formati.'
+          : 'Some files were not added. Only JPG, JPEG, and PNG formats are supported.'
+      )
+    }
+    if (rejections.oversized.length > 0) {
+      messages.push(
+        language === 'hr'
+          ? `Neke datoteke nisu dodane jer su veće od ${maxInspirationFileSizeMiB} MiB.`
+          : `Some files were not added because they exceed ${maxInspirationFileSizeMiB} MiB.`
+      )
+    }
+    if (rejections.duplicate.length > 0) {
+      messages.push(
+        language === 'hr'
+          ? 'Fotografija koja je već odabrana nije dodana ponovno.'
+          : 'An image that was already selected was not added again.'
+      )
+    }
+    if (messages.length > 0) {
+      toast.error(messages.join(' '), { duration: 7000 })
+    }
+  }
+
   function removeInspirationFile(index: number) {
-    const updated = inspirationFiles.filter((_, i) => i !== index)
-    setInspirationFiles(updated)
-    setSelectedInspirationFileNames(updated.map((f) => f.name))
+    setInspirationFiles((prev) => prev.filter((_, i) => i !== index))
+    clearInspirationFileError()
   }
 
   function removePlanFile(index: number) {
@@ -323,28 +377,10 @@ export function InteriorsClientForm({ stolars: _stolarsUnused, onSubmit, languag
       return
     } else if (field === 'inspirationFiles') {
       const incoming = Array.from(files)
-
-      setInspirationFiles((prev) => {
-        const merged = [...prev]
-        for (const f of incoming) {
-          const alreadyExists = merged.some(
-            (p) =>
-              p.name === f.name &&
-              p.size === f.size &&
-              p.lastModified === f.lastModified
-          )
-          if (!alreadyExists) merged.push(f)
-        }
-        return merged
-      })
-
-      setSelectedInspirationFileNames((prev) => {
-        const merged = [...prev]
-        for (const f of incoming) {
-          if (!merged.includes(f.name)) merged.push(f.name)
-        }
-        return merged
-      })
+      const selection = selectInspirationFiles(inspirationFiles, incoming)
+      setInspirationFiles(selection.files)
+      clearInspirationFileError()
+      showInspirationFileFeedback(selection.rejections)
 
       // ne diramo values.inspirationFiles – to polje ni ne postoji u tipu
       event.target.value = ''
@@ -506,6 +542,20 @@ export function InteriorsClientForm({ stolars: _stolarsUnused, onSubmit, languag
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
 
+    if (!isValidInspirationFileState(inspirationFiles)) {
+      const message =
+        language === 'hr'
+          ? `Provjeri inspiracijske fotografije. Dopušteno je najviše ${MAX_INSPIRATION_IMAGES} JPG/JPEG ili PNG fotografija, do ${maxInspirationFileSizeMiB} MiB po datoteci.`
+          : `Check the inspiration images. A maximum of ${MAX_INSPIRATION_IMAGES} JPG/JPEG or PNG images is allowed, up to ${maxInspirationFileSizeMiB} MiB per file.`
+      setErrors((prev) => ({ ...prev, inspirationFiles: message }))
+      toast.error(message, { duration: 7000 })
+      document.getElementById('inspiration-file-input')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      })
+      return
+    }
+
     const validation = validate(values)
     setErrors(validation.errors)
 
@@ -545,7 +595,7 @@ export function InteriorsClientForm({ stolars: _stolarsUnused, onSubmit, languag
         }
       }
 
-      let budget: number | null = parseBudgetLowerBoundEur(values.budgetRange)
+      const budget: number | null = parseBudgetLowerBoundEur(values.budgetRange)
 
       const inspirationCount = inspirationFiles.length
       const photoFilesArray = [...values.photoFiles]
@@ -660,7 +710,6 @@ export function InteriorsClientForm({ stolars: _stolarsUnused, onSubmit, languag
 
       // Reset poruke o odabranom tlocrtu odmah nakon uspješnog slanja
       setSelectedPlanFileNames([])
-      setSelectedInspirationFileNames([])
 
       // Save to admin store (keep existing behavior)
       addInteriorsRequest({
@@ -692,7 +741,6 @@ export function InteriorsClientForm({ stolars: _stolarsUnused, onSubmit, languag
       setValues(INITIAL_VALUES)
       setSelectedPlanFileNames([])
       setSelectedPhotoFileNames([])
-      setSelectedInspirationFileNames([])
       setInspirationFiles([])
     } catch (error) {
       console.error('Error submitting client form:', error)
@@ -1089,6 +1137,11 @@ export function InteriorsClientForm({ stolars: _stolarsUnused, onSubmit, languag
             <span className="text-xs text-slate-500">Približna visina u centimetrima (opcionalno)</span>
           </label>
         </div>
+        <p className="rounded-xl bg-violet-50/70 px-4 py-3 text-xs leading-relaxed text-plum/70 dark:bg-violet-300/[0.06] dark:text-pearl/65">
+          Mjere i podatke dostavljaš ti, a 3D idejno rješenje izrađuje se prema
+          dostavljenim informacijama. Prije stvarne izrade ili ugradnje izvođač
+          odnosno stolar treba napraviti završnu izmjeru i tehničku provjeru.
+        </p>
       </fieldset>
 
       {/* Budžet (opcionalno) */}
@@ -1151,23 +1204,42 @@ export function InteriorsClientForm({ stolars: _stolarsUnused, onSubmit, languag
         </div>
 
         <div>
-          <label className="block space-y-1 text-sm sm:text-base text-plum/90 dark:text-pearl">
-            <span>Učitaj slike inspiracije (npr. Pinterest, Instagram)</span>
-            <div className="flex items-center gap-3">
-              <label className="inline-flex cursor-pointer items-center rounded-full bg-violet-500 px-4 py-2 text-xs font-medium text-white shadow-sm hover:bg-violet-600">
-                Odaberi datoteke
+          <div className="block space-y-2 text-sm sm:text-base text-plum/90 dark:text-pearl">
+            <p>Učitaj slike inspiracije (npr. Pinterest, Instagram)</p>
+            <div className="flex flex-wrap items-center gap-3">
+              <label
+                className={`inline-flex items-center rounded-full px-4 py-2 text-xs font-medium text-white shadow-sm ${
+                  inspirationLimitReached
+                    ? 'cursor-not-allowed bg-violet-300 opacity-70 dark:bg-violet-800'
+                    : 'cursor-pointer bg-violet-500 hover:bg-violet-600'
+                }`}
+              >
+                {inspirationLimitReached ? 'Limit dosegnut' : 'Odaberi datoteke'}
                 <input
+                  id="inspiration-file-input"
                   type="file"
-                  accept=".jpg,.jpeg,.png"
+                  accept="image/jpeg,image/png,.jpg,.jpeg,.png"
                   className="hidden"
                   multiple
+                  disabled={inspirationLimitReached}
                   onChange={e => handleFileChange(e, 'inspirationFiles')}
                 />
               </label>
-              <span className="text-xs text-slate-500">
-                Možeš učitati više datoteka (preporučeno 3–5).
+              <span
+                className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+                  inspirationLimitReached
+                    ? 'bg-amber-100 text-amber-800 dark:bg-amber-300/15 dark:text-amber-200'
+                    : 'bg-violet-100 text-violet-700 dark:bg-violet-300/10 dark:text-lavender'
+                }`}
+                aria-live="polite"
+              >
+                {inspirationFiles.length} / {MAX_INSPIRATION_IMAGES} fotografija
               </span>
             </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Do {MAX_INSPIRATION_IMAGES} fotografija u JPG/JPEG ili PNG formatu, najviše{' '}
+              {maxInspirationFileSizeMiB} MiB po datoteci.
+            </p>
             {selectedInspirationFileNames.length === 0 ? (
               <p className="text-xs text-slate-400 mt-1">
                 {translations.fileUpload.noFilesSelected[language]}
@@ -1196,7 +1268,10 @@ export function InteriorsClientForm({ stolars: _stolarsUnused, onSubmit, languag
                 </ul>
               </div>
             )}
-          </label>
+            {errors.inspirationFiles ? (
+              <p className="mt-1 text-xs text-red-500">{errors.inspirationFiles}</p>
+            ) : null}
+          </div>
         </div>
 
         <div>
@@ -1258,6 +1333,16 @@ export function InteriorsClientForm({ stolars: _stolarsUnused, onSubmit, languag
 
 
       <div className="mt-6 flex flex-col items-center gap-3">
+        <p className="max-w-xl text-center text-sm leading-relaxed text-plum/75 dark:text-pearl/70">
+          Nakon pregleda dostavljenih podataka potvrdit ćemo konačnu cijenu prije
+          početka izrade.{' '}
+          <Link
+            to="/cjenici#interijeri"
+            className="font-semibold text-[--color-primary] underline-offset-2 hover:underline dark:text-lavender"
+          >
+            Pogledaj detaljan cjenik.
+          </Link>
+        </p>
         <button
           type="submit"
           disabled={isSubmitting}

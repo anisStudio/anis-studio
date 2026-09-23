@@ -4,11 +4,17 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "predev": "npm run pricing:validate",
     "dev": "vite",
-    "build": "tsc -b && vite build",
-    "build:analyze": "tsc -b && vite build --mode analyze",
+    "build": "npm run pricing:generate && npm run build:app",
+    "build:app": "tsc -b && vite build",
+    "build:analyze": "npm run pricing:generate && tsc -b && vite build --mode analyze",
     "lint": "eslint .",
     "preview": "vite preview",
+    "pricing:validate": "node scripts/generate-interiors-pricing.mjs --validate-only --allow-draft",
+    "pricing:generate": "node scripts/generate-interiors-pricing.mjs",
+    "pricing:test": "node scripts/test-interiors-pricing.mjs",
+    "form:test": "node --experimental-strip-types scripts/test-interiors-inspiration-files.mjs",
     "save": "node scripts/save.mjs"
   },
   "dependencies": {

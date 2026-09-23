@@ -30,8 +30,8 @@ const GLOBAL_FAQ_ITEMS: FAQItem[] = [
       en: 'Do you work only in Zagreb or also online / remotely?'
     },
     answer: {
-      hr: 'Radim i uživo i online, ovisno o usluzi: interijeri → kombinacija online + dolazak na prostor (kad je moguće), LRC → radionice uglavnom uživo, dio komunikacije/materijala online, web → sve se može odraditi potpuno na daljinu.',
-      en: 'I work both in person and online, depending on the service: interiors → combination of online + site visit (when possible), LRC → workshops mainly in person, part of communication/materials online, web → everything can be done completely remotely.'
+      hr: "Usluge se pružaju online ili uživo, ovisno o odjelu. Ani's Interijeri u pravilu se pružaju online na temelju mjera, fotografija i podataka koje dostavlja klijent. Prema prethodnom dogovoru moguć je dolazak radi pregleda prostora, ali takav dolazak ne predstavlja završnu izmjeru za izradu ili montažu namještaja. Završnu izmjeru i tehničku provjeru prije izrade obavlja izvođač ili stolar. LRC radionice uglavnom se održavaju uživo, uz dio komunikacije i materijala online, dok se Web Atelier može odraditi potpuno na daljinu.",
+      en: "Services are provided online or in person, depending on the department. Ani's Interiors is generally provided online based on measurements, photographs, and information supplied by the client. A site visit may be arranged in advance to review the space, but it does not constitute the final measurement for furniture production or installation. The contractor or carpenter is responsible for the final measurements and technical checks before production. LRC workshops are generally held in person, with some communication and materials provided online, while Web Atelier can be completed entirely remotely."
     }
   },
   {

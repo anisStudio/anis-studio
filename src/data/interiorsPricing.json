@@ -1,0 +1,248 @@
+{
+  "schemaVersion": 1,
+  "publicationStatus": "draft",
+  "version": null,
+  "validFrom": null,
+  "publishedAt": null,
+  "publication": {
+    "sequence": null,
+    "filename": {
+      "serviceObjectTypeToken": null
+    }
+  },
+  "regulatoryMappings": {
+    "kitchenReferencePriceTreatment": {
+      "status": "unresolved",
+      "resolutionCode": null
+    }
+  },
+  "issuer": {
+    "name": "Ani's Studio",
+    "department": "Ani's Interijeri",
+    "addressLine": "Hanibala Lucića 7",
+    "postalCode": "32270",
+    "city": "Županja",
+    "country": "Hrvatska",
+    "domain": "https://anislrc.hr",
+    "businessPremisesCode": "P1"
+  },
+  "currency": "EUR",
+  "items": [
+    {
+      "id": "interior-small-set",
+      "name": {
+        "hr": "3D idejno rješenje manjeg sklopa / pojedinačnih elemenata",
+        "en": "3D concept design for a small furniture set / individual elements"
+      },
+      "description": {
+        "hr": "Primjeri uključuju TV zid, zidnu oblogu, manji sklop namještaja i slične zahvate.",
+        "en": "Examples include a TV wall, wall cladding, a small furniture set, and similar projects."
+      },
+      "price": {
+        "type": "from",
+        "minCents": 3500
+      },
+      "basis": {
+        "code": "small-set",
+        "hr": "po manjem sklopu ili skupini pojedinačnih elemenata",
+        "en": "per small set or group of individual elements"
+      },
+      "introducedAt": null,
+      "displayOrder": 1,
+      "public": true,
+      "category": "base"
+    },
+    {
+      "id": "interior-room",
+      "name": {
+        "hr": "3D idejno rješenje prostorije",
+        "en": "3D concept design for one room"
+      },
+      "description": {
+        "hr": "Primjeri uključuju kupaonicu, dječju sobu, spavaću sobu, dnevni boravak i slične prostorije.",
+        "en": "Examples include a bathroom, children's room, bedroom, living room, and similar spaces."
+      },
+      "price": {
+        "type": "from",
+        "minCents": 4000
+      },
+      "basis": {
+        "code": "room",
+        "hr": "po prostoriji",
+        "en": "per room"
+      },
+      "introducedAt": null,
+      "displayOrder": 2,
+      "public": true,
+      "category": "base"
+    },
+    {
+      "id": "interior-kitchen",
+      "name": {
+        "hr": "3D idejno rješenje kuhinje",
+        "en": "3D kitchen concept design"
+      },
+      "description": {
+        "hr": "Dva ili tri samostalna elementa ne smatraju se kompletnom kuhinjom.",
+        "en": "Two or three standalone elements are not considered a complete kitchen."
+      },
+      "price": {
+        "type": "from",
+        "minCents": 4000
+      },
+      "basis": {
+        "code": "kitchen",
+        "hr": "po kuhinji",
+        "en": "per kitchen"
+      },
+      "calculationNotes": {
+        "hr": "Konačna cijena ovisi o broju i složenosti elemenata, rasporedu i ukupnoj zahtjevnosti projekta.",
+        "en": "The final price depends on the number and complexity of elements, the layout, and the overall project requirements."
+      },
+      "introducedAt": null,
+      "displayOrder": 3,
+      "public": true,
+      "category": "base"
+    },
+    {
+      "id": "photorealistic-visualization",
+      "name": {
+        "hr": "Fotorealistična vizualizacija odobrenog 3D modela",
+        "en": "Photorealistic visualization of an approved 3D model"
+      },
+      "description": {
+        "hr": "Uključuje do 2 kadra iste prostorije i izrađuje se nakon odobrenja konačnog 3D modela.",
+        "en": "Includes up to 2 views of the same room and is produced after the final 3D model has been approved."
+      },
+      "price": {
+        "type": "fixed",
+        "amountCents": 1500
+      },
+      "basis": {
+        "code": "approved-model-up-to-two-views",
+        "hr": "za do 2 kadra iste prostorije",
+        "en": "for up to 2 views of the same room"
+      },
+      "introducedAt": null,
+      "displayOrder": 4,
+      "public": true,
+      "category": "additional"
+    },
+    {
+      "id": "included-minor-revision",
+      "name": {
+        "hr": "Jedna manja korekcija",
+        "en": "One minor revision"
+      },
+      "description": {
+        "hr": "Jedna manja korekcija uključena je u osnovnu cijenu 3D idejnog rješenja.",
+        "en": "One minor revision is included in the base price of the 3D concept design."
+      },
+      "price": {
+        "type": "included",
+        "quantity": 1,
+        "appliesTo": [
+          "interior-small-set",
+          "interior-room",
+          "interior-kitchen"
+        ]
+      },
+      "basis": {
+        "code": "base-3d-service",
+        "hr": "uz osnovnu 3D uslugu",
+        "en": "with a base 3D service"
+      },
+      "introducedAt": null,
+      "displayOrder": 5,
+      "public": true,
+      "category": "included"
+    },
+    {
+      "id": "additional-minor-revision",
+      "name": {
+        "hr": "Dodatna manja izmjena",
+        "en": "Additional minor revision"
+      },
+      "description": {
+        "hr": "Konačan iznos ovisi o opsegu izmjene.",
+        "en": "The final amount depends on the scope of the revision."
+      },
+      "price": {
+        "type": "range",
+        "minCents": 500,
+        "maxCents": 1500
+      },
+      "basis": {
+        "code": "additional-minor-revision",
+        "hr": "po dodatnoj manjoj izmjeni",
+        "en": "per additional minor revision"
+      },
+      "introducedAt": null,
+      "displayOrder": 6,
+      "public": true,
+      "category": "additional"
+    },
+    {
+      "id": "major-revision",
+      "name": {
+        "hr": "Veća izmjena / novo idejno rješenje",
+        "en": "Major revision / new concept design"
+      },
+      "description": {
+        "hr": "Cijena se određuje prema opsegu potrebnog rada.",
+        "en": "The price is determined according to the scope of work required."
+      },
+      "price": {
+        "type": "quote"
+      },
+      "basis": {
+        "code": "scope-of-work",
+        "hr": "prema opsegu potrebnog rada",
+        "en": "according to the required scope of work"
+      },
+      "introducedAt": null,
+      "displayOrder": 7,
+      "public": true,
+      "category": "additional"
+    },
+    {
+      "id": "multi-room-package",
+      "name": {
+        "hr": "Projekt 4 ili više prostorija",
+        "en": "Project covering 4 or more rooms"
+      },
+      "description": {
+        "hr": "Popust se primjenjuje na ukupnu cijenu 3D projektiranja. Fotorealistične vizualizacije nisu dio osnovice za popust.",
+        "en": "The discount applies to the total 3D design price. Photorealistic visualizations are excluded from the discount basis."
+      },
+      "price": {
+        "type": "discount",
+        "percent": 10,
+        "minimumRooms": 4,
+        "appliesTo": [
+          "interior-room",
+          "interior-kitchen"
+        ],
+        "excludes": [
+          "photorealistic-visualization"
+        ]
+      },
+      "basis": {
+        "code": "eligible-3d-design-total",
+        "hr": "na ukupnu cijenu prihvatljivog 3D projektiranja",
+        "en": "on the total eligible 3D design price"
+      },
+      "specialSale": {
+        "applicable": true,
+        "label": {
+          "hr": "Paketni popust za projekt 4 ili više prostorija",
+          "en": "Package discount for a project covering 4 or more rooms"
+        }
+      },
+      "introducedAt": null,
+      "displayOrder": 8,
+      "public": true,
+      "category": "discount"
+    }
+  ]
+}

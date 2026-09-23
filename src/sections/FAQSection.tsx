@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { DecorativeSkyBackdrop } from '../components/DecorativeSkyBackdrop'
 
 export type FaqCategory = 'lrc' | 'interiors' | 'web' | 'global'
@@ -102,9 +103,9 @@ export const FAQ_ITEMS: FAQItem[] = [
     },
     answer: {
       hr:
-        'Nakon što pošaljete osnovne dimenzije prostora, fotografije postojećeg stanja ako ih imate i svoje ideje ili reference, izrađujemo 3D vizualni prikaz prostora. Cilj je da jasno vidite raspored elemenata, odnos proporcija i osnovnu logiku prostora prije izvedbe ili narudžbe namještaja.\n\nFotorealistični render, u kojem se detaljnije vide boje, materijali, rasvjeta i atmosfera prostora, može se izraditi dodatno ako ga želite uključiti u ponudu.',
+        'Nakon što pošaljete osnovne dimenzije prostora, fotografije postojećeg stanja ako ih imate i svoje ideje ili reference, izrađujemo 3D idejno rješenje prostora. Cilj je da jasno vidite raspored elemenata, odnos proporcija i osnovnu logiku prostora prije izvedbe ili narudžbe namještaja.\n\nFotorealistična vizualizacija nije automatski dio osnovne usluge. Može se dodatno naručiti nakon odobrenja konačnog 3D modela.',
       en:
-        'After you send basic room dimensions, photos of the existing space if you have them, and your ideas or references, we create a 3D visual presentation of the space. The goal is for you to clearly see the arrangement of elements, proportions, and basic spatial logic before execution or ordering furniture.\n\nPhotorealistic rendering, where colours, materials, lighting, and atmosphere are shown in more detail, can be produced additionally if you want it included in the quote.'
+        'After you send basic room dimensions, photos of the existing space if you have them, and your ideas or references, we create a 3D concept design of the space. The goal is for you to clearly see the arrangement of elements, proportions, and basic spatial logic before execution or ordering furniture.\n\nPhotorealistic visualization is not automatically included in the base service. It can be ordered as an add-on after the final 3D model has been approved.'
     }
   },
   {
@@ -116,9 +117,9 @@ export const FAQ_ITEMS: FAQItem[] = [
     },
     answer: {
       hr:
-        'Osnovna isporuka ovisi o dogovorenom opsegu projekta, ali može uključivati 3D prikaz prostora, prikaz rasporeda elemenata i vizualnu prezentaciju idejnog rješenja. Takav prikaz pomaže vam da bolje razumijete prostor prije nego krenete u izvedbu ili narudžbu.\n\nFotorealistične renderirane slike nisu automatski uključene u svaki projekt, nego se dogovaraju posebno ako želite detaljniji prikaz boja, materijala, rasvjete i završnog izgleda prostora.',
+        'Osnovna usluga uključuje 3D model prema zahtjevima klijenta, prikaz zatvorenih i otvorenih fronti kada je primjenjivo, kotirani idejni prikaz, tlocrt, nacrt i jednu manju korekciju.\n\nSvi nacrti, kote i prikazi su idejni. Nisu izvedbeni ili radionički nacrti ni proizvodna dokumentacija. Fotorealistična vizualizacija dogovara se kao zasebna dodatna usluga.',
       en:
-        'The basic deliverable depends on the agreed project scope, but it may include a 3D presentation of the space, a view of how elements are arranged, and a visual presentation of the proposed solution. Such a presentation helps you understand the space better before you move into execution or placing orders.\n\nPhotorealistic rendered images are not automatically included in every project; they are agreed separately if you want a more detailed view of colours, materials, lighting, and the finished look of the space.'
+        'The base service includes a 3D model based on the client’s requirements, closed and open front views where applicable, a dimensioned concept view, a floor plan, an elevation drawing, and one minor revision.\n\nAll drawings, dimensions, and visuals are conceptual. They are not construction drawings, workshop drawings, or production documentation. Photorealistic visualization is agreed as a separate add-on.'
     }
   },
   {
@@ -158,9 +159,9 @@ export const FAQ_ITEMS: FAQItem[] = [
     },
     answer: {
       hr:
-        'Da, u projekt je uključen jedan krug manjih korekcija, poput promjene boje, materijala, detalja ili manjih prilagodbi rasporeda.\n\nVeće promjene koncepta, potpuno novi smjer dizajna, dodatni pogledi ili dodatni fotorealistični renderi dogovaraju se posebno. Zato je najbolje na početku poslati što više jasnih referenci i želja.',
+        'Jedna manja korekcija, poput promjene boje, materijala, detalja ili manje prilagodbe rasporeda, uključena je u osnovnu cijenu.\n\nDodatne manje izmjene mogu se naplatiti prema opsegu, dok se veća izmjena ili potpuno novo idejno rješenje dogovaraju zasebno.',
       en:
-        'Yes — one round of smaller revisions is included in the project, such as changes to colour, materials, details, or small layout adjustments.\n\nMajor concept changes, an entirely new design direction, extra views, or additional photorealistic renders are agreed separately. That is why it is best to send as many clear references and wishes as possible at the start.'
+        'One minor revision, such as a colour, material, detail, or small layout adjustment, is included in the base price.\n\nAdditional minor revisions may be charged according to their scope, while a major revision or an entirely new concept design is agreed separately.'
     }
   },
   {
@@ -172,9 +173,9 @@ export const FAQ_ITEMS: FAQItem[] = [
     },
     answer: {
       hr:
-        'Cijena se formira prema opsegu projekta: veličini i složenosti prostora, broju prostorija, razini detalja, broju potrebnih prikaza i tome želite li osnovnu 3D vizualizaciju ili dodatne fotorealistične rendere.\n\nZato se cijena ne navodi unaprijed kao fiksna za svaki projekt. Nakon što pošaljete upit i osnovne informacije, dobivate pisanu ponudu bez obveze. Točnu cijenu uvijek potvrđujemo prije početka rada.',
+        'Početne cijene daju okvir, a konačna cijena ovisi o opsegu projekta, broju i složenosti elemenata, složenosti rasporeda i ukupnoj zahtjevnosti rješenja.\n\nNakon pregleda upita dobivate ponudu, a konačnu cijenu potvrđujemo prije početka izrade. Aktualne iznose možete provjeriti na stranici Cjenici.',
       en:
-        'The price is formed according to project scope: the size and complexity of the space, the number of rooms, the level of detail, how many views are needed, and whether you want basic 3D visualization or additional photorealistic renders.\n\nThat is why we do not quote a single fixed price upfront for every project. After you submit an inquiry and basic information, you receive a written, no-obligation quote. We always confirm the exact price before work begins.'
+        'Starting prices provide a clear framework, while the final price depends on project scope, the number and complexity of elements, layout complexity, and the overall complexity of the solution.\n\nYou receive a quote after we review your inquiry, and the final price is confirmed before work begins. Current amounts are available on the Price lists page.'
     }
   },
   {
@@ -186,9 +187,9 @@ export const FAQ_ITEMS: FAQItem[] = [
     },
     answer: {
       hr:
-        'Usluga je prvenstveno usmjerena na 3D vizualizaciju i vizualnu prezentaciju prostora. Za privatne klijente izrađujemo prikaze koji pomažu jasnije vidjeti raspored, proporcije, izgled elemenata i opći dojam prostora prije izvedbe ili narudžbe namještaja.\n\nTehnička dokumentacija za izvedbu nije dio standardne usluge za privatne klijente. Izrađuje se samo u dogovoru i suradnji sa stolarima, salonima ili profesionalcima koji proizvode namještaj, kada je potrebna prilagodba elemenata, kotiranje i tehnička priprema prema njihovim zahtjevima.',
+        "Usluga za privatne klijente usmjerena je na 3D idejno rješenje i vizualnu prezentaciju prostora. Kotirani prikaz, tlocrt i nacrt pomažu razumjeti ideju, ali nisu izvedbeni ili radionički nacrti ni proizvodna dokumentacija.\n\nAni's Studio radi prema mjerama i podacima koje dostavlja klijent i ne obavlja izmjeru na lokaciji. Prije proizvodnje ili izvedbe izvođač odnosno stolar mora napraviti vlastitu izmjeru, provjeriti dimenzije i potvrditi tehničku izvedivost.",
       en:
-        'The service is primarily focused on 3D visualization and visual presentation of spaces. For private clients, we create visuals that help them clearly understand the layout, proportions, element design, and overall impression of the space before execution or furniture ordering.\n\nTechnical documentation for execution is not part of the standard private-client service. It can be prepared only by agreement and in collaboration with carpenters, showrooms, or professionals who produce furniture, when element adaptation, dimensioning, and technical preparation are needed according to their requirements.'
+        "The private-client service focuses on a 3D concept design and visual presentation of the space. The dimensioned view, floor plan, and elevation help explain the idea, but they are not construction drawings, workshop drawings, or production documentation.\n\nAni's Studio works from measurements and information supplied by the client and does not perform on-site measurements. Before production or installation, the contractor or carpenter must take their own measurements, verify all dimensions, and confirm technical feasibility."
     }
   },
   {
@@ -243,6 +244,7 @@ export default function FAQSection({
   const displayItems = items || (categories 
     ? FAQ_ITEMS.filter(item => categories.includes(item.category))
     : FAQ_ITEMS)
+  const showInteriorsPricingLink = categories?.includes('interiors') ?? false
 
   const toggleItem = (id: number) => {
     setOpenItems(prev =>
@@ -364,6 +366,16 @@ export default function FAQSection({
             )
           }))}
         </div>
+        {showInteriorsPricingLink ? (
+          <div className="mt-7 flex justify-center sm:mt-8">
+            <Link
+              to="/cjenici#interijeri"
+              className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-amethyst/25 bg-white/65 px-5 py-2.5 text-sm font-semibold text-plum/88 shadow-sm transition hover:border-[--color-primary]/45 hover:bg-white/85 dark:border-lavender/25 dark:bg-white/[0.08] dark:text-pearl dark:hover:bg-white/[0.12]"
+            >
+              {language === 'hr' ? 'Pogledaj detaljan cjenik' : 'View detailed pricing'}
+            </Link>
+          </div>
+        ) : null}
       </div>
     </section>
   )

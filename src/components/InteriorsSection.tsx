@@ -162,7 +162,10 @@ export default function InteriorsSection({ language }: InteriorsSectionProps) {
     },
     step6: {
       title: { hr: "Primite prikaz", en: "Receive visualization" },
-      desc: { hr: "Nakon plaćanja, šaljemo Vam realistični 3D prikaz i rendane fotografije", en: "After payment, we send you realistic 3D visualization and rendered photographs" }
+      desc: {
+        hr: "Nakon potvrde ponude i izrade primate dogovoreno 3D idejno rješenje. Fotorealistična vizualizacija dostupna je kao dodatna opcija nakon odobrenja modela.",
+        en: "After the quote is confirmed and the work is completed, you receive the agreed 3D concept design. Photorealistic visualization is available as an add-on after the model is approved."
+      }
     }
   }
 

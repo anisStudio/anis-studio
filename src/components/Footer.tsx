@@ -49,6 +49,12 @@ export default function Footer({ language = 'hr' }: FooterProps) {
             >
               {language === 'hr' ? 'Politika privatnosti' : 'Privacy Policy'}
             </Link>
+            <Link
+              to="/cjenici"
+              className="text-xs text-plum/55 underline-offset-2 hover:text-[--color-primary] hover:underline dark:text-pearl/45 dark:hover:text-lavender transition-colors"
+            >
+              {language === 'hr' ? 'Cjenici' : 'Price lists'}
+            </Link>
           </div>
           
           {hasFooterSocialIcons && (
