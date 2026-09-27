@@ -1337,7 +1337,7 @@ export function InteriorsClientForm({ stolars: _stolarsUnused, onSubmit, languag
           Nakon pregleda dostavljenih podataka potvrdit ćemo konačnu cijenu prije
           početka izrade.{' '}
           <Link
-            to="/cjenici#interijeri"
+            to="/cjenici/interijeri"
             className="font-semibold text-[--color-primary] underline-offset-2 hover:underline dark:text-lavender"
           >
             Pogledaj detaljan cjenik.

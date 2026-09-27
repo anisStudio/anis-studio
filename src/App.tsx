@@ -29,6 +29,7 @@ const AboutPage = lazy(() => import('./pages/AboutPage'))
 const ContactPage = lazy(() => import('./pages/ContactPage'))
 const FAQPage = lazy(() => import('./pages/FAQPage'))
 const CjeniciPage = lazy(() => import('./pages/CjeniciPage'))
+const CjeniciInterijeriPage = lazy(() => import('./pages/CjeniciInterijeriPage'))
 const PublicProjectVrPage = lazy(() => import('./pages/PublicProjectVrPage'))
 
 const AdminLoginPage = lazy(() => import('./pages/AdminLoginPage'))
@@ -126,6 +127,10 @@ function AnimatedRoutes({
             <Route path="/o-nama" element={<AboutPage language={language} />} />
             <Route path="/kontakt" element={<ContactPage language={language} />} />
             <Route path="/faq" element={<FAQPage language={language} />} />
+            <Route
+              path="/cjenici/interijeri"
+              element={<CjeniciInterijeriPage language={language} />}
+            />
             <Route path="/cjenici" element={<CjeniciPage language={language} />} />
             <Route path="/vr/:projectId" element={<PublicProjectVrPage />} />
             <Route

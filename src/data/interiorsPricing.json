@@ -31,8 +31,8 @@
     {
       "id": "interior-small-set",
       "name": {
-        "hr": "3D idejno rješenje manjeg sklopa / pojedinačnih elemenata",
-        "en": "3D concept design for a small furniture set / individual elements"
+        "hr": "3D idejno rješenje manjeg sklopa",
+        "en": "3D concept design for a smaller furniture set"
       },
       "description": {
         "hr": "Primjeri uključuju TV zid, zidnu oblogu, manji sklop namještaja i slične zahvate.",
@@ -44,10 +44,14 @@
       },
       "basis": {
         "code": "small-set",
-        "hr": "po manjem sklopu ili skupini pojedinačnih elemenata",
-        "en": "per small set or group of individual elements"
+        "hr": "po manjem sklopu",
+        "en": "per smaller set"
       },
-      "introducedAt": null,
+      "calculationNotes": {
+        "hr": "Početna cijena odnosi se na jednostavnije rješenje standardnog opsega. Dodatni opseg modeliranja obračunava se kroz dodatak za dodatnu složenost.",
+        "en": "The starting price applies to a simpler solution within a standard scope. Additional modelling scope is billed through the additional-complexity add-on."
+      },
+      "introducedAt": "2026-09-10",
       "displayOrder": 1,
       "public": true,
       "category": "base"
@@ -71,7 +75,11 @@
         "hr": "po prostoriji",
         "en": "per room"
       },
-      "introducedAt": null,
+      "calculationNotes": {
+        "hr": "Početna cijena odnosi se na jednostavnije rješenje standardnog opsega. Dodatni opseg modeliranja obračunava se kroz dodatak za dodatnu složenost.",
+        "en": "The starting price applies to a simpler solution within a standard scope. Additional modelling scope is billed through the additional-complexity add-on."
+      },
+      "introducedAt": "2026-09-10",
       "displayOrder": 2,
       "public": true,
       "category": "base"
@@ -83,8 +91,8 @@
         "en": "3D kitchen concept design"
       },
       "description": {
-        "hr": "Dva ili tri samostalna elementa ne smatraju se kompletnom kuhinjom.",
-        "en": "Two or three standalone elements are not considered a complete kitchen."
+        "hr": "Početna cijena odnosi se na jednostavniju kuhinju standardnog opsega — primjerice nekoliko donjih i nekoliko gornjih elemenata uz osnovnu logiku rasporeda. Dva ili tri samostalna elementa ne smatraju se kompletnom kuhinjom.",
+        "en": "The starting price applies to a simpler kitchen within a standard scope — for example several base and several wall units with a straightforward layout. Two or three standalone elements are not considered a complete kitchen."
       },
       "price": {
         "type": "from",
@@ -96,10 +104,10 @@
         "en": "per kitchen"
       },
       "calculationNotes": {
-        "hr": "Konačna cijena ovisi o broju i složenosti elemenata, rasporedu i ukupnoj zahtjevnosti projekta.",
-        "en": "The final price depends on the number and complexity of elements, the layout, and the overall project requirements."
+        "hr": "Dodatnu složenost mogu stvarati dodatni elementi, složenija unutarnja organizacija, skrivene ladice, posebna rješenja kutova, maske i drugi zahtjevi koji traže više modeliranja. Količina obračunskih jedinica ovisi o stvarnom dodatnom opsegu — nije povezana rigidno s brojem pojedinačnih elemenata.",
+        "en": "Additional complexity may come from extra elements, more complex internal organisation, hidden drawers, special corner solutions, panels, and other work that requires more modelling. The number of billing units depends on the actual additional scope — it is not tied rigidly to a count of individual elements."
       },
-      "introducedAt": null,
+      "introducedAt": "2026-09-10",
       "displayOrder": 3,
       "public": true,
       "category": "base"
@@ -107,12 +115,12 @@
     {
       "id": "photorealistic-visualization",
       "name": {
-        "hr": "Fotorealistična vizualizacija odobrenog 3D modela",
-        "en": "Photorealistic visualization of an approved 3D model"
+        "hr": "Fotorealistična vizualizacija interijera",
+        "en": "Photorealistic interior visualization"
       },
       "description": {
-        "hr": "Uključuje do 2 kadra iste prostorije i izrađuje se nakon odobrenja konačnog 3D modela.",
-        "en": "Includes up to 2 views of the same room and is produced after the final 3D model has been approved."
+        "hr": "Dodatna usluga uz odobreno 3D idejno rješenje. Uključuje do 2 kadra iste prostorije i izrađuje se nakon odobrenja konačnog 3D modela.",
+        "en": "An add-on to an approved 3D concept design. Includes up to 2 views of the same room and is produced after the final 3D model has been approved."
       },
       "price": {
         "type": "fixed",
@@ -123,8 +131,37 @@
         "hr": "za do 2 kadra iste prostorije",
         "en": "for up to 2 views of the same room"
       },
-      "introducedAt": null,
+      "introducedAt": "2026-09-10",
       "displayOrder": 4,
+      "public": true,
+      "category": "additional"
+    },
+    {
+      "id": "additional-3d-complexity",
+      "name": {
+        "hr": "Dodatna složenost 3D idejnog rješenja",
+        "en": "Additional complexity for a 3D concept design"
+      },
+      "description": {
+        "hr": "Dodatak osnovnoj 3D usluzi, a ne samostalno idejno rješenje. Obračunska jedinica predstavlja dodatni opseg modeliranja i projektiranja iznad standardnog opsega osnovne usluge.",
+        "en": "An add-on to a base 3D service, not a standalone concept design. Each billing unit represents additional modelling and design scope beyond the standard scope of the base service."
+      },
+      "price": {
+        "type": "unit",
+        "amountCents": 1000,
+        "appliesTo": [
+          "interior-small-set",
+          "interior-room",
+          "interior-kitchen"
+        ]
+      },
+      "basis": {
+        "code": "billing-unit",
+        "hr": "po obračunskoj jedinici",
+        "en": "per billing unit"
+      },
+      "introducedAt": "2026-09-10",
+      "displayOrder": 5,
       "public": true,
       "category": "additional"
     },
@@ -152,35 +189,10 @@
         "hr": "uz osnovnu 3D uslugu",
         "en": "with a base 3D service"
       },
-      "introducedAt": null,
-      "displayOrder": 5,
-      "public": true,
-      "category": "included"
-    },
-    {
-      "id": "additional-minor-revision",
-      "name": {
-        "hr": "Dodatna manja izmjena",
-        "en": "Additional minor revision"
-      },
-      "description": {
-        "hr": "Konačan iznos ovisi o opsegu izmjene.",
-        "en": "The final amount depends on the scope of the revision."
-      },
-      "price": {
-        "type": "range",
-        "minCents": 500,
-        "maxCents": 1500
-      },
-      "basis": {
-        "code": "additional-minor-revision",
-        "hr": "po dodatnoj manjoj izmjeni",
-        "en": "per additional minor revision"
-      },
-      "introducedAt": null,
+      "introducedAt": "2026-09-10",
       "displayOrder": 6,
       "public": true,
-      "category": "additional"
+      "category": "included"
     },
     {
       "id": "major-revision",
@@ -189,18 +201,18 @@
         "en": "Major revision / new concept design"
       },
       "description": {
-        "hr": "Cijena se određuje prema opsegu potrebnog rada.",
-        "en": "The price is determined according to the scope of work required."
+        "hr": "Primjenjuje se kada je potrebno bitno drugačije rješenje ili značajna promjena prethodno odobrenog koncepta. Cijena se određuje prema opsegu potrebnog rada.",
+        "en": "Applies when a substantially different solution or a significant change to a previously approved concept is required. The price is determined according to the scope of work required."
       },
       "price": {
         "type": "quote"
       },
       "basis": {
         "code": "scope-of-work",
-        "hr": "prema opsegu potrebnog rada",
-        "en": "according to the required scope of work"
+        "hr": "prema opsegu / prema ponudi",
+        "en": "based on scope / by quote"
       },
-      "introducedAt": null,
+      "introducedAt": "2026-09-10",
       "displayOrder": 7,
       "public": true,
       "category": "additional"
@@ -239,7 +251,8 @@
           "en": "Package discount for a project covering 4 or more rooms"
         }
       },
-      "introducedAt": null,
+      "introducedAt": "2026-10-01",
+      "validFrom": "2026-10-01",
       "displayOrder": 8,
       "public": true,
       "category": "discount"

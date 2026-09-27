@@ -142,7 +142,10 @@ const byId = new Map(rows.map((row) => [column(row, 'item_id'), row]))
 
 assert.equal(column(byId.get('interior-small-set'), 'price_display_hr'), 'od 35.00 EUR')
 assert.equal(column(byId.get('photorealistic-visualization'), 'price_display_hr'), '15.00 EUR')
-assert.equal(column(byId.get('additional-minor-revision'), 'price_display_hr'), '5.00–15.00 EUR')
+assert.equal(
+  column(byId.get('additional-3d-complexity'), 'price_display_hr'),
+  '10.00 EUR / obračunska jedinica',
+)
 assert.equal(column(byId.get('major-revision'), 'price_display_hr'), 'prema opsegu')
 assert.equal(
   column(byId.get('included-minor-revision'), 'price_display_hr'),
@@ -190,18 +193,24 @@ expectFailure(
   /amountCents mora biti pozitivan integer/,
 )
 
-const zeroRangeMinFixture = publicReadyFixture()
+const rangeFixture = publicReadyFixture()
+const complexityItem = rangeFixture.items.find(
+  (item) => item.id === 'additional-3d-complexity',
+)
+complexityItem.price = { type: 'range', minCents: 500, maxCents: 1500 }
+
+const zeroRangeMinFixture = structuredClone(rangeFixture)
 zeroRangeMinFixture.items.find(
-  (item) => item.id === 'additional-minor-revision',
+  (item) => item.id === 'additional-3d-complexity',
 ).price.minCents = 0
 expectFailure(
   () => validatePricingDocument(zeroRangeMinFixture),
   /minCents mora biti pozitivan integer/,
 )
 
-const zeroRangeMaxFixture = publicReadyFixture()
+const zeroRangeMaxFixture = structuredClone(rangeFixture)
 zeroRangeMaxFixture.items.find(
-  (item) => item.id === 'additional-minor-revision',
+  (item) => item.id === 'additional-3d-complexity',
 ).price.maxCents = 0
 expectFailure(
   () => validatePricingDocument(zeroRangeMaxFixture),
@@ -217,12 +226,19 @@ expectFailure(
   /amountCents mora biti pozitivan integer/,
 )
 
-const badRangeFixture = publicReadyFixture()
-badRangeFixture.items.find((item) => item.id === 'additional-minor-revision').price.minCents =
+const badRangeFixture = structuredClone(rangeFixture)
+badRangeFixture.items.find((item) => item.id === 'additional-3d-complexity').price.minCents =
   2000
 expectFailure(
   () => validatePricingDocument(badRangeFixture),
   /minCents ne smije biti veći/,
+)
+
+const zeroUnitFixture = publicReadyFixture()
+zeroUnitFixture.items.find((item) => item.id === 'additional-3d-complexity').price.amountCents = 0
+expectFailure(
+  () => validatePricingDocument(zeroUnitFixture),
+  /amountCents mora biti pozitivan integer/,
 )
 
 const validNonMonetaryFixture = publicReadyFixture()

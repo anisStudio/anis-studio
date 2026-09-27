@@ -17,7 +17,7 @@ const EXPECTED_PRICING_ITEM_IDS = new Set([
   'interior-kitchen',
   'photorealistic-visualization',
   'included-minor-revision',
-  'additional-minor-revision',
+  'additional-3d-complexity',
   'major-revision',
   'multi-room-package',
 ])
@@ -197,6 +197,11 @@ function validatePrice(price, itemId, knownIds) {
       rejectUnexpectedKeys(price, ['type', 'amountCents'], field)
       requirePositiveIntegerCents(price.amountCents, `${field}.amountCents`)
       break
+    case 'unit':
+      rejectUnexpectedKeys(price, ['type', 'amountCents', 'appliesTo'], field)
+      requirePositiveIntegerCents(price.amountCents, `${field}.amountCents`)
+      validateIdReferences(price.appliesTo, `${field}.appliesTo`, knownIds)
+      break
     case 'range':
       rejectUnexpectedKeys(price, ['type', 'minCents', 'maxCents'], field)
       requirePositiveIntegerCents(price.minCents, `${field}.minCents`)
@@ -350,6 +355,15 @@ export function validatePricingDocument(
     if (item.introducedAt !== null) {
       validateCalendarDate(item.introducedAt, `${item.id}.introducedAt`)
     }
+    if (item.validFrom !== undefined && item.validFrom !== null) {
+      validateCalendarDate(item.validFrom, `${item.id}.validFrom`)
+      if (
+        item.introducedAt !== null &&
+        item.introducedAt > item.validFrom
+      ) {
+        fail(`${item.id}.introducedAt ne smije biti nakon validFrom.`)
+      }
+    }
     const archivedDate = archivedIntroductions.get(item.id)
     if (archivedDate && item.introducedAt !== archivedDate) {
       fail(
@@ -423,6 +437,12 @@ function priceColumns(item) {
       return { ...blank, price_from: centsToCsv(item.price.minCents) }
     case 'fixed':
       return { ...blank, price_fixed: centsToCsv(item.price.amountCents) }
+    case 'unit':
+      return {
+        ...blank,
+        price_fixed: centsToCsv(item.price.amountCents),
+        applies_to: item.price.appliesTo.join(';'),
+      }
     case 'range':
       return {
         ...blank,
@@ -454,6 +474,8 @@ function displayPriceHr(item) {
       return `od ${centsToCsv(item.price.minCents)} EUR`
     case 'fixed':
       return `${centsToCsv(item.price.amountCents)} EUR`
+    case 'unit':
+      return `${centsToCsv(item.price.amountCents)} EUR / obračunska jedinica`
     case 'range':
       return `${centsToCsv(item.price.minCents)}–${centsToCsv(item.price.maxCents)} EUR`
     case 'quote':
@@ -547,7 +569,7 @@ export function renderPricingCsv(document) {
       description_en: item.description?.en ?? '',
       internal_row_kind: internalRowKind(item),
       internal_price_type: item.price.type,
-      currency: ['from', 'fixed', 'range'].includes(item.price.type)
+      currency: ['from', 'fixed', 'range', 'unit'].includes(item.price.type)
         ? document.currency
         : '',
       ...price,

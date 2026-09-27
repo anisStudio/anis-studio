@@ -1,4 +1,5 @@
 import pricingSource from '../data/interiorsPricing.json'
+import { getWebVisiblePricingItemsForDate } from './interiorsPricingWeb'
 
 export type PricingLanguage = 'hr' | 'en'
 export type PricingCategory = 'base' | 'additional' | 'included' | 'discount'
@@ -6,6 +7,7 @@ export type PricingCategory = 'base' | 'additional' | 'included' | 'discount'
 export type InteriorsPrice =
   | { type: 'from'; minCents: number }
   | { type: 'fixed'; amountCents: number }
+  | { type: 'unit'; amountCents: number; appliesTo: string[] }
   | { type: 'range'; minCents: number; maxCents: number }
   | { type: 'quote' }
   | {
@@ -30,6 +32,8 @@ export interface InteriorsPricingItem {
   basis: LocalizedText & { code: string }
   calculationNotes?: LocalizedText
   introducedAt: string | null
+  /** First calendar day (Europe/Zagreb) the item may appear on the web price list. */
+  validFrom?: string | null
   displayOrder: number
   public: boolean
   category: PricingCategory
@@ -96,6 +100,22 @@ function parsePricingDocument(value: unknown): InteriorsPricingDocument {
 
 export const interiorsPricing = parsePricingDocument(pricingSource)
 
+/**
+ * Regulatory CSV channel (`publicationStatus` on the document root) is separate from web presentation.
+ * Parra Cjenici are the official regulatory channel while this JSON feeds the human-readable `/cjenici/interijeri` page.
+ */
+export const isOwnRegulatoryCsvPublicationReady =
+  interiorsPricing.publicationStatus === 'public-ready'
+
+export { isInteriorsItemWebVisible } from './interiorsPricingWeb'
+
+export function getWebVisibleInteriorsPricingItems(
+  referenceDate: Date = new Date(),
+): InteriorsPricingItem[] {
+  return getWebVisiblePricingItemsForDate(interiorsPricing.items, referenceDate)
+}
+
+/** All items marked `public` in source data (ignores web `validFrom` scheduling). */
 export const publicInteriorsPricingItems = interiorsPricing.items
   .filter((item) => item.public)
   .sort((a, b) => a.displayOrder - b.displayOrder)
@@ -132,6 +152,10 @@ export function formatInteriorsPrice(
         : `from ${formatEurFromCents(price.minCents, language)}`
     case 'fixed':
       return formatEurFromCents(price.amountCents, language)
+    case 'unit':
+      return language === 'hr'
+        ? `${formatEurFromCents(price.amountCents, language)} / obračunska jedinica`
+        : `${formatEurFromCents(price.amountCents, language)} / billing unit`
     case 'range': {
       const min = formatDecimalFromCents(price.minCents, language)
       const max = formatDecimalFromCents(price.maxCents, language)
@@ -156,3 +180,5 @@ export function formatInteriorsPriceById(
 ): string {
   return formatInteriorsPrice(getInteriorsPricingItem(id).price, language)
 }
+
+export { getZagrebCalendarDate } from './interiorsPricingWeb'

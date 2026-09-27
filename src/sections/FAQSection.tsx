@@ -159,9 +159,9 @@ export const FAQ_ITEMS: FAQItem[] = [
     },
     answer: {
       hr:
-        'Jedna manja korekcija, poput promjene boje, materijala, detalja ili manje prilagodbe rasporeda, uključena je u osnovnu cijenu.\n\nDodatne manje izmjene mogu se naplatiti prema opsegu, dok se veća izmjena ili potpuno novo idejno rješenje dogovaraju zasebno.',
+        'Jedna manja korekcija, poput promjene boje, materijala, detalja ili manje prilagodbe rasporeda, uključena je u osnovnu cijenu.\n\nDodatni rad iznad uključenog opsega modeliranja obračunava se kroz dodatak za dodatnu složenost 3D idejnog rješenja (obračunska jedinica). Veća izmjena ili potpuno novo idejno rješenje dogovaraju se prema opsegu / prema ponudi.',
       en:
-        'One minor revision, such as a colour, material, detail, or small layout adjustment, is included in the base price.\n\nAdditional minor revisions may be charged according to their scope, while a major revision or an entirely new concept design is agreed separately.'
+        'One minor revision, such as a colour, material, detail, or small layout adjustment, is included in the base price.\n\nAdditional work beyond the included modelling scope is billed through the additional-complexity add-on for a 3D concept design (billing unit). A major revision or an entirely new concept design is agreed based on scope / by quote.'
     }
   },
   {
@@ -173,9 +173,9 @@ export const FAQ_ITEMS: FAQItem[] = [
     },
     answer: {
       hr:
-        'Početne cijene daju okvir, a konačna cijena ovisi o opsegu projekta, broju i složenosti elemenata, složenosti rasporeda i ukupnoj zahtjevnosti rješenja.\n\nNakon pregleda upita dobivate ponudu, a konačnu cijenu potvrđujemo prije početka izrade. Aktualne iznose možete provjeriti na stranici Cjenici.',
+        'Početne cijene odnose se na jednostavnije rješenje standardnog opsega. Konačna cijena ovisi o stvarnom opsegu modeliranja, broju i složenosti elemenata te dodatnoj složenosti iznad osnovnog opsega.\n\nNakon pregleda upita dobivate ponudu, a konačnu cijenu potvrđujemo prije početka izrade. Aktualne iznose možete provjeriti na stranici Cjenici.',
       en:
-        'Starting prices provide a clear framework, while the final price depends on project scope, the number and complexity of elements, layout complexity, and the overall complexity of the solution.\n\nYou receive a quote after we review your inquiry, and the final price is confirmed before work begins. Current amounts are available on the Price lists page.'
+        'Starting prices apply to a simpler solution within a standard scope. The final price depends on the actual modelling scope, the number and complexity of elements, and any additional complexity beyond the base scope.\n\nYou receive a quote after we review your inquiry, and the final price is confirmed before work begins. Current amounts are available on the Price lists page.'
     }
   },
   {
@@ -369,7 +369,7 @@ export default function FAQSection({
         {showInteriorsPricingLink ? (
           <div className="mt-7 flex justify-center sm:mt-8">
             <Link
-              to="/cjenici#interijeri"
+              to="/cjenici/interijeri"
               className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-amethyst/25 bg-white/65 px-5 py-2.5 text-sm font-semibold text-plum/88 shadow-sm transition hover:border-[--color-primary]/45 hover:bg-white/85 dark:border-lavender/25 dark:bg-white/[0.08] dark:text-pearl dark:hover:bg-white/[0.12]"
             >
               {language === 'hr' ? 'Pogledaj detaljan cjenik' : 'View detailed pricing'}

@@ -26,6 +26,12 @@
   </url>
 
   <url>
+    <loc>https://anislrc.hr/cjenici/interijeri</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
     <loc>https://anislrc.hr/o-nama</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
