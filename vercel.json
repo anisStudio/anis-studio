@@ -1,3 +1,10 @@
 {
+  "redirects": [
+    {
+      "source": "/sluzbeni-cjenik",
+      "destination": "https://cjenici.parra.hr/javno/ani-s-studio",
+      "permanent": true
+    }
+  ],
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
