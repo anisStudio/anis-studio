@@ -10,7 +10,7 @@ export default function AdminLoginPage() {
   const [error, setError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const { login, isAdmin, loading } = useAdminAuth()
+  const { login, isAdmin, loading, user } = useAdminAuth()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -46,6 +46,9 @@ export default function AdminLoginPage() {
   }
 
   const canSubmit = email.trim().length > 0 && password.length > 0
+  const visibleError =
+    error ??
+    (user && !isAdmin ? 'Ovaj račun nema pristup admin panelu.' : null)
 
   return (
     <div className="admin-scope min-h-screen bg-slate-50 px-4 py-8">
@@ -117,13 +120,13 @@ export default function AdminLoginPage() {
                 </div>
               </div>
 
-              {error && (
+              {visibleError && (
                 <div
                   role="alert"
                   className="rounded-lg border-2 border-red-600 bg-red-100 px-4 py-3 shadow-sm dark:border-red-500 dark:bg-red-950 dark:outline dark:outline-1 dark:outline-red-700"
                 >
                   <p className="text-sm font-semibold leading-relaxed text-red-950 dark:text-red-50">
-                    {error}
+                    {visibleError}
                   </p>
                 </div>
               )}
