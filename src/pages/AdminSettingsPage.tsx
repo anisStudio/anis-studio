@@ -1,8 +1,5 @@
 import { useState, useEffect } from 'react'
 import { useSettings } from '../hooks/useSettings'
-import { supabase, isSupabaseConfigured } from '../lib/supabase'
-
-const TEMP_ADMIN_EMAIL_TARGET = 'info.anistudio@gmail.com'
 
 type VisibilityKey =
   | 'interiors_public_visible'
@@ -29,12 +26,6 @@ export default function AdminSettingsPage() {
   const [localLrcPublicVisible, setLocalLrcPublicVisible] = useState(false)
   const [localWebAtelierVisible, setLocalWebAtelierVisible] = useState(false)
   const [localVrEnabled, setLocalVrEnabled] = useState(false)
-  // TEMPORARY: one-time Secure Email Change helper — remove after confirmation.
-  const [isEmailChangePending, setIsEmailChangePending] = useState(false)
-  const [emailChangeSuccess, setEmailChangeSuccess] = useState<string | null>(
-    null
-  )
-  const [emailChangeError, setEmailChangeError] = useState<string | null>(null)
 
   // Sync localEnabled with settings when settings change
   useEffect(() => {
@@ -158,40 +149,6 @@ export default function AdminSettingsPage() {
     } finally {
       setIsVisibilityToggling(false)
     }
-  }
-
-  const handleTemporaryAdminEmailChange = async () => {
-    if (isEmailChangePending) return
-
-    setIsEmailChangePending(true)
-    setEmailChangeSuccess(null)
-    setEmailChangeError(null)
-
-    if (!supabase || !isSupabaseConfigured) {
-      setEmailChangeError(
-        'Supabase nije konfiguriran. Promjena e-pošte nije moguća.'
-      )
-      setIsEmailChangePending(false)
-      return
-    }
-
-    const { error } = await supabase.auth.updateUser({
-      email: TEMP_ADMIN_EMAIL_TARGET,
-    })
-
-    if (error) {
-      console.error('[AdminSettings] updateUser email change failed:', error.message)
-      setEmailChangeError(
-        'Zahtjev za promjenu e-pošte nije uspio. Provjerite je li sesija aktivna i pokušajte ponovno.'
-      )
-      setIsEmailChangePending(false)
-      return
-    }
-
-    setEmailChangeSuccess(
-      `Zahtjev je poslan. Potvrdite promjenu prema Supabase Secure Email Change: otvorite poruke na trenutnoj i novoj adresi (${TEMP_ADMIN_EMAIL_TARGET}) i dovršite obje potvrde.`
-    )
-    setIsEmailChangePending(false)
   }
 
   const visibilityToggleButton = (
@@ -461,54 +418,6 @@ export default function AdminSettingsPage() {
                       </p>
                     </div>
                   )}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* TEMPORARY: one-time authenticated email change helper */}
-          <div className="mt-6 rounded-xl bg-white shadow-sm">
-            <div className="border-b px-6 py-4">
-              <h2 className="text-lg font-semibold text-slate-900">
-                Privremena promjena admin e-pošte
-              </h2>
-              <p className="mt-1 text-sm text-slate-700">
-                Jednokratni pomoćni alat. Pokreće normalni autentificirani
-                Supabase Auth zahtjev za promjenu e-pošte trenutnog
-                administratora na {TEMP_ADMIN_EMAIL_TARGET}. UUID korisnika se
-                ne mijenja.
-              </p>
-            </div>
-
-            <div className="px-6 py-6 space-y-4">
-              <button
-                type="button"
-                onClick={handleTemporaryAdminEmailChange}
-                disabled={isEmailChangePending}
-                className="w-full px-4 py-2.5 text-sm font-semibold text-white rounded-lg transition-all duration-200 hover:scale-105 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-                style={{
-                  background: 'linear-gradient(135deg, #BDA6FF 0%, #6E44FF 100%)',
-                  boxShadow: '0 2px 8px rgba(110, 68, 255, 0.3)',
-                }}
-              >
-                {isEmailChangePending
-                  ? 'Slanje zahtjeva...'
-                  : `Promijeni admin email na ${TEMP_ADMIN_EMAIL_TARGET}`}
-              </button>
-
-              {emailChangeSuccess && (
-                <div className="rounded-lg border border-green-200 bg-green-50 p-3">
-                  <p className="text-sm font-medium text-green-950">
-                    {emailChangeSuccess}
-                  </p>
-                </div>
-              )}
-
-              {emailChangeError && (
-                <div className="rounded-lg border border-red-200 bg-red-50 p-3">
-                  <p className="text-xs font-semibold text-red-950">
-                    {emailChangeError}
-                  </p>
                 </div>
               )}
             </div>
