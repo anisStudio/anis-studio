@@ -249,6 +249,33 @@ const NOT_CONFIGURED_ERROR =
 
 const PROJECT_FILES_BUCKET = "project-files"; // Bucket se kreira putem supabase/project_files_storage.sql
 
+// Token iz create_public_inquiry_project. Vrijedi samo u ovoj stranici i
+// samo za metadata RPC. Nije projektni SELECT.
+const publicInquiryUploadTokens = new Map<string, string>()
+
+function readCreatedInquiry(data: unknown): { projectId: string; uploadToken: string } {
+  const row = Array.isArray(data) ? data[0] : data
+  if (!row || typeof row !== 'object') {
+    throw new Error('create_public_inquiry_project nije vratio identifikator upita.')
+  }
+
+  const record = row as Record<string, unknown>
+  const projectId = record.project_id
+  const uploadToken = record.upload_token
+  if (typeof projectId !== 'string' || typeof uploadToken !== 'string') {
+    throw new Error('create_public_inquiry_project nije vratio identifikator upita.')
+  }
+
+  return { projectId, uploadToken }
+}
+
+function readCreatedFileId(data: unknown): string {
+  if (typeof data !== 'string' || data.length === 0) {
+    throw new Error('create_public_project_file nije vratio identifikator datoteke.')
+  }
+  return data
+}
+
 // ============================================
 // Helper Functions
 // ============================================
@@ -384,8 +411,9 @@ export async function fetchCarpenterById(id: string): Promise<Carpenter | null> 
 }
 
 /**
- * Creates a new project in Supabase.
- * If Supabase is not configured, returns a mock project with fake ID for development.
+ * Creates a public inquiry through create_public_inquiry_project.
+ * The database forces status inquiry and returns only the new id plus an
+ * upload token kept in memory for the following file metadata call.
  *
  * @param payload - The project data to create (without id, created_at, updated_at)
  * @returns The created project
@@ -405,18 +433,39 @@ export async function createProject(
     }
   }
 
-  const { data, error } = await supabase!
-    .from('projects')
-    .insert(payload)
-    .select('*')
-    .single()
+  const { data, error } = await supabase!.rpc('create_public_inquiry_project', {
+    p_title: payload.title,
+    p_user_type: payload.user_type,
+    p_client_id: payload.client_id,
+    p_carpenter_id: payload.carpenter_id,
+    p_uses_corpus: payload.uses_corpus,
+    p_wants_vr: payload.wants_vr,
+    p_vr_location_preference: payload.vr_location_preference,
+    p_vr_package_preference: payload.vr_package_preference,
+    p_space_type: payload.space_type,
+    p_area_m2: payload.area_m2,
+    p_budget: payload.budget,
+    p_notes: payload.notes,
+  })
 
   if (error) {
     console.error('[Interiors] createProject error:', error)
     throw error
   }
 
-  return data as Project
+  const created = readCreatedInquiry(data)
+  publicInquiryUploadTokens.set(created.projectId, created.uploadToken)
+
+  const now = new Date().toISOString()
+  return {
+    ...payload,
+    id: created.projectId,
+    status: 'inquiry',
+    drawn_by: 'ani',
+    review_request_sent_at: null,
+    created_at: now,
+    updated_at: now,
+  }
 }
 
 /**
@@ -765,27 +814,38 @@ export async function createProjectFile(
     }
   }
 
-  const { data, error } = await supabase!
-    .from("project_files")
-    .insert({
-      project_id: input.project_id,
-      file_type: input.file_type,
-      storage_bucket: input.storage_bucket,
-      storage_path: input.storage_path,
-      original_name: input.original_name,
-      mime_type: input.mime_type ?? null,
-      size_bytes: input.size_bytes ?? null,
-      notes: input.notes ?? null,
-    })
-    .select("*")
-    .single()
+  const uploadToken = publicInquiryUploadTokens.get(input.project_id)
+  if (!uploadToken) {
+    throw new Error('Nedostaje token za prilog ovog upita.')
+  }
+
+  const { data, error } = await supabase!.rpc('create_public_project_file', {
+    p_upload_token: uploadToken,
+    p_file_type: input.file_type,
+    p_storage_path: input.storage_path,
+    p_original_name: input.original_name,
+    p_mime_type: input.mime_type ?? null,
+    p_size_bytes: input.size_bytes ?? null,
+    p_notes: input.notes ?? null,
+  })
 
   if (error) {
     console.error("[Interiors] createProjectFile error:", error)
     throw error
   }
 
-  return data as ProjectFile
+  return {
+    id: readCreatedFileId(data),
+    created_at: new Date().toISOString(),
+    project_id: input.project_id,
+    file_type: input.file_type,
+    storage_bucket: PROJECT_FILES_BUCKET,
+    storage_path: input.storage_path,
+    original_name: input.original_name,
+    mime_type: input.mime_type ?? null,
+    size_bytes: input.size_bytes ?? null,
+    notes: input.notes ?? null,
+  }
 }
 
 /**
