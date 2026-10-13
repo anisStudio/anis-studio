@@ -1,0 +1,6 @@
+# Local project name only. Database commands keep using --project-ref.
+# This file exists so the public inquiry function does not require a user JWT.
+project_id = "anis-studio"
+
+[functions.submit-web-atelier-inquiry]
+verify_jwt = false

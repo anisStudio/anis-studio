@@ -1,8 +1,24 @@
 // src/components/WebProjectForm.tsx
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { useAdminStore, type AdminStoreState } from '../lib/admin.store'
 import { trackEvent } from '../lib/analytics'
+import {
+  WEB_ATELIER_FEATURES,
+  WEB_ATELIER_FORM_MOODS,
+  WEB_ATELIER_GOALS,
+  WEB_ATELIER_PROJECT_TYPES,
+} from '../lib/webAtelierOptions.ts'
+import {
+  canonicalSubmission,
+  inquiryErrorMessage,
+  inquiryFingerprint,
+  readStoredIdempotency,
+  rememberIdempotency,
+  resolveIdempotencyKey,
+  type WebAtelierDraft,
+} from '../lib/webAtelierInquiry.ts'
+import { submitWebAtelierInquiry } from '../lib/webAtelierSubmit.ts'
+import { TurnstileWidget } from './TurnstileWidget.tsx'
 
 export interface WebProjectFormValues {
   // 1) Osnovne informacije
@@ -44,6 +60,7 @@ export interface WebProjectFormValues {
   contactPreference: string
   contactTime: string
   extraNotes: string
+  packagePreference: '' | 'start' | 'pro' | 'premium'
 }
 
 const INITIAL_VALUES: WebProjectFormValues = {
@@ -78,73 +95,27 @@ const INITIAL_VALUES: WebProjectFormValues = {
   contactPreference: '',
   contactTime: '',
   extraNotes: '',
+  packagePreference: '',
 }
 
-const PROJECT_TYPES = [
-  'Nova web stranica od nule',
-  'Redizajn postojeće stranice',
-  'Landing stranica za kampanju',
-  'Web shop',
-  'Portfolio / osobna stranica',
-  'Sustav za rezervacije / termine',
-  'Web aplikacija / SaaS',
-  'Interna aplikacija / alat (za firmu)',
-  'Drugo',
-]
-
-const GOALS = [
-  'Predstaviti usluge / brand',
-  'Prodavati proizvode online (web shop)',
-  'Prikazati radove / portfolio',
-  'Dobiti upite (leadove)',
-  'Educirati (blog, članci, tutorijali)',
-  'Primati rezervacije / termine online',
-  'Omogućiti prijave / članstva (user accounti)',
-  'Automatizirati interne procese (interna aplikacija / alat)',
-  'Drugo',
-]
-
-const DESIGN_MOODS = [
-  'Ozbiljno / poslovno',
-  'Svježe i moderno',
-  'Elegantno i luksuzno',
-  'Razigrano i kreativno',
-  'Minimalistički',
-]
-
-const FEATURES = [
-  'Kontakt forma i osnovni upiti',
-  'Blog / novosti',
-  'Web shop (košarica, naplata)',
-  'Sustav za rezervacije (kalendar, termini)',
-  'Korisnički računi / članstvo',
-  'Administratorski panel / dashboard',
-  'Višejezičnost (npr. HR/EN)',
-  'Integracija s newsletterom (Mailchimp, sl.)',
-  'Integracije s vanjskim servisima (npr. CRM, sustav naplate)',
-  'Integracija s društvenim mrežama',
-  'Drugo',
-]
-
 export type WebAtelierPaket = 'start' | 'pro' | 'premium'
+
+function packageNote(language: 'hr' | 'en', paket: WebAtelierPaket): string {
+  const label = { start: 'Start', pro: 'Pro', premium: 'Premium' }[paket]
+  return language === 'hr'
+    ? `Informativna oznaka paketa: ${label}. Ovo nije ponuda ni konačna cijena.\n`
+    : `Informational package label: ${label}. This is not a quote or a final price.\n`
+}
 
 function initialValuesFromPaket(
   language: 'hr' | 'en',
   paket?: WebAtelierPaket
 ): WebProjectFormValues {
   if (!paket) return { ...INITIAL_VALUES }
-  const label =
-    language === 'hr'
-      ? { start: 'Start (299 €)', pro: 'Pro (499 €)', premium: 'Premium (799 €)' }
-      : { start: 'Start (299 €)', pro: 'Pro (499 €)', premium: 'Premium (799 €)' }
-  const note =
-    language === 'hr'
-      ? `Željeni Web Atelier paket: ${label[paket]}.\n`
-      : `Preferred Web Atelier package: ${label[paket]}.\n`
   return {
     ...INITIAL_VALUES,
-    budgetRange: 'under-1000',
-    extraNotes: note,
+    packagePreference: paket,
+    extraNotes: packageNote(language, paket),
   }
 }
 
@@ -152,7 +123,7 @@ interface WebProjectFormProps {
   language?: 'hr' | 'en'
   /** Hide the in-form title block when the page layout already provides an H1 (e.g. /web-atelier/upit). */
   hidePageTitle?: boolean
-  /** Prefill from `?paket=` on /web-atelier/upit (notes + rough budget tier). */
+  /** Prefill an informational package label from `?paket=` on /web-atelier/upit. */
   initialPaket?: WebAtelierPaket
 }
 
@@ -170,8 +141,12 @@ export function WebProjectForm({ language = 'hr', hidePageTitle = false, initial
   )
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isSubmitted, setIsSubmitted] = useState(false)
-
-  const addWebProjectRequest = useAdminStore((state: AdminStoreState) => state.addWebProjectRequest)
+  const [isSending, setIsSending] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
+  const [referenceCode, setReferenceCode] = useState<string | null>(null)
+  const [turnstileToken, setTurnstileToken] = useState('')
+  const [turnstileReset, setTurnstileReset] = useState(0)
+  const turnstileSiteKey = (import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined)?.trim() ?? ''
 
   const translations = {
     errors: {
@@ -217,8 +192,9 @@ export function WebProjectForm({ language = 'hr', hidePageTitle = false, initial
     setValues(prev => ({ ...prev, [field]: value }))
     // Clear error for this field when user changes it
     if (errors[field]) {
-      setErrors(prev => {
-        const { [field]: _, ...rest } = prev
+      setErrors((prev) => {
+        const rest = { ...prev }
+        delete rest[field]
         return rest
       })
     }
@@ -229,12 +205,13 @@ export function WebProjectForm({ language = 'hr', hidePageTitle = false, initial
       const current = (prev[field] as string[]) || []
       const exists = current.includes(option)
       const next = exists ? current.filter(o => o !== option) : [...current, option]
-      return { ...prev, [field]: next as any }
+      return { ...prev, [field]: next } as WebProjectFormValues
     })
     // Clear error for this field when user changes it
     if (errors[field]) {
-      setErrors(prev => {
-        const { [field]: _, ...rest } = prev
+      setErrors((prev) => {
+        const rest = { ...prev }
+        delete rest[field]
         return rest
       })
     }
@@ -281,47 +258,63 @@ export function WebProjectForm({ language = 'hr', hidePageTitle = false, initial
     return newErrors
   }
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    setIsSubmitted(false)
+    if (isSending || isSubmitted) return
+    setSubmitError(null)
 
     const newErrors = validate(values)
     setErrors(newErrors)
 
     if (Object.keys(newErrors).length > 0) {
-      // Focus first error field
       const firstErrorField = Object.keys(newErrors)[0]
       setTimeout(() => {
-        const field = document.getElementById(firstErrorField) || 
+        const field = document.getElementById(firstErrorField) ||
                      document.querySelector(`[name="${firstErrorField}"]`) ||
                      document.querySelector(`input[name="${firstErrorField}"], select[name="${firstErrorField}"], textarea[name="${firstErrorField}"]`)
-        if (field) {
+        if (field instanceof HTMLElement) {
           field.focus()
           field.scrollIntoView({ behavior: 'smooth', block: 'center' })
         }
       }, 100)
-      return // Stop if there are errors
+      return
     }
 
-    setErrors({}) // Clear all errors on successful validation
+    if (!turnstileSiteKey || !turnstileToken) {
+      setSubmitError(inquiryErrorMessage(turnstileSiteKey ? 'captcha_failed' : 'unavailable', language))
+      return
+    }
+
+    const draft: WebAtelierDraft = { ...values, language }
+    const submission = canonicalSubmission(draft)
+    if (!submission) {
+      setSubmitError(inquiryErrorMessage('invalid_payload', language))
+      return
+    }
+
+    const fingerprint = inquiryFingerprint(submission)
+    const storage = typeof window === 'undefined' ? null : window.sessionStorage
+    const idempotency = resolveIdempotencyKey(
+      readStoredIdempotency(storage),
+      fingerprint,
+      crypto.randomUUID(),
+    )
+    rememberIdempotency(storage, idempotency)
+
+    setIsSending(true)
+    const result = await submitWebAtelierInquiry(draft, idempotency.key, turnstileToken)
+    setIsSending(false)
+    setTurnstileToken('')
+    setTurnstileReset((count) => count + 1)
+
+    if (!result.ok) {
+      setSubmitError(inquiryErrorMessage(result.error, language))
+      return
+    }
+
+    setReferenceCode(result.referenceCode)
     setIsSubmitted(true)
-
-    // Save to admin store
-    addWebProjectRequest({
-      clientName: values.fullNameOrCompany,
-      email: values.email,
-      projectTypesSummary: Array.isArray(values.projectTypes)
-        ? values.projectTypes.join(', ')
-        : '',
-      budgetRange: values.budgetRange || '',
-    })
     trackEvent('form_submit_success', { form: 'web-atelier' })
-
-    // Reset form after 3 seconds
-    setTimeout(() => {
-      setValues(INITIAL_VALUES)
-      setIsSubmitted(false)
-    }, 3000)
   }
 
   return (
@@ -342,6 +335,11 @@ export function WebProjectForm({ language = 'hr', hidePageTitle = false, initial
         <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
           Legenda: kružić (◉) znači da možeš odabrati <span className="font-semibold">samo jednu</span> opciju, a kvadratić (☑) da možeš odabrati <span className="font-semibold">više</span> opcija.
         </p>
+        {values.packagePreference && (
+          <p className="text-sm text-slate-600 dark:text-pearl/80">
+            {packageNote(language, values.packagePreference).trim()}
+          </p>
+        )}
 
         {/* 1) Osnovne informacije */}
         <fieldset className="space-y-4 rounded-2xl bg-white/70 p-4 sm:p-6 shadow-sm ring-1 ring-slate-100 dark:bg-white/8 dark:ring-slate-700/50">
@@ -434,7 +432,7 @@ export function WebProjectForm({ language = 'hr', hidePageTitle = false, initial
             Koji tip web projekta želiš? *
           </div>
           <div className={`grid gap-2 sm:grid-cols-2 ${errors.projectTypes ? 'border border-red-300 rounded-xl bg-red-50/40 px-3 py-2' : ''}`} id="projectTypes">
-            {PROJECT_TYPES.map(option => (
+            {WEB_ATELIER_PROJECT_TYPES.map(option => (
               <label key={option} className="flex items-start gap-2 text-sm text-slate-700">
                 <input
                   type="checkbox"
@@ -474,7 +472,7 @@ export function WebProjectForm({ language = 'hr', hidePageTitle = false, initial
             Koji su glavni ciljevi tvog online projekta?
           </div>
           <div className="grid gap-2 sm:grid-cols-2">
-            {GOALS.map(option => (
+            {WEB_ATELIER_GOALS.map(option => (
               <label key={option} className="flex items-start gap-2 text-sm text-slate-700">
                 <input
                   type="checkbox"
@@ -613,7 +611,7 @@ export function WebProjectForm({ language = 'hr', hidePageTitle = false, initial
             Kakav stil dizajna želiš?
           </p>
           <div className="grid gap-2 sm:grid-cols-2">
-            {DESIGN_MOODS.map(option => (
+            {WEB_ATELIER_FORM_MOODS.map(option => (
               <label key={option} className="flex items-start gap-2 text-sm text-slate-700">
                 <input
                   type="checkbox"
@@ -675,7 +673,7 @@ export function WebProjectForm({ language = 'hr', hidePageTitle = false, initial
             Koje funkcionalnosti želiš u projektu?
           </p>
           <div className="grid gap-2 sm:grid-cols-2">
-            {FEATURES.map(option => (
+            {WEB_ATELIER_FEATURES.map(option => (
               <label key={option} className="flex items-start gap-2 text-sm text-slate-700">
                 <input
                   type="checkbox"
@@ -836,20 +834,38 @@ export function WebProjectForm({ language = 'hr', hidePageTitle = false, initial
           </div>
         </fieldset>
 
-        {/* Success message */}
-        {isSubmitted && (
-          <div className="mt-4 rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-            {translations.success[language]}
+        {submitError && (
+          <div className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-800" role="alert">
+            {submitError}
           </div>
         )}
 
-        {/* Submit button */}
+        {isSubmitted && referenceCode && (
+          <div className="mt-4 rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800" role="status">
+            <p>{translations.success[language]}</p>
+            <p className="mt-2 font-semibold">
+              {language === 'hr' ? 'Broj upita:' : 'Inquiry reference:'} {referenceCode}
+            </p>
+          </div>
+        )}
+
+        <TurnstileWidget
+          siteKey={turnstileSiteKey}
+          resetSignal={turnstileReset}
+          onToken={setTurnstileToken}
+        />
+
         <div className="mt-6 flex justify-center">
           <button
             type="submit"
-            className="inline-flex items-center justify-center rounded-full bg-violet-500 px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-violet-600 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-violet-300 focus:ring-offset-2"
+            disabled={isSending || isSubmitted}
+            className="inline-flex items-center justify-center rounded-full bg-violet-500 px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-violet-600 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-violet-300 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            Pošalji upit za web projekt
+            {isSending
+              ? language === 'hr'
+                ? 'Šaljem upit…'
+                : 'Sending…'
+              : 'Pošalji upit za web projekt'}
           </button>
         </div>
       </form>

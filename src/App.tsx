@@ -41,6 +41,10 @@ const AdminInteriorsProjectDetailPage = lazy(
 )
 const AdminPortfolioPage = lazy(() => import('./pages/AdminPortfolioPage'))
 const AdminReviewsPage = lazy(() => import('./pages/AdminReviewsPage'))
+const AdminWebAtelierInquiriesPage = lazy(() => import('./pages/AdminWebAtelierInquiriesPage'))
+const AdminWebAtelierInquiryDetailPage = lazy(
+  () => import('./pages/AdminWebAtelierInquiryDetailPage'),
+)
 const OstaviRecenzijuPage = lazy(() => import('./pages/OstaviRecenzijuPage'))
 const PolitikaPrivatnostiPage = lazy(() => import('./pages/PolitikaPrivatnostiPage'))
 const StarlinkHrvatskaPage = lazy(() => import('./pages/StarlinkHrvatskaPage'))
@@ -163,6 +167,8 @@ function AnimatedRoutes({
             <Route path="interiors-projects/:id" element={<AdminInteriorsProjectDetailPage />} />
             <Route path="portfolio" element={<AdminPortfolioPage />} />
             <Route path="reviews" element={<AdminReviewsPage />} />
+            <Route path="web-atelier-inquiries" element={<AdminWebAtelierInquiriesPage />} />
+            <Route path="web-atelier-inquiries/:id" element={<AdminWebAtelierInquiryDetailPage />} />
           </Route>
         </Routes>
       </Suspense>

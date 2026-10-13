@@ -25,7 +25,7 @@ const AdminNav: React.FC = () => {
           <div className="flex items-center gap-6">
             <h2 className="text-lg font-semibold text-slate-900">Admin panel</h2>
 
-            <nav className="flex items-center gap-4">
+            <nav className="flex flex-wrap items-center gap-4">
               <NavLink
                 to="/admin/settings"
                 className={({ isActive }) =>
@@ -85,6 +85,18 @@ const AdminNav: React.FC = () => {
                 }
               >
                 Recenzije
+              </NavLink>
+              <NavLink
+                to="/admin/web-atelier-inquiries"
+                className={({ isActive }) =>
+                  `text-sm font-medium transition-colors duration-200 px-3 py-1.5 rounded-lg ${
+                    isActive
+                      ? 'text-violet-700 bg-violet-50 font-semibold'
+                      : 'text-slate-700 hover:text-violet-700 hover:bg-slate-100'
+                  }`
+                }
+              >
+                Web Atelier
               </NavLink>
             </nav>
           </div>

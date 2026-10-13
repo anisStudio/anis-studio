@@ -17,6 +17,7 @@
     "pricing:web-visibility:test": "node --experimental-strip-types scripts/test-interiors-web-pricing-visibility.mjs",
     "pricing:kitchen-example:test": "node --experimental-strip-types scripts/test-interiors-kitchen-pricing-example.mjs",
     "form:test": "node --experimental-strip-types scripts/test-interiors-inspiration-files.mjs",
+    "web-atelier:test": "node --experimental-strip-types scripts/test-web-atelier-inquiry.ts",
     "save": "node scripts/save.mjs"
   },
   "dependencies": {
