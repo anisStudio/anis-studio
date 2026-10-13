@@ -1,0 +1,174 @@
+/*
+ * Web Atelier inquiry form — self-contained light surface.
+ *
+ * Why this file exists (root cause of the contrast regression):
+ *  - The form is rendered in contexts whose theme does NOT follow `html.dark`:
+ *      * `.admin-scope` forces a light surface even when `html.dark` is set
+ *        (src/index.css: `html.dark .admin-scope { color-scheme: light; ... }`),
+ *        so Tailwind `dark:` variants (keyed on `html.dark`) produced pale text
+ *        on a near-white panel and dark inputs.
+ *      * `.section-with-bg` forces colours with `!important` on every descendant
+ *        (`.section-with-bg *`, `html.dark .section-with-bg *`,
+ *        `html:not(.dark) input…`), which overrides any Tailwind utility.
+ *  - Therefore the form must not depend on `html.dark` or on inherited colour at
+ *    all. It always renders as a light card with dark text, in every context.
+ *
+ * Specificity: selectors repeat `.wa-form` on purpose so they out-rank the
+ * global `!important` rules above without editing the protected index.css.
+ * Class names deliberately avoid the substrings `text-*`, `bg-*`, `bg-white/`
+ * that the global `[class*="…"]` selectors match.
+ */
+
+.wa-form {
+  --wa-ink: #2e2447; /* plum — 13.5:1 on #f9f7fb, 14.4:1 on #fff */
+  --wa-ink-soft: #453c5e; /* help / legend text */
+  --wa-input-ink: #1b1530;
+  --wa-placeholder: #6b6280; /* 5.7:1 on white */
+  --wa-border: #8b7fa3; /* 3.7:1 on white (UI boundary >= 3:1) */
+  --wa-accent: #6e44ff; /* amethyst */
+  --wa-required: #5b21b6;
+  --wa-danger: #b91c1c; /* 6.5:1 on white */
+  color-scheme: light;
+}
+
+/* Outer light surface so the intro text is readable on any page background */
+html body .wa-form.wa-form.wa-form {
+  background-color: #f9f7fb !important;
+  border-radius: 1.5rem;
+  box-shadow: 0 0 0 1px var(--wa-border);
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  html body .wa-form.wa-form.wa-form {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+/* Base ink for every descendant (beats `.section-with-bg *` / `html.dark … *`) */
+html body .wa-form.wa-form.wa-form,
+html body .wa-form.wa-form.wa-form * {
+  color: var(--wa-ink) !important;
+  opacity: 1;
+  text-shadow: none !important;
+}
+
+html body .wa-form.wa-form.wa-form .wa-panel {
+  background-color: #ffffff !important;
+  backdrop-filter: none !important;
+  box-shadow: 0 0 0 1px var(--wa-border), 0 1px 2px rgba(46, 36, 71, 0.06);
+}
+
+html body .wa-form.wa-form.wa-form .wa-heading,
+html body .wa-form.wa-form.wa-form .wa-title {
+  color: var(--wa-ink) !important;
+}
+
+html body .wa-form.wa-form.wa-form .wa-help,
+html body .wa-form.wa-form.wa-form .wa-legend {
+  color: var(--wa-ink-soft) !important;
+}
+
+html body .wa-form.wa-form.wa-form .wa-strong {
+  color: var(--wa-ink) !important;
+  font-weight: 700;
+}
+
+html body .wa-form.wa-form.wa-form .wa-required {
+  color: var(--wa-required) !important;
+}
+
+html body .wa-form.wa-form.wa-form .wa-error {
+  color: var(--wa-danger) !important;
+}
+
+/* Inputs / selects / textareas: white, dark entered text */
+html body .wa-form.wa-form.wa-form :is(input, select, textarea).wa-control.wa-control {
+  background-color: #ffffff !important;
+  color: var(--wa-input-ink) !important;
+  -webkit-text-fill-color: var(--wa-input-ink);
+  border: 1px solid var(--wa-border) !important;
+  color-scheme: light;
+  caret-color: var(--wa-accent);
+  box-shadow: inset 0 1px 2px rgba(46, 36, 71, 0.08);
+}
+
+html body .wa-form.wa-form.wa-form .wa-control.wa-control::placeholder {
+  color: var(--wa-placeholder) !important;
+  -webkit-text-fill-color: var(--wa-placeholder);
+  opacity: 1;
+}
+
+html body .wa-form.wa-form.wa-form select.wa-control.wa-control option {
+  background-color: #ffffff !important;
+  color: var(--wa-input-ink) !important;
+}
+
+html body .wa-form.wa-form.wa-form :is(input, select, textarea).wa-control.wa-control:focus {
+  border-color: var(--wa-accent) !important;
+  outline: 2px solid var(--wa-accent);
+  outline-offset: 1px;
+  box-shadow: 0 0 0 4px rgba(110, 68, 255, 0.25);
+}
+
+html body .wa-form.wa-form.wa-form :is(input, select, textarea).wa-control.wa-control:disabled {
+  background-color: #efedf3 !important;
+  color: #5b5470 !important;
+  -webkit-text-fill-color: #5b5470;
+  cursor: not-allowed;
+}
+
+html body .wa-form.wa-form.wa-form :is(input, select, textarea).wa-control.wa-control.wa-control-error {
+  border-color: var(--wa-danger) !important;
+  border-width: 2px !important;
+}
+
+/* Checkboxes / radios */
+html body .wa-form.wa-form.wa-form input.wa-check {
+  accent-color: var(--wa-accent);
+  color-scheme: light;
+}
+
+html body .wa-form.wa-form.wa-form .wa-group-error {
+  background-color: #fef2f2 !important;
+  box-shadow: 0 0 0 2px var(--wa-danger);
+}
+
+/* Status banners */
+html body .wa-form.wa-form.wa-form .wa-banner-error {
+  background-color: #fef2f2 !important;
+  border-color: var(--wa-danger) !important;
+}
+
+html body .wa-form.wa-form.wa-form .wa-banner-error,
+html body .wa-form.wa-form.wa-form .wa-banner-error * {
+  color: #7f1d1d !important;
+}
+
+html body .wa-form.wa-form.wa-form .wa-banner-ok {
+  background-color: #ecfdf5 !important;
+  border-color: #047857 !important;
+}
+
+html body .wa-form.wa-form.wa-form .wa-banner-ok,
+html body .wa-form.wa-form.wa-form .wa-banner-ok * {
+  color: #064e3b !important;
+}
+
+/* Submit button: white on amethyst (5.3:1) in every context */
+html body .wa-form.wa-form.wa-form .wa-submit {
+  background-color: var(--wa-accent) !important;
+  color: #ffffff !important;
+  border: 0;
+}
+
+html body .wa-form.wa-form.wa-form .wa-submit:hover:not(:disabled) {
+  background-color: #5a2fe6 !important;
+}
+
+html body .wa-form.wa-form.wa-form .wa-submit:focus-visible {
+  outline: 2px solid var(--wa-ink);
+  outline-offset: 2px;
+}

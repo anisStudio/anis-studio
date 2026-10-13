@@ -18,6 +18,7 @@ import {
   type WebAtelierDraft,
 } from '../lib/webAtelierInquiry.ts'
 import { submitWebAtelierInquiry } from '../lib/webAtelierSubmit.ts'
+import './webProjectForm.css'
 import { TurnstileWidget } from './TurnstileWidget.tsx'
 
 export interface WebProjectFormValues {
@@ -139,32 +140,24 @@ export function WebProjectForm({
   initialPaket,
   initialContact,
 }: WebProjectFormProps) {
-  // Local contrast tokens (component-scoped). Keep lavender accents; avoid pale /opacity inks.
-  const fieldsetClass =
-    'space-y-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-[#8B7FA3] sm:p-6 dark:bg-white/[0.07] dark:ring-lavender/50'
-  const headingClass =
-    'mb-3 text-lg font-bold leading-snug text-plum dark:text-pearl'
-  const labelClass =
-    'block space-y-1 text-sm font-medium text-plum sm:text-base dark:text-pearl'
-  const questionClass =
-    'mb-2 text-sm font-semibold text-plum sm:text-base dark:text-pearl'
-  const optionClass =
-    'flex items-start gap-2 text-sm font-medium text-plum dark:text-pearl/95'
-  const optionInlineClass =
-    'inline-flex items-center gap-2 text-sm font-medium text-plum dark:text-pearl/95'
-  const helpClass =
-    'text-sm leading-relaxed text-slate-700 dark:text-pearl/85'
-  const legendClass =
-    'mt-2 text-xs leading-relaxed text-slate-700 dark:text-pearl/80'
-  const errorClass = 'mt-1 text-xs font-medium text-red-700 dark:text-red-300'
+  // Layout-only utility classes. ALL colours live in ./webProjectForm.css (`.wa-*`)
+  // so the form never depends on `html.dark`, inherited colour or global !important rules.
+  const fieldsetClass = 'wa-panel space-y-4 rounded-2xl p-4 sm:p-6'
+  const headingClass = 'wa-heading mb-3 text-lg font-bold leading-snug'
+  const labelClass = 'block space-y-1 text-sm font-medium sm:text-base'
+  const questionClass = 'wa-heading mb-2 text-sm font-semibold sm:text-base'
+  const optionClass = 'flex items-start gap-2 text-sm font-medium'
+  const optionInlineClass = 'inline-flex items-center gap-2 text-sm font-medium'
+  const helpClass = 'wa-help text-sm leading-relaxed'
+  const legendClass = 'wa-legend mt-2 text-xs leading-relaxed'
+  const errorClass = 'wa-error mt-1 text-xs font-medium'
   const controlClass =
-    'w-full rounded-xl border border-[#8B7FA3] bg-white px-3 py-2 text-sm font-medium text-slate-900 shadow-inner placeholder:font-normal placeholder:text-slate-500 focus:border-violet-600 focus:outline-none focus:ring-2 focus:ring-violet-300 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500 dark:border-lavender/60 dark:bg-slate-950/60 dark:text-pearl dark:placeholder:text-slate-400 dark:focus:border-violet-400 dark:focus:ring-violet-500/30'
+    'wa-control w-full rounded-xl px-3 py-2 text-sm font-medium focus:outline-none'
   const inputClass = controlClass
   const textareaClass = `${controlClass} min-h-[96px] resize-y`
   const selectClass = controlClass
-  const controlErrorClass =
-    'border-red-600 focus:border-red-600 focus:ring-red-200 dark:border-red-400 dark:focus:ring-red-500/30'
-  const checkClass = 'mt-1 h-4 w-4 shrink-0 accent-violet-600'
+  const controlErrorClass = 'wa-control-error'
+  const checkClass = 'wa-check mt-1 h-4 w-4 shrink-0'
 
   const [values, setValues] = useState<WebProjectFormValues>(() => {
     const base = initialValuesFromPaket(language, initialPaket)
@@ -355,21 +348,11 @@ export function WebProjectForm({
   }
 
   return (
-    <div className="web-atelier-inquiry-form mx-auto max-w-3xl space-y-8 py-8 text-plum dark:text-pearl">
-      <style>{`
-        .web-atelier-inquiry-form .wa-control::placeholder {
-          color: #6b6280;
-          opacity: 1;
-        }
-        html.dark .web-atelier-inquiry-form .wa-control::placeholder {
-          color: #a8a0b8;
-          opacity: 1;
-        }
-      `}</style>
+    <div className="web-atelier-inquiry-form wa-form mx-auto max-w-3xl space-y-8 py-8">
       <form onSubmit={handleSubmit} className="space-y-8">
         {!hidePageTitle && (
           <div className="mb-4 space-y-1 text-center">
-            <h2 className="text-xl font-bold text-plum dark:text-pearl">
+            <h2 className="wa-title text-xl font-bold">
               Upit za web projekt
             </h2>
             <p className={helpClass}>
@@ -380,7 +363,7 @@ export function WebProjectForm({
 
         {/* Legenda za checkboxe i radio gumbe */}
         <p className={legendClass}>
-          Legenda: kružić (◉) znači da možeš odabrati <span className="font-semibold text-plum dark:text-pearl">samo jednu</span> opciju, a kvadratić (☑) da možeš odabrati <span className="font-semibold text-plum dark:text-pearl">više</span> opcija.
+          Legenda: kružić (◉) znači da možeš odabrati <span className="wa-strong font-semibold">samo jednu</span> opciju, a kvadratić (☑) da možeš odabrati <span className="wa-strong font-semibold">više</span> opcija.
         </p>
         {values.packagePreference && (
           <p className={helpClass}>
@@ -397,7 +380,7 @@ export function WebProjectForm({
 
           <div>
             <label className={labelClass}>
-              <span>Ime i prezime ili naziv firme <span className="text-violet-700 dark:text-violet-300" aria-hidden="true">*</span></span>
+              <span>Ime i prezime ili naziv firme <span className="wa-required" aria-hidden="true">*</span></span>
               <input
                 type="text"
                 id="fullNameOrCompany"
@@ -414,7 +397,7 @@ export function WebProjectForm({
 
           <div>
             <label className={labelClass}>
-              <span>Email <span className="text-violet-700 dark:text-violet-300" aria-hidden="true">*</span></span>
+              <span>Email <span className="wa-required" aria-hidden="true">*</span></span>
               <input
                 type="email"
                 id="email"
@@ -476,9 +459,9 @@ export function WebProjectForm({
         <fieldset className={fieldsetClass}>
           <legend className="sr-only">Koji tip web projekta želiš? *</legend>
           <div className={headingClass} aria-hidden="true">
-            Koji tip web projekta želiš? <span className="text-violet-700 dark:text-violet-300" aria-hidden="true">*</span>
+            Koji tip web projekta želiš? <span className="wa-required" aria-hidden="true">*</span>
           </div>
-          <div className={`grid gap-2 sm:grid-cols-2 ${errors.projectTypes ? 'rounded-xl border border-red-400 bg-red-50 px-3 py-2 dark:bg-red-950/30' : ''}`} id="projectTypes">
+          <div className={`grid gap-2 sm:grid-cols-2 ${errors.projectTypes ? 'wa-group-error rounded-xl px-3 py-2' : ''}`} id="projectTypes">
             {WEB_ATELIER_PROJECT_TYPES.map(option => (
               <label key={option} className={optionClass}>
                 <input
@@ -563,7 +546,7 @@ export function WebProjectForm({
                   type="radio"
                   name="contentReady"
                   value="yes"
-                  className="h-4 w-4 accent-violet-600"
+                  className="wa-check h-4 w-4"
                   checked={values.contentReady === 'yes'}
                   onChange={e => handleChange('contentReady', e.target.value as 'yes' | 'partial' | 'no')}
                 />
@@ -574,7 +557,7 @@ export function WebProjectForm({
                   type="radio"
                   name="contentReady"
                   value="partial"
-                  className="h-4 w-4 accent-violet-600"
+                  className="wa-check h-4 w-4"
                   checked={values.contentReady === 'partial'}
                   onChange={e => handleChange('contentReady', e.target.value as 'yes' | 'partial' | 'no')}
                 />
@@ -585,7 +568,7 @@ export function WebProjectForm({
                   type="radio"
                   name="contentReady"
                   value="no"
-                  className="h-4 w-4 accent-violet-600"
+                  className="wa-check h-4 w-4"
                   checked={values.contentReady === 'no'}
                   onChange={e => handleChange('contentReady', e.target.value as 'yes' | 'partial' | 'no')}
                 />
@@ -602,7 +585,7 @@ export function WebProjectForm({
                   type="radio"
                   name="visualsReady"
                   value="yes"
-                  className="h-4 w-4 accent-violet-600"
+                  className="wa-check h-4 w-4"
                   checked={values.visualsReady === 'yes'}
                   onChange={e => handleChange('visualsReady', e.target.value as 'yes' | 'partial' | 'no')}
                 />
@@ -613,7 +596,7 @@ export function WebProjectForm({
                   type="radio"
                   name="visualsReady"
                   value="partial"
-                  className="h-4 w-4 accent-violet-600"
+                  className="wa-check h-4 w-4"
                   checked={values.visualsReady === 'partial'}
                   onChange={e => handleChange('visualsReady', e.target.value as 'yes' | 'partial' | 'no')}
                 />
@@ -624,7 +607,7 @@ export function WebProjectForm({
                   type="radio"
                   name="visualsReady"
                   value="no"
-                  className="h-4 w-4 accent-violet-600"
+                  className="wa-check h-4 w-4"
                   checked={values.visualsReady === 'no'}
                   onChange={e => handleChange('visualsReady', e.target.value as 'yes' | 'partial' | 'no')}
                 />
@@ -771,7 +754,7 @@ export function WebProjectForm({
 
           <div>
             <label className={labelClass}>
-              <span>Okvirni budžet <span className="text-violet-700 dark:text-violet-300" aria-hidden="true">*</span></span>
+              <span>Okvirni budžet <span className="wa-required" aria-hidden="true">*</span></span>
               <select
                 id="budgetRange"
                 name="budgetRange"
@@ -829,7 +812,7 @@ export function WebProjectForm({
 
           <div>
             <label className={labelClass}>
-              <span>Način kontaktiranja <span className="text-violet-700 dark:text-violet-300" aria-hidden="true">*</span></span>
+              <span>Način kontaktiranja <span className="wa-required" aria-hidden="true">*</span></span>
               <select
                 id="contactPreference"
                 name="contactPreference"
@@ -864,7 +847,7 @@ export function WebProjectForm({
 
           <div>
             <label className={labelClass}>
-              <span>Dodatne napomene / Opis projekta <span className="text-violet-700 dark:text-violet-300" aria-hidden="true">*</span></span>
+              <span>Dodatne napomene / Opis projekta <span className="wa-required" aria-hidden="true">*</span></span>
               <textarea
                 id="extraNotes"
                 name="extraNotes"
@@ -882,13 +865,13 @@ export function WebProjectForm({
         </fieldset>
 
         {submitError && (
-          <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-900 dark:border-red-800 dark:bg-red-950/40 dark:text-red-200" role="alert">
+          <div className="wa-banner-error mt-4 rounded-xl border px-4 py-3 text-sm font-medium" role="alert">
             {submitError}
           </div>
         )}
 
         {isSubmitted && referenceCode && (
-          <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-950 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-100" role="status">
+          <div className="wa-banner-ok mt-4 rounded-xl border px-4 py-3 text-sm font-medium" role="status">
             <p>{translations.success[language]}</p>
             <p className="mt-2 font-bold">
               {language === 'hr' ? 'Broj upita:' : 'Inquiry reference:'} {referenceCode}
@@ -906,7 +889,7 @@ export function WebProjectForm({
           <button
             type="submit"
             disabled={isSending || isSubmitted}
-            className="inline-flex items-center justify-center rounded-full bg-violet-500 px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-violet-600 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-violet-300 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+            className="wa-submit inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold shadow-md transition hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSending
               ? language === 'hr'
