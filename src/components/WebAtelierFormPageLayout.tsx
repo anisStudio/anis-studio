@@ -27,7 +27,7 @@ export function WebAtelierFormPageLayout({ language, title, children }: WebAteli
             <span aria-hidden>←</span>
             {backLabel}
           </Link>
-          <h1 className="mt-4 font-heading text-2xl font-bold tracking-tight text-balance text-plum/90 dark:text-pearl sm:text-3xl">
+          <h1 className="mt-4 font-heading text-2xl font-bold tracking-tight text-balance text-plum dark:text-pearl sm:text-3xl">
             {title}
           </h1>
         </div>

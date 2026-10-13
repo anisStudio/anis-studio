@@ -139,13 +139,32 @@ export function WebProjectForm({
   initialPaket,
   initialContact,
 }: WebProjectFormProps) {
-  const inputClass =
-    "w-full rounded-xl border border-slate-200 bg-white/80 px-3 py-2 text-sm shadow-inner focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-violet-400";
-  
-  const textareaClass =
-    "w-full rounded-xl border border-slate-200 bg-white/80 px-3 py-2 text-sm shadow-inner resize-y min-h-[96px] focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-violet-400";
-  
-  const selectClass = inputClass;
+  // Local contrast tokens (component-scoped). Keep lavender accents; avoid pale /opacity inks.
+  const fieldsetClass =
+    'space-y-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-[#8B7FA3] sm:p-6 dark:bg-white/[0.07] dark:ring-lavender/50'
+  const headingClass =
+    'mb-3 text-lg font-bold leading-snug text-plum dark:text-pearl'
+  const labelClass =
+    'block space-y-1 text-sm font-medium text-plum sm:text-base dark:text-pearl'
+  const questionClass =
+    'mb-2 text-sm font-semibold text-plum sm:text-base dark:text-pearl'
+  const optionClass =
+    'flex items-start gap-2 text-sm font-medium text-plum dark:text-pearl/95'
+  const optionInlineClass =
+    'inline-flex items-center gap-2 text-sm font-medium text-plum dark:text-pearl/95'
+  const helpClass =
+    'text-sm leading-relaxed text-slate-700 dark:text-pearl/85'
+  const legendClass =
+    'mt-2 text-xs leading-relaxed text-slate-700 dark:text-pearl/80'
+  const errorClass = 'mt-1 text-xs font-medium text-red-700 dark:text-red-300'
+  const controlClass =
+    'w-full rounded-xl border border-[#8B7FA3] bg-white px-3 py-2 text-sm font-medium text-slate-900 shadow-inner placeholder:font-normal placeholder:text-slate-500 focus:border-violet-600 focus:outline-none focus:ring-2 focus:ring-violet-300 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500 dark:border-lavender/60 dark:bg-slate-950/60 dark:text-pearl dark:placeholder:text-slate-400 dark:focus:border-violet-400 dark:focus:ring-violet-500/30'
+  const inputClass = controlClass
+  const textareaClass = `${controlClass} min-h-[96px] resize-y`
+  const selectClass = controlClass
+  const controlErrorClass =
+    'border-red-600 focus:border-red-600 focus:ring-red-200 dark:border-red-400 dark:focus:ring-red-500/30'
+  const checkClass = 'mt-1 h-4 w-4 shrink-0 accent-violet-600'
 
   const [values, setValues] = useState<WebProjectFormValues>(() => {
     const base = initialValuesFromPaket(language, initialPaket)
@@ -336,76 +355,86 @@ export function WebProjectForm({
   }
 
   return (
-    <div className="max-w-3xl mx-auto py-8 space-y-8">
+    <div className="web-atelier-inquiry-form mx-auto max-w-3xl space-y-8 py-8 text-plum dark:text-pearl">
+      <style>{`
+        .web-atelier-inquiry-form .wa-control::placeholder {
+          color: #6b6280;
+          opacity: 1;
+        }
+        html.dark .web-atelier-inquiry-form .wa-control::placeholder {
+          color: #a8a0b8;
+          opacity: 1;
+        }
+      `}</style>
       <form onSubmit={handleSubmit} className="space-y-8">
         {!hidePageTitle && (
           <div className="mb-4 space-y-1 text-center">
-            <h2 className="text-xl font-semibold text-slate-900 dark:text-pearl">
+            <h2 className="text-xl font-bold text-plum dark:text-pearl">
               Upit za web projekt
             </h2>
-            <p className="text-sm text-slate-600 dark:text-pearl/70">
+            <p className={helpClass}>
               Ispunite formu s detaljima o vašem web projektu.
             </p>
           </div>
         )}
 
         {/* Legenda za checkboxe i radio gumbe */}
-        <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-          Legenda: kružić (◉) znači da možeš odabrati <span className="font-semibold">samo jednu</span> opciju, a kvadratić (☑) da možeš odabrati <span className="font-semibold">više</span> opcija.
+        <p className={legendClass}>
+          Legenda: kružić (◉) znači da možeš odabrati <span className="font-semibold text-plum dark:text-pearl">samo jednu</span> opciju, a kvadratić (☑) da možeš odabrati <span className="font-semibold text-plum dark:text-pearl">više</span> opcija.
         </p>
         {values.packagePreference && (
-          <p className="text-sm text-slate-600 dark:text-pearl/80">
+          <p className={helpClass}>
             {packageNote(language, values.packagePreference).trim()}
           </p>
         )}
 
         {/* 1) Osnovne informacije */}
-        <fieldset className="space-y-4 rounded-2xl bg-white/70 p-4 sm:p-6 shadow-sm ring-1 ring-slate-100 dark:bg-white/8 dark:ring-slate-700/50">
+        <fieldset className={fieldsetClass}>
           <legend className="sr-only">Osnovne informacije</legend>
-          <div className="mb-3 text-lg font-semibold leading-snug text-plum/90 dark:text-pearl" aria-hidden="true">
+          <div className={headingClass} aria-hidden="true">
             Osnovne informacije
           </div>
 
           <div>
-            <label className="block space-y-1 text-sm sm:text-base text-slate-800">
-              <span>Ime i prezime ili naziv firme *</span>
+            <label className={labelClass}>
+              <span>Ime i prezime ili naziv firme <span className="text-violet-700 dark:text-violet-300" aria-hidden="true">*</span></span>
               <input
                 type="text"
                 id="fullNameOrCompany"
                 name="fullNameOrCompany"
-                className={`${inputClass} ${errors.fullNameOrCompany ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''}`}
+                className={`wa-control ${inputClass} ${errors.fullNameOrCompany ? controlErrorClass : ''}`}
                 value={values.fullNameOrCompany}
                 onChange={e => handleChange('fullNameOrCompany', e.target.value)}
               />
             </label>
             {errors.fullNameOrCompany && (
-              <p className="text-xs text-red-500 mt-1">{errors.fullNameOrCompany}</p>
+              <p className={errorClass}>{errors.fullNameOrCompany}</p>
             )}
           </div>
 
           <div>
-            <label className="block space-y-1 text-sm sm:text-base text-slate-800">
-              <span>Email *</span>
+            <label className={labelClass}>
+              <span>Email <span className="text-violet-700 dark:text-violet-300" aria-hidden="true">*</span></span>
               <input
                 type="email"
                 id="email"
                 name="email"
-                className={`${inputClass} ${errors.email ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''}`}
+                className={`wa-control ${inputClass} ${errors.email ? controlErrorClass : ''}`}
                 value={values.email}
                 onChange={e => handleChange('email', e.target.value)}
               />
             </label>
             {errors.email && (
-              <p className="text-xs text-red-500 mt-1">{errors.email}</p>
+              <p className={errorClass}>{errors.email}</p>
             )}
           </div>
 
           <div>
-            <label className="block space-y-1 text-sm sm:text-base text-slate-800">
+            <label className={labelClass}>
               <span>Telefon</span>
               <input
                 type="tel"
-                className={inputClass}
+                className={`wa-control ${inputClass}`}
                 value={values.phone}
                 onChange={e => handleChange('phone', e.target.value)}
               />
@@ -413,11 +442,11 @@ export function WebProjectForm({
           </div>
 
           <div>
-            <label className="block space-y-1 text-sm sm:text-base text-slate-800">
+            <label className={labelClass}>
               <span>Postoji li već web stranica? (URL)</span>
               <input
                 type="url"
-                className={inputClass}
+                className={`wa-control ${inputClass}`}
                 value={values.existingWebsite}
                 onChange={e => handleChange('existingWebsite', e.target.value)}
                 placeholder="https://..."
@@ -426,10 +455,10 @@ export function WebProjectForm({
           </div>
 
           <div>
-            <label className="block space-y-1 text-sm sm:text-base text-slate-800">
+            <label className={labelClass}>
               <span>Kako si saznao/la za Ani's Studio?</span>
               <select
-                className={selectClass}
+                className={`wa-control ${selectClass}`}
                 value={values.referral}
                 onChange={e => handleChange('referral', e.target.value)}
               >
@@ -444,18 +473,18 @@ export function WebProjectForm({
         </fieldset>
 
         {/* 2) Vrsta web projekta */}
-        <fieldset className="space-y-4 rounded-2xl bg-white/70 p-4 sm:p-6 shadow-sm ring-1 ring-slate-100 dark:bg-white/8 dark:ring-slate-700/50">
+        <fieldset className={fieldsetClass}>
           <legend className="sr-only">Koji tip web projekta želiš? *</legend>
-          <div className="mb-3 text-lg font-semibold leading-snug text-plum/90 dark:text-pearl" aria-hidden="true">
-            Koji tip web projekta želiš? *
+          <div className={headingClass} aria-hidden="true">
+            Koji tip web projekta želiš? <span className="text-violet-700 dark:text-violet-300" aria-hidden="true">*</span>
           </div>
-          <div className={`grid gap-2 sm:grid-cols-2 ${errors.projectTypes ? 'border border-red-300 rounded-xl bg-red-50/40 px-3 py-2' : ''}`} id="projectTypes">
+          <div className={`grid gap-2 sm:grid-cols-2 ${errors.projectTypes ? 'rounded-xl border border-red-400 bg-red-50 px-3 py-2 dark:bg-red-950/30' : ''}`} id="projectTypes">
             {WEB_ATELIER_PROJECT_TYPES.map(option => (
-              <label key={option} className="flex items-start gap-2 text-sm text-slate-700">
+              <label key={option} className={optionClass}>
                 <input
                   type="checkbox"
                   name="projectTypes"
-                  className="mt-1 accent-violet-500"
+                  className={checkClass}
                   checked={values.projectTypes.includes(option)}
                   onChange={() => handleToggleMulti('projectTypes', option)}
                 />
@@ -464,16 +493,16 @@ export function WebProjectForm({
             ))}
           </div>
           {errors.projectTypes && (
-            <p className="text-xs text-red-500 mt-1">{errors.projectTypes}</p>
+            <p className={errorClass}>{errors.projectTypes}</p>
           )}
 
           {values.projectTypes.includes('Drugo') && (
             <div>
-              <label className="block space-y-1 text-sm sm:text-base text-slate-800">
+              <label className={labelClass}>
                 <span>Opiši drugi tip projekta</span>
                 <input
                   type="text"
-                  className={inputClass}
+                  className={`wa-control ${inputClass}`}
                   value={values.projectTypesOther}
                   onChange={e => handleChange('projectTypesOther', e.target.value)}
                   placeholder="Opiši..."
@@ -484,17 +513,17 @@ export function WebProjectForm({
         </fieldset>
 
         {/* 3) Ciljevi projekta */}
-        <fieldset className="space-y-4 rounded-2xl bg-white/70 p-4 sm:p-6 shadow-sm ring-1 ring-slate-100 dark:bg-white/8 dark:ring-slate-700/50">
+        <fieldset className={fieldsetClass}>
           <legend className="sr-only">Koji su glavni ciljevi tvog online projekta?</legend>
-          <div className="mb-3 text-lg font-semibold leading-snug text-plum/90 dark:text-pearl" aria-hidden="true">
+          <div className={headingClass} aria-hidden="true">
             Koji su glavni ciljevi tvog online projekta?
           </div>
           <div className="grid gap-2 sm:grid-cols-2">
             {WEB_ATELIER_GOALS.map(option => (
-              <label key={option} className="flex items-start gap-2 text-sm text-slate-700">
+              <label key={option} className={optionClass}>
                 <input
                   type="checkbox"
-                  className="mt-1 accent-violet-500"
+                  className={checkClass}
                   checked={values.goals.includes(option)}
                   onChange={() => handleToggleMulti('goals', option)}
                 />
@@ -505,11 +534,11 @@ export function WebProjectForm({
 
           {values.goals.includes('Drugo') && (
             <div>
-              <label className="block space-y-1 text-sm sm:text-base text-slate-800">
+              <label className={labelClass}>
                 <span>Opiši druge ciljeve</span>
                 <input
                   type="text"
-                  className={inputClass}
+                  className={`wa-control ${inputClass}`}
                   value={values.goalsOther}
                   onChange={e => handleChange('goalsOther', e.target.value)}
                   placeholder="Opiši..."
@@ -520,43 +549,43 @@ export function WebProjectForm({
         </fieldset>
 
         {/* 4) Sadržaj */}
-        <fieldset className="space-y-4 rounded-2xl bg-white/70 p-4 sm:p-6 shadow-sm ring-1 ring-slate-100 dark:bg-white/8 dark:ring-slate-700/50">
+        <fieldset className={fieldsetClass}>
           <legend className="sr-only">Sadržaj</legend>
-          <div className="mb-3 text-lg font-semibold leading-snug text-plum/90 dark:text-pearl" aria-hidden="true">
+          <div className={headingClass} aria-hidden="true">
             Sadržaj
           </div>
 
           <div>
-            <p className="text-sm sm:text-base font-medium text-slate-800 mb-2">Jesu li tekstovi spremni?</p>
-            <div className="flex flex-col gap-1 sm:flex-row sm:flex-wrap">
-              <label className="inline-flex items-center gap-2 text-sm text-slate-700">
+            <p className={questionClass}>Jesu li tekstovi spremni?</p>
+            <div className="flex flex-col gap-1 sm:flex-row sm:flex-wrap sm:gap-4">
+              <label className={optionInlineClass}>
                 <input
                   type="radio"
                   name="contentReady"
                   value="yes"
-                  className="accent-violet-500"
+                  className="h-4 w-4 accent-violet-600"
                   checked={values.contentReady === 'yes'}
                   onChange={e => handleChange('contentReady', e.target.value as 'yes' | 'partial' | 'no')}
                 />
                 <span>Da</span>
               </label>
-              <label className="inline-flex items-center gap-2 text-sm text-slate-700">
+              <label className={optionInlineClass}>
                 <input
                   type="radio"
                   name="contentReady"
                   value="partial"
-                  className="accent-violet-500"
+                  className="h-4 w-4 accent-violet-600"
                   checked={values.contentReady === 'partial'}
                   onChange={e => handleChange('contentReady', e.target.value as 'yes' | 'partial' | 'no')}
                 />
                 <span>Djelomično</span>
               </label>
-              <label className="inline-flex items-center gap-2 text-sm text-slate-700">
+              <label className={optionInlineClass}>
                 <input
                   type="radio"
                   name="contentReady"
                   value="no"
-                  className="accent-violet-500"
+                  className="h-4 w-4 accent-violet-600"
                   checked={values.contentReady === 'no'}
                   onChange={e => handleChange('contentReady', e.target.value as 'yes' | 'partial' | 'no')}
                 />
@@ -566,36 +595,36 @@ export function WebProjectForm({
           </div>
 
           <div>
-            <p className="text-sm sm:text-base font-medium text-slate-800 mb-2">Jesu li fotografije/vizuali spremni?</p>
-            <div className="flex flex-col gap-1 sm:flex-row sm:flex-wrap">
-              <label className="inline-flex items-center gap-2 text-sm text-slate-700">
+            <p className={questionClass}>Jesu li fotografije/vizuali spremni?</p>
+            <div className="flex flex-col gap-1 sm:flex-row sm:flex-wrap sm:gap-4">
+              <label className={optionInlineClass}>
                 <input
                   type="radio"
                   name="visualsReady"
                   value="yes"
-                  className="accent-violet-500"
+                  className="h-4 w-4 accent-violet-600"
                   checked={values.visualsReady === 'yes'}
                   onChange={e => handleChange('visualsReady', e.target.value as 'yes' | 'partial' | 'no')}
                 />
                 <span>Da</span>
               </label>
-              <label className="inline-flex items-center gap-2 text-sm text-slate-700">
+              <label className={optionInlineClass}>
                 <input
                   type="radio"
                   name="visualsReady"
                   value="partial"
-                  className="accent-violet-500"
+                  className="h-4 w-4 accent-violet-600"
                   checked={values.visualsReady === 'partial'}
                   onChange={e => handleChange('visualsReady', e.target.value as 'yes' | 'partial' | 'no')}
                 />
                 <span>Djelomično</span>
               </label>
-              <label className="inline-flex items-center gap-2 text-sm text-slate-700">
+              <label className={optionInlineClass}>
                 <input
                   type="radio"
                   name="visualsReady"
                   value="no"
-                  className="accent-violet-500"
+                  className="h-4 w-4 accent-violet-600"
                   checked={values.visualsReady === 'no'}
                   onChange={e => handleChange('visualsReady', e.target.value as 'yes' | 'partial' | 'no')}
                 />
@@ -605,11 +634,11 @@ export function WebProjectForm({
           </div>
 
           <div>
-            <label className="block space-y-1 text-sm sm:text-base text-slate-800">
+            <label className={labelClass}>
               <span>Linkovi na postojeće materijale (Drive, Canva, stara stranica...)</span>
               <input
                 type="text"
-                className={inputClass}
+                className={`wa-control ${inputClass}`}
                 value={values.contentLinks}
                 onChange={e => handleChange('contentLinks', e.target.value)}
                 placeholder="https://..."
@@ -619,31 +648,31 @@ export function WebProjectForm({
         </fieldset>
 
         {/* 5) Dizajn i stil */}
-        <fieldset className="space-y-4 rounded-2xl bg-white/70 p-4 sm:p-6 shadow-sm ring-1 ring-slate-100 dark:bg-white/8 dark:ring-slate-700/50">
+        <fieldset className={fieldsetClass}>
           <legend className="sr-only">Dizajn i stil</legend>
-          <div className="mb-3 text-lg font-semibold leading-snug text-plum/90 dark:text-pearl" aria-hidden="true">
+          <div className={headingClass} aria-hidden="true">
             Dizajn i stil
           </div>
 
-          <p className="text-sm sm:text-base font-medium text-slate-800 mb-2">
+          <p className={questionClass}>
             Kakav stil dizajna želiš?
           </p>
           <div className="grid gap-2 sm:grid-cols-2">
             {WEB_ATELIER_FORM_MOODS.map(option => (
-              <label key={option} className="flex items-start gap-2 text-sm text-slate-700">
+              <label key={option} className={optionClass}>
                 <input
                   type="checkbox"
-                  className="mt-1 accent-violet-500"
+                  className={checkClass}
                   checked={values.designMood.includes(option)}
                   onChange={() => handleToggleMulti('designMood', option)}
                 />
                 <span>{option}</span>
               </label>
             ))}
-            <label className="flex items-start gap-2 text-sm text-slate-700">
+            <label className={optionClass}>
               <input
                 type="checkbox"
-                className="mt-1 accent-violet-500"
+                className={checkClass}
                 checked={values.designMood.includes('Drugo')}
                 onChange={() => handleToggleMulti('designMood', 'Drugo')}
               />
@@ -653,11 +682,11 @@ export function WebProjectForm({
 
           {values.designMood.includes('Drugo') && (
             <div>
-              <label className="block space-y-1 text-sm sm:text-base text-slate-800">
+              <label className={labelClass}>
                 <span>Opiši drugi stil</span>
                 <input
                   type="text"
-                  className={inputClass}
+                  className={`wa-control ${inputClass}`}
                   value={values.designMoodOther}
                   onChange={e => handleChange('designMoodOther', e.target.value)}
                   placeholder="Opiši..."
@@ -667,10 +696,10 @@ export function WebProjectForm({
           )}
 
           <div>
-            <label className="block space-y-1 text-sm sm:text-base text-slate-800">
+            <label className={labelClass}>
               <span>Linkovi na stranice koje ti se sviđaju + opis zašto</span>
               <textarea
-                className={textareaClass}
+                className={`wa-control ${textareaClass}`}
                 value={values.designInspiration}
                 onChange={e => handleChange('designInspiration', e.target.value)}
                 rows={4}
@@ -681,21 +710,21 @@ export function WebProjectForm({
         </fieldset>
 
         {/* 6) Funkcionalnosti */}
-        <fieldset className="space-y-4 rounded-2xl bg-white/70 p-4 sm:p-6 shadow-sm ring-1 ring-slate-100 dark:bg-white/8 dark:ring-slate-700/50">
+        <fieldset className={fieldsetClass}>
           <legend className="sr-only">Funkcionalnosti</legend>
-          <div className="mb-3 text-lg font-semibold leading-snug text-plum/90 dark:text-pearl" aria-hidden="true">
+          <div className={headingClass} aria-hidden="true">
             Funkcionalnosti
           </div>
 
-          <p className="text-sm sm:text-base font-medium text-slate-800 mb-2">
+          <p className={questionClass}>
             Koje funkcionalnosti želiš u projektu?
           </p>
           <div className="grid gap-2 sm:grid-cols-2">
             {WEB_ATELIER_FEATURES.map(option => (
-              <label key={option} className="flex items-start gap-2 text-sm text-slate-700">
+              <label key={option} className={optionClass}>
                 <input
                   type="checkbox"
-                  className="mt-1 accent-violet-500"
+                  className={checkClass}
                   checked={values.features.includes(option)}
                   onChange={() => handleToggleMulti('features', option)}
                 />
@@ -706,11 +735,11 @@ export function WebProjectForm({
 
           {values.features.includes('Drugo') && (
             <div>
-              <label className="block space-y-1 text-sm sm:text-base text-slate-800">
+              <label className={labelClass}>
                 <span>Opiši druge funkcionalnosti</span>
                 <input
                   type="text"
-                  className={inputClass}
+                  className={`wa-control ${inputClass}`}
                   value={values.featuresOther}
                   onChange={e => handleChange('featuresOther', e.target.value)}
                   placeholder="Opiši..."
@@ -720,10 +749,10 @@ export function WebProjectForm({
           )}
 
           <div>
-            <label className="block space-y-1 text-sm sm:text-base text-slate-800">
+            <label className={labelClass}>
               <span>Dodatne funkcionalnosti ili specifični zahtjevi</span>
               <textarea
-                className={textareaClass}
+                className={`wa-control ${textareaClass}`}
                 value={values.featuresNotes}
                 onChange={e => handleChange('featuresNotes', e.target.value)}
                 rows={4}
@@ -734,19 +763,19 @@ export function WebProjectForm({
         </fieldset>
 
         {/* 7) Budžet i rok */}
-        <fieldset className="space-y-4 rounded-2xl bg-white/70 p-4 sm:p-6 shadow-sm ring-1 ring-slate-100 dark:bg-white/8 dark:ring-slate-700/50">
+        <fieldset className={fieldsetClass}>
           <legend className="sr-only">Budžet i rok</legend>
-          <div className="mb-3 text-lg font-semibold leading-snug text-plum/90 dark:text-pearl" aria-hidden="true">
+          <div className={headingClass} aria-hidden="true">
             Budžet i rok
           </div>
 
           <div>
-            <label className="block space-y-1 text-sm sm:text-base text-slate-800">
-              <span>Okvirni budžet *</span>
+            <label className={labelClass}>
+              <span>Okvirni budžet <span className="text-violet-700 dark:text-violet-300" aria-hidden="true">*</span></span>
               <select
                 id="budgetRange"
                 name="budgetRange"
-                className={`${selectClass} ${errors.budgetRange ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''}`}
+                className={`wa-control ${selectClass} ${errors.budgetRange ? controlErrorClass : ''}`}
                 value={values.budgetRange}
                 onChange={e => handleChange('budgetRange', e.target.value)}
               >
@@ -758,16 +787,16 @@ export function WebProjectForm({
               </select>
             </label>
             {errors.budgetRange && (
-              <p className="text-xs text-red-500 mt-1">{errors.budgetRange}</p>
+              <p className={errorClass}>{errors.budgetRange}</p>
             )}
           </div>
 
           <div>
-            <label className="block space-y-1 text-sm sm:text-base text-slate-800">
+            <label className={labelClass}>
               <span>Željeni datum pokretanja</span>
               <input
                 type="date"
-                className={inputClass}
+                className={`wa-control ${inputClass}`}
                 value={values.launchDeadline}
                 onChange={e => handleChange('launchDeadline', e.target.value)}
               />
@@ -775,10 +804,10 @@ export function WebProjectForm({
           </div>
 
           <div>
-            <label className="block space-y-1 text-sm sm:text-base text-slate-800">
+            <label className={labelClass}>
               <span>Fleksibilnost roka</span>
               <select
-                className={selectClass}
+                className={`wa-control ${selectClass}`}
                 value={values.deadlineFlexibility}
                 onChange={e => handleChange('deadlineFlexibility', e.target.value)}
               >
@@ -792,19 +821,19 @@ export function WebProjectForm({
         </fieldset>
 
         {/* 8) Kontakt i napomene */}
-        <fieldset className="space-y-4 rounded-2xl bg-white/70 p-4 sm:p-6 shadow-sm ring-1 ring-slate-100 dark:bg-white/8 dark:ring-slate-700/50">
+        <fieldset className={fieldsetClass}>
           <legend className="sr-only">Kontakt i napomene</legend>
-          <div className="mb-3 text-lg font-semibold leading-snug text-plum/90 dark:text-pearl" aria-hidden="true">
+          <div className={headingClass} aria-hidden="true">
             Kontakt i napomene
           </div>
 
           <div>
-            <label className="block space-y-1 text-sm sm:text-base text-slate-800">
-              <span>Način kontaktiranja *</span>
+            <label className={labelClass}>
+              <span>Način kontaktiranja <span className="text-violet-700 dark:text-violet-300" aria-hidden="true">*</span></span>
               <select
                 id="contactPreference"
                 name="contactPreference"
-                className={`${selectClass} ${errors.contactPreference ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''}`}
+                className={`wa-control ${selectClass} ${errors.contactPreference ? controlErrorClass : ''}`}
                 value={values.contactPreference}
                 onChange={e => handleChange('contactPreference', e.target.value)}
               >
@@ -816,16 +845,16 @@ export function WebProjectForm({
               </select>
             </label>
             {errors.contactPreference && (
-              <p className="text-xs text-red-500 mt-1">{errors.contactPreference}</p>
+              <p className={errorClass}>{errors.contactPreference}</p>
             )}
           </div>
 
           <div>
-            <label className="block space-y-1 text-sm sm:text-base text-slate-800">
+            <label className={labelClass}>
               <span>Najbolje vrijeme za kontakt</span>
               <input
                 type="text"
-                className={inputClass}
+                className={`wa-control ${inputClass}`}
                 value={values.contactTime}
                 onChange={e => handleChange('contactTime', e.target.value)}
                 placeholder="npr. radnim danom od 9 do 17h"
@@ -834,12 +863,12 @@ export function WebProjectForm({
           </div>
 
           <div>
-            <label className="block space-y-1 text-sm sm:text-base text-slate-800">
-              <span>Dodatne napomene / Opis projekta *</span>
+            <label className={labelClass}>
+              <span>Dodatne napomene / Opis projekta <span className="text-violet-700 dark:text-violet-300" aria-hidden="true">*</span></span>
               <textarea
                 id="extraNotes"
                 name="extraNotes"
-                className={`${textareaClass} ${errors.extraNotes ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''}`}
+                className={`wa-control ${textareaClass} ${errors.extraNotes ? controlErrorClass : ''}`}
                 value={values.extraNotes}
                 onChange={e => handleChange('extraNotes', e.target.value)}
                 rows={4}
@@ -847,21 +876,21 @@ export function WebProjectForm({
               />
             </label>
             {errors.extraNotes && (
-              <p className="text-xs text-red-500 mt-1">{errors.extraNotes}</p>
+              <p className={errorClass}>{errors.extraNotes}</p>
             )}
           </div>
         </fieldset>
 
         {submitError && (
-          <div className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-800" role="alert">
+          <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-900 dark:border-red-800 dark:bg-red-950/40 dark:text-red-200" role="alert">
             {submitError}
           </div>
         )}
 
         {isSubmitted && referenceCode && (
-          <div className="mt-4 rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800" role="status">
+          <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-950 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-100" role="status">
             <p>{translations.success[language]}</p>
-            <p className="mt-2 font-semibold">
+            <p className="mt-2 font-bold">
               {language === 'hr' ? 'Broj upita:' : 'Inquiry reference:'} {referenceCode}
             </p>
           </div>
