@@ -45,6 +45,7 @@ const AdminWebAtelierInquiriesPage = lazy(() => import('./pages/AdminWebAtelierI
 const AdminWebAtelierInquiryDetailPage = lazy(
   () => import('./pages/AdminWebAtelierInquiryDetailPage'),
 )
+const AdminWebAtelierTestPage = lazy(() => import('./pages/AdminWebAtelierTestPage'))
 const OstaviRecenzijuPage = lazy(() => import('./pages/OstaviRecenzijuPage'))
 const PolitikaPrivatnostiPage = lazy(() => import('./pages/PolitikaPrivatnostiPage'))
 const StarlinkHrvatskaPage = lazy(() => import('./pages/StarlinkHrvatskaPage'))
@@ -169,6 +170,7 @@ function AnimatedRoutes({
             <Route path="reviews" element={<AdminReviewsPage />} />
             <Route path="web-atelier-inquiries" element={<AdminWebAtelierInquiriesPage />} />
             <Route path="web-atelier-inquiries/:id" element={<AdminWebAtelierInquiryDetailPage />} />
+            <Route path="web-atelier-test" element={<AdminWebAtelierTestPage />} />
           </Route>
         </Routes>
       </Suspense>

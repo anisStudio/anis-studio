@@ -125,9 +125,20 @@ interface WebProjectFormProps {
   hidePageTitle?: boolean
   /** Prefill an informational package label from `?paket=` on /web-atelier/upit. */
   initialPaket?: WebAtelierPaket
+  /** Optional contact prefill (admin E2E test). Does not bypass validation or CAPTCHA. */
+  initialContact?: {
+    fullNameOrCompany?: string
+    email?: string
+    extraNotes?: string
+  }
 }
 
-export function WebProjectForm({ language = 'hr', hidePageTitle = false, initialPaket }: WebProjectFormProps) {
+export function WebProjectForm({
+  language = 'hr',
+  hidePageTitle = false,
+  initialPaket,
+  initialContact,
+}: WebProjectFormProps) {
   const inputClass =
     "w-full rounded-xl border border-slate-200 bg-white/80 px-3 py-2 text-sm shadow-inner focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-violet-400";
   
@@ -136,9 +147,16 @@ export function WebProjectForm({ language = 'hr', hidePageTitle = false, initial
   
   const selectClass = inputClass;
 
-  const [values, setValues] = useState<WebProjectFormValues>(() =>
-    initialValuesFromPaket(language, initialPaket)
-  )
+  const [values, setValues] = useState<WebProjectFormValues>(() => {
+    const base = initialValuesFromPaket(language, initialPaket)
+    if (!initialContact) return base
+    return {
+      ...base,
+      fullNameOrCompany: initialContact.fullNameOrCompany?.trim() || base.fullNameOrCompany,
+      email: initialContact.email?.trim() || base.email,
+      extraNotes: initialContact.extraNotes?.trim() || base.extraNotes,
+    }
+  })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isSending, setIsSending] = useState(false)
