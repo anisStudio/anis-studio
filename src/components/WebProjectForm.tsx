@@ -126,19 +126,12 @@ interface WebProjectFormProps {
   hidePageTitle?: boolean
   /** Prefill an informational package label from `?paket=` on /web-atelier/upit. */
   initialPaket?: WebAtelierPaket
-  /** Optional contact prefill (admin E2E test). Does not bypass validation or CAPTCHA. */
-  initialContact?: {
-    fullNameOrCompany?: string
-    email?: string
-    extraNotes?: string
-  }
 }
 
 export function WebProjectForm({
   language = 'hr',
   hidePageTitle = false,
   initialPaket,
-  initialContact,
 }: WebProjectFormProps) {
   // Layout-only utility classes. ALL colours live in ./webProjectForm.css (`.wa-*`)
   // so the form never depends on `html.dark`, inherited colour or global !important rules.
@@ -159,16 +152,9 @@ export function WebProjectForm({
   const controlErrorClass = 'wa-control-error'
   const checkClass = 'wa-check mt-1 h-4 w-4 shrink-0'
 
-  const [values, setValues] = useState<WebProjectFormValues>(() => {
-    const base = initialValuesFromPaket(language, initialPaket)
-    if (!initialContact) return base
-    return {
-      ...base,
-      fullNameOrCompany: initialContact.fullNameOrCompany?.trim() || base.fullNameOrCompany,
-      email: initialContact.email?.trim() || base.email,
-      extraNotes: initialContact.extraNotes?.trim() || base.extraNotes,
-    }
-  })
+  const [values, setValues] = useState<WebProjectFormValues>(() =>
+    initialValuesFromPaket(language, initialPaket),
+  )
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isSending, setIsSending] = useState(false)

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { createHmac } from 'node:crypto'
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { buildWebAtelierInquiryUpdate } from '../src/lib/webAtelierAdmin.ts'
@@ -451,20 +451,20 @@ assert.match(read('src/App.tsx'), /web-atelier-inquiries\/:id/)
 assert.match(read('src/App.tsx'), /PublicServiceGuard service="webAtelier"/)
 assert.match(read('src/App.tsx'), /<AdminRoute>/)
 const appSource = read('src/App.tsx')
-const adminShell = appSource.indexOf('path="/admin"')
-const adminShellClose = appSource.indexOf('</Route>', appSource.indexOf('path="web-atelier-test"'))
-const testRouteIndex = appSource.indexOf('path="web-atelier-test"')
-assert.ok(adminShell > 0 && testRouteIndex > adminShell && testRouteIndex < adminShellClose)
-assert.match(appSource.slice(adminShell, testRouteIndex), /<AdminRoute>/)
+assert.equal(appSource.includes('web-atelier-test'), false)
+assert.equal(appSource.includes('AdminWebAtelierTestPage'), false)
 assert.equal(read('src/components/Header.tsx').includes('web-atelier-test'), false)
 assert.equal(read('src/components/AdminNav.tsx').includes('web-atelier-test'), false)
 assert.match(read('src/components/AdminRoute.tsx'), /isAdmin/)
 assert.match(read('src/components/AdminRoute.tsx'), /Navigate to="\/admin\/login"/)
-assert.match(read('src/pages/AdminWebAtelierTestPage.tsx'), /TESTNI UPIT — Web Atelier/)
-assert.match(read('src/pages/AdminWebAtelierTestPage.tsx'), /useAdminAuth/)
-assert.match(read('src/pages/AdminWebAtelierTestPage.tsx'), /<WebProjectForm/)
+assert.equal(existsSync(join(root, 'src/pages/AdminWebAtelierTestPage.tsx')), false)
+assert.match(read('src/components/AdminNav.tsx'), /web-atelier-inquiries/)
 assert.match(read('src/components/WebProjectForm.tsx'), /form_submit_success/)
 assert.equal(read('src/components/WebProjectForm.tsx').includes('addWebProjectRequest'), false)
+assert.equal(read('src/components/WebProjectForm.tsx').includes('initialContact'), false)
+assert.match(read('src/hooks/useSettings.ts'), /web_atelier_public_visible:\s*false/)
+assert.match(read('src/App.tsx'), /path="web-atelier-inquiries"/)
+assert.match(read('src/App.tsx'), /path="web-atelier-inquiries\/:id"/)
 const formUx = read('src/components/WebProjectForm.tsx')
 assert.match(formUx, /web-atelier-inquiry-form/)
 assert.match(formUx, /import '\.\/webProjectForm\.css'/)
