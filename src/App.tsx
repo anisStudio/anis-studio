@@ -45,6 +45,13 @@ const AdminWebAtelierInquiriesPage = lazy(() => import('./pages/AdminWebAtelierI
 const AdminWebAtelierInquiryDetailPage = lazy(
   () => import('./pages/AdminWebAtelierInquiryDetailPage'),
 )
+const AdminWebAtelierOffersPage = lazy(() => import('./pages/AdminWebAtelierOffersPage'))
+const AdminWebAtelierOfferDetailPage = lazy(() => import('./pages/AdminWebAtelierOfferDetailPage'))
+const AdminWebAtelierProjectsPage = lazy(() => import('./pages/AdminWebAtelierProjectsPage'))
+const AdminWebAtelierProjectDetailPage = lazy(
+  () => import('./pages/AdminWebAtelierProjectDetailPage'),
+)
+const WebAtelierProjectTrackingPage = lazy(() => import('./pages/WebAtelierProjectTrackingPage'))
 const OstaviRecenzijuPage = lazy(() => import('./pages/OstaviRecenzijuPage'))
 const PolitikaPrivatnostiPage = lazy(() => import('./pages/PolitikaPrivatnostiPage'))
 const StarlinkHrvatskaPage = lazy(() => import('./pages/StarlinkHrvatskaPage'))
@@ -80,7 +87,7 @@ function AnimatedRoutes({
         el.scrollIntoView({ behavior: 'auto', block: 'start' })
       }
     }
-  }, [location.pathname, location.hash])
+  }, [location])
 
   return (
     <AnimatePresence mode="wait">
@@ -137,6 +144,10 @@ function AnimatedRoutes({
             />
             <Route path="/cjenici" element={<CjeniciPage language={language} />} />
             <Route path="/vr/:projectId" element={<PublicProjectVrPage />} />
+            {/* Token-auth status view; outside Web Atelier public launch guard.
+                Bare /pracenje-projekta supports post-scrub sessionStorage restore. */}
+            <Route path="/pracenje-projekta" element={<WebAtelierProjectTrackingPage />} />
+            <Route path="/pracenje-projekta/:token" element={<WebAtelierProjectTrackingPage />} />
             <Route
               path="/ostavi-recenziju"
               element={<OstaviRecenzijuPage language={language} />}
@@ -169,6 +180,10 @@ function AnimatedRoutes({
             <Route path="reviews" element={<AdminReviewsPage />} />
             <Route path="web-atelier-inquiries" element={<AdminWebAtelierInquiriesPage />} />
             <Route path="web-atelier-inquiries/:id" element={<AdminWebAtelierInquiryDetailPage />} />
+            <Route path="web-atelier-offers" element={<AdminWebAtelierOffersPage />} />
+            <Route path="web-atelier-offers/:id" element={<AdminWebAtelierOfferDetailPage />} />
+            <Route path="web-atelier-projects" element={<AdminWebAtelierProjectsPage />} />
+            <Route path="web-atelier-projects/:id" element={<AdminWebAtelierProjectDetailPage />} />
           </Route>
         </Routes>
       </Suspense>

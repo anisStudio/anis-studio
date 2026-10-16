@@ -18,6 +18,9 @@
     "pricing:kitchen-example:test": "node --experimental-strip-types scripts/test-interiors-kitchen-pricing-example.mjs",
     "form:test": "node --experimental-strip-types scripts/test-interiors-inspiration-files.mjs",
     "web-atelier:test": "node --experimental-strip-types scripts/test-web-atelier-inquiry.ts",
+    "web-atelier:offers:test": "node --experimental-strip-types scripts/test-web-atelier-offers.ts",
+    "web-atelier:tracking:test": "node --experimental-strip-types scripts/test-web-atelier-tracking-materials.ts",
+    "web-atelier:tracking:sql": "node scripts/test-web-atelier-tracking-materials-sql.mjs",
     "save": "node scripts/save.mjs"
   },
   "dependencies": {

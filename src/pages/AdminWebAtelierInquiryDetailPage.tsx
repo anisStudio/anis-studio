@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
   fetchWebAtelierInquiry,
   updateWebAtelierInquiry,
@@ -9,6 +9,12 @@ import {
   type WebAtelierRisk,
   type WebAtelierStatus,
 } from '../lib/webAtelierAdmin'
+import {
+  createWebAtelierOfferDraft,
+  fetchWebAtelierOffersForInquiry,
+  formatEuroCents,
+  type WebAtelierOfferListItem,
+} from '../lib/webAtelierOffers'
 import { isSupabaseConfigured } from '../lib/supabase'
 
 const STATUS_LABEL: Record<WebAtelierStatus, string> = {
@@ -36,10 +42,13 @@ function formatValue(value: unknown): string {
 
 export default function AdminWebAtelierInquiryDetailPage() {
   const { id = '' } = useParams()
+  const navigate = useNavigate()
   const [inquiry, setInquiry] = useState<WebAtelierInquiryDetail | null>(null)
+  const [offers, setOffers] = useState<WebAtelierOfferListItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
+  const [isCreatingOffer, setIsCreatingOffer] = useState(false)
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
@@ -52,8 +61,14 @@ export default function AdminWebAtelierInquiryDetailPage() {
       setIsLoading(true)
       setError(null)
       try {
-        const data = await fetchWebAtelierInquiry(id)
-        if (!cancelled) setInquiry(data)
+        const [data, relatedOffers] = await Promise.all([
+          fetchWebAtelierInquiry(id),
+          fetchWebAtelierOffersForInquiry(id).catch(() => [] as WebAtelierOfferListItem[]),
+        ])
+        if (!cancelled) {
+          setInquiry(data)
+          setOffers(relatedOffers)
+        }
       } catch {
         console.error('Web Atelier inquiry detail failed')
         if (!cancelled) setError('Došlo je do greške pri dohvaćanju upita.')
@@ -162,6 +177,47 @@ export default function AdminWebAtelierInquiryDetailPage() {
                 {inquiry.archived_at ? 'Vrati iz arhive' : 'Arhiviraj'}
               </button>
             </div>
+
+            <section className="rounded-xl border border-slate-200 p-4">
+              <h2 className="mb-2 text-lg font-semibold text-slate-900">Službene ponude</h2>
+              <p className="mb-3 text-sm text-slate-600">
+                Upit nije ponuda ni projekt. Nacrt se može otvoriti tek za pregledan upit bez
+                blokiranog rizika.
+              </p>
+              {offers.length === 0 ? (
+                <p className="text-sm text-slate-600">Još nema ponuda za ovaj upit.</p>
+              ) : (
+                <ul className="mb-3 space-y-2 text-sm">
+                  {offers.map((row) => (
+                    <li key={row.id}>
+                      <Link className="font-medium text-violet-700 hover:underline" to={`/admin/web-atelier-offers/${row.id}`}>
+                        {row.offer_number}
+                      </Link>
+                      <span className="ml-2 text-slate-600">
+                        {row.status} · {formatEuroCents(row.total_cents)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <button
+                type="button"
+                disabled={isCreatingOffer}
+                className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-800 hover:bg-slate-50 disabled:opacity-50"
+                onClick={() => {
+                  setIsCreatingOffer(true)
+                  setError(null)
+                  void createWebAtelierOfferDraft(inquiry.id)
+                    .then((offerId) => navigate(`/admin/web-atelier-offers/${offerId}`))
+                    .catch((caught: unknown) => {
+                      setError(caught instanceof Error ? caught.message : 'Nacrt ponude nije kreiran.')
+                    })
+                    .finally(() => setIsCreatingOffer(false))
+                }}
+              >
+                {isCreatingOffer ? 'Otvaram nacrt…' : 'Otvori nacrt ponude'}
+              </button>
+            </section>
 
             <dl className="grid gap-3 text-sm">
               <div>
