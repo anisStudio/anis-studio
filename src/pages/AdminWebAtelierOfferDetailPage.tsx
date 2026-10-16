@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { isSupabaseConfigured } from '../lib/supabase'
+import AdminCommunicationsPanel from '../components/AdminCommunicationsPanel'
 import {
   WEB_ATELIER_DELIVERY_CHANNELS,
   WEB_ATELIER_EVIDENCE_CHANNELS,
@@ -608,6 +609,11 @@ export default function AdminWebAtelierOfferDetailPage() {
                 Nova verzija ponude
               </button>
             )}
+
+            <AdminCommunicationsPanel
+              inquiryId={offer.inquiry_id}
+              offerId={offer.id}
+            />
           </div>
         )}
       </section>

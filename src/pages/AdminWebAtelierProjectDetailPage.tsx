@@ -32,6 +32,8 @@ import {
   type WebAtelierTrackingTokenCreated,
   type WebAtelierTrackingTokenMeta,
 } from '../lib/webAtelierTracking'
+import AdminCommunicationsPanel from '../components/AdminCommunicationsPanel'
+import AdminFinancePanel from '../components/AdminFinancePanel'
 
 const STATUS_LABEL: Record<WebAtelierProjectStatus, string> = {
   preparing: 'Priprema',
@@ -488,6 +490,13 @@ export default function AdminWebAtelierProjectDetailPage() {
                 ))}
               </ul>
             </section>
+
+            <AdminCommunicationsPanel
+              inquiryId={project.inquiry_id}
+              offerId={project.offer_id}
+              projectId={project.id}
+            />
+            <AdminFinancePanel projectId={project.id} />
           </div>
         )}
       </section>

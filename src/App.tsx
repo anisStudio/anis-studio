@@ -51,6 +51,7 @@ const AdminWebAtelierProjectsPage = lazy(() => import('./pages/AdminWebAtelierPr
 const AdminWebAtelierProjectDetailPage = lazy(
   () => import('./pages/AdminWebAtelierProjectDetailPage'),
 )
+const AdminAvailabilityPage = lazy(() => import('./pages/AdminAvailabilityPage'))
 const WebAtelierProjectTrackingPage = lazy(() => import('./pages/WebAtelierProjectTrackingPage'))
 const OstaviRecenzijuPage = lazy(() => import('./pages/OstaviRecenzijuPage'))
 const PolitikaPrivatnostiPage = lazy(() => import('./pages/PolitikaPrivatnostiPage'))
@@ -184,6 +185,7 @@ function AnimatedRoutes({
             <Route path="web-atelier-offers/:id" element={<AdminWebAtelierOfferDetailPage />} />
             <Route path="web-atelier-projects" element={<AdminWebAtelierProjectsPage />} />
             <Route path="web-atelier-projects/:id" element={<AdminWebAtelierProjectDetailPage />} />
+            <Route path="availability" element={<AdminAvailabilityPage />} />
           </Route>
         </Routes>
       </Suspense>

@@ -16,6 +16,7 @@ import {
   type WebAtelierOfferListItem,
 } from '../lib/webAtelierOffers'
 import { isSupabaseConfigured } from '../lib/supabase'
+import AdminCommunicationsPanel from '../components/AdminCommunicationsPanel'
 
 const STATUS_LABEL: Record<WebAtelierStatus, string> = {
   submitted: 'Zaprimljeno',
@@ -274,6 +275,8 @@ export default function AdminWebAtelierInquiryDetailPage() {
                 </dl>
               </section>
             )}
+
+            <AdminCommunicationsPanel inquiryId={inquiry.id} />
           </div>
         )}
       </section>

@@ -122,6 +122,18 @@ const AdminNav: React.FC = () => {
               >
                 WA projekti
               </NavLink>
+              <NavLink
+                to="/admin/availability"
+                className={({ isActive }) =>
+                  `text-sm font-medium transition-colors duration-200 px-3 py-1.5 rounded-lg ${
+                    isActive
+                      ? 'text-violet-700 bg-violet-50 font-semibold'
+                      : 'text-slate-700 hover:text-violet-700 hover:bg-slate-100'
+                  }`
+                }
+              >
+                Kapacitet
+              </NavLink>
             </nav>
           </div>
 
