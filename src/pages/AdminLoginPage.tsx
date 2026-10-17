@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Eye, EyeOff } from 'lucide-react'
+import {
+  EXPECTED_SUPABASE_PROJECT_REF,
+  getSupabasePublicDiagnostics,
+} from '../lib/supabasePublicConfig'
 import { useAdminAuth } from '../providers/AdminAuthProvider'
 
 export default function AdminLoginPage() {
@@ -13,6 +17,12 @@ export default function AdminLoginPage() {
   const { login, isAdmin, loading, user } = useAdminAuth()
   const navigate = useNavigate()
   const location = useLocation()
+  const diagnostics = getSupabasePublicDiagnostics()
+  const projectRefLabel = diagnostics.projectRef ?? '—'
+  const envLooksUnexpected =
+    diagnostics.status === 'ready' &&
+    diagnostics.projectRef !== null &&
+    diagnostics.projectRef !== EXPECTED_SUPABASE_PROJECT_REF
 
   useEffect(() => {
     if (loading || !isAdmin) return
@@ -29,12 +39,13 @@ export default function AdminLoginPage() {
     const result = await login(email, password)
 
     if (result.success) {
-      const from = location.state?.from?.pathname
-      navigate(from || '/admin/settings', { replace: true })
-    } else {
-      setError(result.error ?? 'Prijava nije uspjela.')
+      // Wait for AdminAuthProvider isAdmin — avoids racing AdminRoute.
       setIsSubmitting(false)
+      return
     }
+
+    setError(result.error ?? 'Prijava nije uspjela.')
+    setIsSubmitting(false)
   }
 
   if (loading) {
@@ -59,6 +70,27 @@ export default function AdminLoginPage() {
           </h1>
           <p className="mt-1 text-sm text-slate-600">
             Ova stranica je namijenjena samo vlasniku Ani's Studia.
+          </p>
+          <p className="mt-2 text-xs text-slate-500">
+            Auth projekt:{' '}
+            <code className="rounded bg-slate-100 px-1 py-0.5 text-[11px] text-slate-700">
+              {projectRefLabel}
+            </code>
+            {diagnostics.status === 'missing' || diagnostics.status === 'invalid_url' ? (
+              <span className="ml-2 text-red-700">· konfiguracija nedostaje</span>
+            ) : null}
+            {diagnostics.status === 'url_key_mismatch' ? (
+              <span className="ml-2 text-red-700">· URL i ključ nisu usklađeni</span>
+            ) : null}
+            {envLooksUnexpected ? (
+              <span className="ml-2 text-amber-700">
+                · očekivano {EXPECTED_SUPABASE_PROJECT_REF}
+              </span>
+            ) : null}
+          </p>
+          <p className="mt-1 text-xs text-slate-500">
+            Sesija s produkcijske domene ne prenosi se na Vercel Preview — potrebna je nova
+            prijava.
           </p>
         </header>
 

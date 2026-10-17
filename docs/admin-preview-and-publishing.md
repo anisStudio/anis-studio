@@ -44,21 +44,36 @@ Cilj: korisnica vidi feature granu prije mergea na `main`.
 5. Provjera izgleda i funkcionalnosti.
 6. Tek nakon odobrenja: merge u `main` → Production.
 
-### Status zaštite Preview deploymenta — NOT VERIFIED
+### Status zaštite Preview deploymenta
 
-Bez pristupa Vercel dashboardu u ovoj sesiji **nije verificirano**:
-
-- je li Deployment Protection / Vercel Authentication uključen;
-- jesu li Preview URL-ovi javno dostupni poznavateljima linka.
+Za granu `feature/universal-admin-preview` potvrđeno je da Preview URL preusmjerava na
+**Vercel Authentication / SSO** (zaštita je uključena). To nije zamjena za Supabase admin
+prijavu: nakon Vercel prolaza i dalje treba `/admin/login` s produkcijskim Auth računom.
 
 **Ne pretpostavljajte** da je Preview privatan samo zato što URL nije oglašen.
 
-Preporuka (ručno u Vercel projektu, uz odobrenje vlasnice):
-
-- Settings → Deployment Protection → zaštita Preview deploymenta;
-- po potrebi Vercel Authentication za Preview.
-
 Ne mijenjajte produkcijske domene ni Vercel projekt bez odobrenja.
+
+### Admin prijava na Preview — okruženje
+
+Vite ugrađuje `VITE_*` varijable u build. Preview i Production moraju koristiti **isti**
+Supabase projekt (`cpvofgaknmgnmusypoev`) ako želite istu admin e-poštu/lozinku.
+
+1. Vercel → Project → **Settings** → **Environment Variables**
+2. Provjerite da su za **Preview** (i Production) postavljene:
+   - `VITE_SUPABASE_URL` = `https://cpvofgaknmgnmusypoev.supabase.co`
+   - `VITE_SUPABASE_ANON_KEY` = ista vrijednost kao na Production (anon/publishable, ne service role)
+3. Ako Preview nema te varijable ili ima drugi projekt — to je uzrok neuspješne prijave.
+4. Nakon ispravke: **Redeploy** Preview deploymenta (env se ne primijeni na stari build).
+5. Na `/admin/login` provjerite redak **Auth projekt:** — mora pisati `cpvofgaknmgnmusypoev`.
+
+Poruka „Neispravna e-pošta ili lozinka.” dolazi od Supabase `signInWithPassword` (autentifikacija),
+ne od `is_admin()` (autorizacija). Produkcijska sesija na `anislrc.hr` ne dokazuje Preview prijavu.
+
+`VITE_ADMIN_PASSWORD` više nije u upotrebi za admin login — ignorirajte stare upute koje ga traže.
+
+**Nemojte mijenjati Vercel env bez odobrenja vlasnice.** Ako Preview nije usklađen, zatražite
+usklađivanje Preview varijabli s Production.
 
 ## SEO
 

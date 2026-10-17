@@ -9,11 +9,19 @@ import React, {
   type ReactNode,
 } from 'react'
 import type { Session, User } from '@supabase/supabase-js'
+import {
+  failureFromSupabaseAuthError,
+  messageForAdminAuthFailure,
+  type AdminAuthFailureKind,
+} from '../lib/adminAuthErrors'
+import { getSupabasePublicDiagnostics } from '../lib/supabasePublicConfig'
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
 
 export interface AdminLoginResult {
   success: boolean
   error?: string
+  /** Machine-readable failure class for safe UI / tests — never secrets. */
+  failureKind?: AdminAuthFailureKind
 }
 
 interface AdminAuthContextValue {
@@ -26,20 +34,6 @@ interface AdminAuthContextValue {
 }
 
 const AdminAuthContext = createContext<AdminAuthContextValue | undefined>(undefined)
-
-function mapAuthErrorMessage(message: string | undefined): string {
-  const m = message?.toLowerCase() ?? ''
-  if (
-    m.includes('invalid login credentials') ||
-    m.includes('invalid email or password')
-  ) {
-    return 'Neispravna e-pošta ili lozinka.'
-  }
-  if (m.includes('email not confirmed')) {
-    return 'Potvrdite adresu e-pošte prije prijave.'
-  }
-  return 'Prijava nije uspjela. Pokušajte ponovo.'
-}
 
 /**
  * Fail closed. Only a boolean true from public.is_admin() is authorization.
@@ -163,11 +157,24 @@ export const AdminAuthProvider: React.FC<{ children: ReactNode }> = ({ children 
   }, [applySession, clearAuthenticatedState])
 
   const login = useCallback(async (email: string, password: string): Promise<AdminLoginResult> => {
-    if (!supabase || !isSupabaseConfigured) {
+    const diagnostics = getSupabasePublicDiagnostics()
+    if (
+      !supabase ||
+      !isSupabaseConfigured ||
+      diagnostics.status === 'missing' ||
+      diagnostics.status === 'invalid_url'
+    ) {
       return {
         success: false,
-        error:
-          'Supabase nije konfiguriran. Provjerite VITE_SUPABASE_URL i VITE_SUPABASE_ANON_KEY u .env.',
+        failureKind: 'not_configured',
+        error: messageForAdminAuthFailure('not_configured'),
+      }
+    }
+    if (diagnostics.status === 'url_key_mismatch') {
+      return {
+        success: false,
+        failureKind: 'misconfigured',
+        error: messageForAdminAuthFailure('misconfigured'),
       }
     }
 
@@ -176,17 +183,43 @@ export const AdminAuthProvider: React.FC<{ children: ReactNode }> = ({ children 
       return { success: false, error: 'Unesite e-poštu i lozinku.' }
     }
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email: trimmedEmail,
-      password,
-    })
+    let signInError: { message?: string; status?: number; name?: string } | null = null
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: trimmedEmail,
+        password,
+      })
+      signInError = error
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'failed to fetch'
+      const name = err instanceof Error ? err.name : null
+      const failure = failureFromSupabaseAuthError({ message, name })
+      return { success: false, failureKind: failure.kind, error: failure.message }
+    }
 
-    if (error) {
-      return { success: false, error: mapAuthErrorMessage(error.message) }
+    if (signInError) {
+      const failure = failureFromSupabaseAuthError({
+        message: signInError.message,
+        status: signInError.status,
+        name: signInError.name,
+      })
+      return { success: false, failureKind: failure.kind, error: failure.message }
+    }
+
+    // Distinguish auth success vs missing admin role before the UI navigates.
+    const allowed = await fetchIsAdmin()
+    if (!allowed) {
+      await supabase.auth.signOut({ scope: 'global' })
+      clearAuthenticatedState()
+      return {
+        success: false,
+        failureKind: 'not_admin',
+        error: messageForAdminAuthFailure('not_admin'),
+      }
     }
 
     return { success: true }
-  }, [])
+  }, [clearAuthenticatedState])
 
   const logout = useCallback(async (): Promise<void> => {
     // Immediate teardown so AdminRoute redirects before sign-out finishes.
