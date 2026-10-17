@@ -2,6 +2,7 @@ import { ErrorBoundary } from '../ErrorBoundary'
 import { AnimatedPage } from '../components/AnimatedPage'
 import { LrcFormPageLayout } from '../components/LrcFormPageLayout'
 import LRCInquiryForm from '../components/LRCInquiryForm'
+import { PublicConsultationBooking } from '../components/PublicConsultationBooking'
 import { useSettings } from '../hooks/useSettings'
 import { PageSEO } from '../components/PageSEO'
 
@@ -64,6 +65,7 @@ export default function LrcInquiryPage({ language = 'hr' }: LrcInquiryPageProps)
             <LrcFormPageLayout language={language} title={title}>
               <div className="mx-auto min-w-0 max-w-4xl">
                 <LRCInquiryForm language={language} />
+                <PublicConsultationBooking department="lrc" language={language} />
               </div>
             </LrcFormPageLayout>
           )}

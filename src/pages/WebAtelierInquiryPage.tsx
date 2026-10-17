@@ -3,6 +3,7 @@ import { ErrorBoundary } from '../ErrorBoundary'
 import { AnimatedPage } from '../components/AnimatedPage'
 import { WebAtelierFormPageLayout } from '../components/WebAtelierFormPageLayout'
 import { WebProjectForm, type WebAtelierPaket } from '../components/WebProjectForm'
+import { PublicConsultationBooking } from '../components/PublicConsultationBooking'
 import { PageSEO } from '../components/PageSEO'
 
 interface WebAtelierInquiryPageProps {
@@ -35,6 +36,8 @@ export default function WebAtelierInquiryPage({ language }: WebAtelierInquiryPag
                 initialPaket={initialPaket}
                 applyStoredConfigurator={applyStoredConfigurator}
               />
+              {/* Behind PublicServiceGuard; WA public remains OFF until F2.11. */}
+              <PublicConsultationBooking department="web_atelier" language={language} />
             </div>
           </WebAtelierFormPageLayout>
         </ErrorBoundary>

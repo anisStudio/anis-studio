@@ -3,6 +3,7 @@ import { ErrorBoundary } from '../ErrorBoundary'
 import { AnimatedPage } from '../components/AnimatedPage'
 import { InteriorsFormPageLayout } from '../components/InteriorsFormPageLayout'
 import { InteriorsClientForm } from '../components/InteriorsClientForm'
+import { PublicConsultationBooking } from '../components/PublicConsultationBooking'
 import { INTERIORS_STOLAR_OPTIONS } from '../data/interiorsPublic'
 import { PageSEO } from '../components/PageSEO'
 import { InteriorsSettingsLoading } from '../components/InteriorsSettingsLoading'
@@ -74,6 +75,7 @@ export default function InterijeriClientsPage({ language }: InterijeriClientsPag
         <ErrorBoundary name="InterijeriKlijenti">
           <InteriorsFormPageLayout language={language} title={title}>
             <InteriorsClientForm stolars={INTERIORS_STOLAR_OPTIONS} language={language} />
+            <PublicConsultationBooking department="interiors" language={language} />
           </InteriorsFormPageLayout>
         </ErrorBoundary>
       </main>
