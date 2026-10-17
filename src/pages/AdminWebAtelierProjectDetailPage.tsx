@@ -496,7 +496,10 @@ export default function AdminWebAtelierProjectDetailPage() {
               offerId={project.offer_id}
               projectId={project.id}
             />
-            <AdminFinancePanel projectId={project.id} />
+            <AdminFinancePanel
+              projectId={project.id}
+              agreedTotalCents={project.agreed_total_cents}
+            />
           </div>
         )}
       </section>

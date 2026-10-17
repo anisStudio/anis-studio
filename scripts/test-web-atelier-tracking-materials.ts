@@ -76,6 +76,14 @@ const okPayload = {
   checked_at: new Date().toISOString(),
 }
 assert.equal(assertPublicStatusPayload(okPayload).status, 'in_progress')
+assert.equal(assertPublicStatusPayload(okPayload).receipts, undefined)
+assert.equal(
+  assertPublicStatusPayload({
+    ...okPayload,
+    receipts: [{ label: 'Avans', status: 'awaiting', confirmed_on: null }],
+  }).receipts?.[0]?.status,
+  'awaiting',
+)
 assert.throws(
   () => assertPublicStatusPayload({ ...okPayload, client_email: 'x@y.z' }),
   /public_status_leaks_sensitive_field/,

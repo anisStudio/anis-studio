@@ -135,6 +135,36 @@ export default function WebAtelierProjectTrackingPage() {
                 {status.status_description_hr}
               </p>
             </div>
+            {status.receipts && status.receipts.length > 0 ? (
+              <div className="rounded-lg border border-slate-200 bg-white p-4">
+                <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                  Potvrda uplata
+                </p>
+                <ul className="mt-3 space-y-3">
+                  {status.receipts.map((receipt) => (
+                    <li key={`${receipt.label}-${receipt.status}-${receipt.confirmed_on ?? 'x'}`}>
+                      <p className="font-medium text-slate-900">{receipt.label}</p>
+                      <p
+                        className={`text-sm ${
+                          receipt.status === 'confirmed' ? 'text-emerald-800' : 'text-amber-800'
+                        }`}
+                      >
+                        {receipt.status === 'confirmed'
+                          ? 'Primitak potvrđen'
+                          : 'Čeka potvrdu'}
+                        {receipt.status === 'confirmed' && receipt.confirmed_on
+                          ? ` · ${receipt.confirmed_on}`
+                          : ''}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+                <p className="mt-3 text-xs text-slate-500">
+                  Iznosi, bankovni podaci i dokumenti nisu prikazani. Službena evidencija vodi se
+                  zasebno.
+                </p>
+              </div>
+            ) : null}
             <p className="text-xs text-slate-500">
               Provjereno: {new Date(status.checked_at).toLocaleString('hr-HR')}
             </p>

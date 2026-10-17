@@ -25,6 +25,8 @@
     "web-atelier:tracking:sql": "node scripts/test-web-atelier-tracking-materials-sql.mjs",
     "web-atelier:ghi:test": "node --experimental-strip-types scripts/test-web-atelier-ghi.ts",
     "web-atelier:ghi:sql": "node scripts/test-web-atelier-ghi-sql.mjs",
+    "web-atelier:finance-receipt:test": "node --experimental-strip-types scripts/test-web-atelier-finance-receipt.ts",
+    "web-atelier:finance-receipt:sql": "node scripts/test-web-atelier-finance-receipt-sql.mjs",
     "save": "node scripts/save.mjs"
   },
   "dependencies": {

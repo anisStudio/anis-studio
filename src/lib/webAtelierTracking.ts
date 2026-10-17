@@ -85,6 +85,13 @@ export interface WebAtelierTrackingTokenCreated {
   label: string | null
 }
 
+/** Public receipt row — label + status/date only (no amounts / Parra / admin). */
+export interface WebAtelierPublicReceiptStatus {
+  label: string
+  status: 'awaiting' | 'confirmed'
+  confirmed_on: string | null
+}
+
 /** Minimal public status — must never include PII, notes, evidence, or money. */
 export interface WebAtelierPublicProjectStatus {
   project_number: string
@@ -93,6 +100,8 @@ export interface WebAtelierPublicProjectStatus {
   status_label_hr: string
   status_description_hr: string
   checked_at: string
+  /** Present after receipt-confirmation migration; omit/empty hides the section. */
+  receipts?: WebAtelierPublicReceiptStatus[]
 }
 
 const PUBLIC_STATUS_KEYS = [
@@ -104,6 +113,8 @@ const PUBLIC_STATUS_KEYS = [
   'checked_at',
 ] as const
 
+const OPTIONAL_PUBLIC_KEYS = ['receipts'] as const
+
 const FORBIDDEN_PUBLIC_KEYS = [
   'client_email',
   'client_name',
@@ -113,10 +124,18 @@ const FORBIDDEN_PUBLIC_KEYS = [
   'admin_notes',
   'agreed_total_cents',
   'total_cents',
+  'amount_cents',
+  'amount',
+  'external_reference',
+  'parra',
   'approval_id',
   'evidence',
   'token_hash',
+  'receipt_confirmed_by',
+  'actor_id',
 ] as const
+
+const RECEIPT_ALLOWED_KEYS = ['label', 'status', 'confirmed_on'] as const
 
 async function adminClient() {
   const { supabase } = await import('./supabase.ts')
@@ -138,6 +157,32 @@ export function defaultTrackingExpiryIso(days = 30): string {
   return at.toISOString()
 }
 
+function assertPublicReceipts(value: unknown): WebAtelierPublicReceiptStatus[] | undefined {
+  if (value === undefined) return undefined
+  if (!Array.isArray(value)) throw new Error('public_status_receipts_invalid')
+  return value.map((raw) => {
+    if (!raw || typeof raw !== 'object') throw new Error('public_status_receipts_invalid')
+    const row = raw as Record<string, unknown>
+    for (const key of Object.keys(row)) {
+      if (!(RECEIPT_ALLOWED_KEYS as readonly string[]).includes(key)) {
+        throw new Error('public_status_receipt_leaks_field')
+      }
+    }
+    if (typeof row.label !== 'string' || !row.label) throw new Error('public_status_receipts_invalid')
+    if (row.status !== 'awaiting' && row.status !== 'confirmed') {
+      throw new Error('public_status_receipts_invalid')
+    }
+    if (row.confirmed_on != null && typeof row.confirmed_on !== 'string') {
+      throw new Error('public_status_receipts_invalid')
+    }
+    return {
+      label: row.label,
+      status: row.status,
+      confirmed_on: row.confirmed_on ?? null,
+    }
+  })
+}
+
 export function assertPublicStatusPayload(payload: Record<string, unknown>): WebAtelierPublicProjectStatus {
   for (const key of FORBIDDEN_PUBLIC_KEYS) {
     if (key in payload) throw new Error('public_status_leaks_sensitive_field')
@@ -147,10 +192,11 @@ export function assertPublicStatusPayload(payload: Record<string, unknown>): Web
       throw new Error('public_status_incomplete')
     }
   }
-  const extra = Object.keys(payload).filter(
-    (key) => !(PUBLIC_STATUS_KEYS as readonly string[]).includes(key),
-  )
+  const allowed = new Set<string>([...PUBLIC_STATUS_KEYS, ...OPTIONAL_PUBLIC_KEYS])
+  const extra = Object.keys(payload).filter((key) => !allowed.has(key))
   if (extra.length > 0) throw new Error('public_status_unexpected_fields')
+
+  const receipts = assertPublicReceipts(payload.receipts)
 
   return {
     project_number: String(payload.project_number),
@@ -159,6 +205,7 @@ export function assertPublicStatusPayload(payload: Record<string, unknown>): Web
     status_label_hr: String(payload.status_label_hr),
     status_description_hr: String(payload.status_description_hr),
     checked_at: String(payload.checked_at),
+    ...(receipts !== undefined ? { receipts } : {}),
   }
 }
 
