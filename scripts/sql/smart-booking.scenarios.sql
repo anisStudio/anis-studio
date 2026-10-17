@@ -118,7 +118,7 @@ begin
 end
 $close$;
 
--- Public atomic book + idempotency + stale refusal
+-- Public atomic book via service_role only (Edge path) + idempotency
 do $public$
 declare
   v_win uuid;
@@ -136,16 +136,34 @@ begin
     1, null
   );
 
+  -- Anon must NOT be able to call booking RPC directly (Turnstile bypass closed).
   perform t.as_anon();
+  begin
+    perform public.public_book_consultation_slot(
+      'interiors', v_win, 'Bypass', 'bypass@example.com', '0950000000',
+      'Pokušaj zaobilaženja Turnstile zaštite.', 
+      'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
+      null, 'booking_lead', null
+    );
+    raise exception 'FAIL: anon must not execute public_book_consultation_slot';
+  exception when others then
+    if sqlerrm ~ 'permission denied|42501' then
+      raise notice 'PASS: anon cannot execute booking RPC (bypass closed)';
+    else
+      raise;
+    end if;
+  end;
+
+  perform t.as_service();
   v_a := public.public_book_consultation_slot(
     'interiors', v_win, 'Maja Test', 'maja@example.com', '0955555555',
-    'Detaljan opis projekta kuhinje.', v_key, 'fp1', 'booking_lead', null
+    'Detaljan opis projekta kuhinje.', v_key, null, 'booking_lead', null
   );
   perform t.ok((v_a->>'replay')::boolean = false, 'public book creates reservation');
 
   v_b := public.public_book_consultation_slot(
     'interiors', v_win, 'Maja Test', 'maja@example.com', '0955555555',
-    'Detaljan opis projekta kuhinje.', v_key, 'fp1', 'booking_lead', null
+    'Detaljan opis projekta kuhinje.', v_key, null, 'booking_lead', null
   );
   perform t.ok((v_b->>'replay')::boolean = true, 'idempotent replay returns same booking');
   perform t.ok(v_a->>'reservation_id' = v_b->>'reservation_id', 'idempotent same id');
@@ -154,7 +172,7 @@ begin
     perform public.public_book_consultation_slot(
       'interiors', v_win, 'Other', 'other@example.com', '0966666666',
       'Drugi pokušaj istog slota.', 'bbbbbbbb-bbbb-cccc-dddd-eeeeeeeeeeee',
-      'fp2', 'booking_lead', null
+      null, 'booking_lead', null
     );
     raise exception 'FAIL: second public book should fail on full slot';
   exception when others then
@@ -165,6 +183,7 @@ begin
     end if;
   end;
 
+  perform t.as_anon();
   -- No PII leak via list
   perform t.ok(
     (select public.public_list_consultation_availability(
@@ -264,6 +283,21 @@ select t.fails(
   $q$ select public.admin_list_booking_calendar(null, null, null) $q$,
   'forbidden|not_admin|permission denied|42501',
   'anon cannot list admin calendar'
+);
+
+-- Authenticated non-admin also cannot call booking RPC (must use Edge).
+select t.as_user();
+select t.fails(
+  $q$ select public.public_book_consultation_slot(
+    'lrc',
+    '00000000-0000-4000-8000-000000000001'::uuid,
+    'User', 'user@example.com', '0911111111',
+    'Opis pokušaja authenticated bypass.',
+    'dddddddd-dddd-4ddd-8ddd-dddddddddddd'::uuid,
+    null, 'booking_lead', null
+  ) $q$,
+  'permission denied|42501',
+  'authenticated cannot execute booking RPC'
 );
 
 select t.as_postgres();

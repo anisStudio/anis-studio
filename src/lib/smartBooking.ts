@@ -399,6 +399,48 @@ export async function listPublicConsultationAvailability(input: {
   }
 }
 
+export type BookingClientErrorCode =
+  | 'captcha_failed'
+  | 'rate_limited'
+  | 'invalid_payload'
+  | 'unavailable'
+  | 'slot_unavailable'
+
+export class BookingClientError extends Error {
+  readonly code: BookingClientErrorCode
+  readonly language: 'hr' | 'en'
+
+  constructor(code: BookingClientErrorCode, language: 'hr' | 'en' = 'hr') {
+    super(bookingErrorMessage(code, language))
+    this.name = 'BookingClientError'
+    this.code = code
+    this.language = language
+  }
+}
+
+export function bookingErrorMessage(code: BookingClientErrorCode, language: 'hr' | 'en'): string {
+  const hr: Record<BookingClientErrorCode, string> = {
+    captcha_failed: 'Provjera sigurnosti nije uspjela. Osvježite stranicu i pokušajte ponovno.',
+    rate_limited: 'Previše pokušaja. Pričekajte malo pa pokušajte ponovno.',
+    invalid_payload: 'Provjerite unesene podatke i pokušajte ponovno.',
+    unavailable: 'Rezervacije trenutno nisu dostupne. Pokušajte kasnije.',
+    slot_unavailable:
+      'Odabrani termin više nije dostupan. Osvježite kalendar i odaberite drugi termin.',
+  }
+  const en: Record<BookingClientErrorCode, string> = {
+    captcha_failed: 'Security check failed. Refresh the page and try again.',
+    rate_limited: 'Too many attempts. Please wait a moment and try again.',
+    invalid_payload: 'Please check your details and try again.',
+    unavailable: 'Booking is temporarily unavailable. Please try again later.',
+    slot_unavailable: 'That slot is no longer available. Refresh and pick another time.',
+  }
+  return language === 'en' ? en[code] : hr[code]
+}
+
+/**
+ * Public booking via Edge Function only (server-side Turnstile).
+ * Direct anon RPC to public_book_consultation_slot is revoked after hardening migration.
+ */
 export async function bookConsultationSlot(input: {
   department: Department
   windowId: string
@@ -407,37 +449,102 @@ export async function bookConsultationSlot(input: {
   contactPhone: string
   description: string
   idempotencyKey: string
-  clientFingerprint?: string | null
+  turnstileToken: string
+  language?: 'hr' | 'en'
   entityKind?: string
   entityId?: string | null
 }): Promise<PublicBookResult> {
-  const client = await requireClient()
-  const { data, error } = await client.rpc('public_book_consultation_slot', {
-    p_department: input.department,
-    p_window_id: input.windowId,
-    p_contact_name: input.contactName,
-    p_contact_email: input.contactEmail,
-    p_contact_phone: input.contactPhone,
-    p_description: input.description,
-    p_idempotency_key: input.idempotencyKey,
-    p_client_fingerprint: input.clientFingerprint ?? null,
-    p_entity_kind: input.entityKind ?? 'booking_lead',
-    p_entity_id: input.entityId ?? null,
-  })
-  if (error) {
-    if (isMissingRpcError(error)) throw new SmartBookingUnavailableError()
-    const msg = error.message ?? ''
-    if (/booking_slot_unavailable|capacity_exceeded|stale|closed/i.test(msg)) {
-      throw new Error(
-        'Odabrani termin više nije dostupan. Osvježite kalendar i odaberite drugi termin.',
+  const language = input.language ?? 'hr'
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined
+  const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
+  if (!supabaseUrl || !anonKey) {
+    throw new SmartBookingUnavailableError()
+  }
+  if (!input.turnstileToken.trim()) {
+    throw new BookingClientError('captcha_failed', language)
+  }
+
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), 20_000)
+  try {
+    const response = await fetch(
+      `${supabaseUrl.replace(/\/$/, '')}/functions/v1/book-consultation-slot`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          apikey: anonKey,
+          Authorization: `Bearer ${anonKey}`,
+        },
+        body: JSON.stringify({
+          department: input.department,
+          windowId: input.windowId,
+          contactName: input.contactName,
+          contactEmail: input.contactEmail,
+          contactPhone: input.contactPhone,
+          description: input.description,
+          idempotencyKey: input.idempotencyKey,
+          turnstileToken: input.turnstileToken,
+          language,
+          entityKind: input.entityKind ?? 'booking_lead',
+          entityId: input.entityId ?? null,
+        }),
+        signal: controller.signal,
+      },
+    )
+
+    let payload: Record<string, unknown> = {}
+    try {
+      payload = (await response.json()) as Record<string, unknown>
+    } catch {
+      payload = {}
+    }
+
+    if (response.ok) {
+      if (
+        typeof payload.reservationId === 'string' &&
+        typeof payload.startsAt === 'string' &&
+        typeof payload.endsAt === 'string'
+      ) {
+        return {
+          reservation_id: payload.reservationId,
+          department: (payload.department as Department) ?? input.department,
+          starts_at: payload.startsAt,
+          ends_at: payload.endsAt,
+          replay: payload.replay === true,
+          notice_hr: typeof payload.noticeHr === 'string' ? payload.noticeHr : undefined,
+          notice_en: typeof payload.noticeEn === 'string' ? payload.noticeEn : undefined,
+        }
+      }
+      throw new BookingClientError('unavailable', language)
+    }
+
+    const code = payload.error
+    if (
+      code === 'captcha_failed' ||
+      code === 'rate_limited' ||
+      code === 'invalid_payload' ||
+      code === 'unavailable' ||
+      code === 'slot_unavailable'
+    ) {
+      throw new BookingClientError(code, language)
+    }
+    if (response.status === 404 || response.status === 503) {
+      throw new SmartBookingUnavailableError(
+        language === 'en'
+          ? 'Booking is not activated yet. Please try again later.'
+          : 'Rezervacije još nisu aktivirane. Pokušajte kasnije.',
       )
     }
-    if (/rate_limited/i.test(msg)) {
-      throw new Error('Previše pokušaja. Pričekajte malo pa pokušajte ponovno.')
+    throw new BookingClientError('unavailable', language)
+  } catch (caught) {
+    if (caught instanceof BookingClientError || caught instanceof SmartBookingUnavailableError) {
+      throw caught
     }
-    throw new Error(msg)
+    throw new BookingClientError('unavailable', language)
+  } finally {
+    clearTimeout(timer)
   }
-  return data as PublicBookResult
 }
 
 /** Zagreb calendar helpers for month grids (Europe/Zagreb). */

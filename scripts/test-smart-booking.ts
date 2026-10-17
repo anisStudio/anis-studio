@@ -19,6 +19,11 @@ const migration = readFileSync(
   join(root, 'supabase/migrations/20261017130000_f26_smart_booking_shared_availability.sql'),
   'utf8',
 )
+const hardening = readFileSync(
+  join(root, 'supabase/migrations/20261017140000_f26_booking_turnstile_edge_hardening.sql'),
+  'utf8',
+)
+const clientLib = readFileSync(join(root, 'src/lib/smartBooking.ts'), 'utf8')
 
 assert.match(migration, /create table public\.booking_shared_settings/)
 assert.match(migration, /create table public\.availability_closures/)
@@ -39,6 +44,15 @@ assert.match(migration, /info_sufficient/)
 assert.doesNotMatch(migration, /stripe/i)
 assert.doesNotMatch(migration, /twilio|sendgrid|resend\.com|nodemailer/i)
 assert.match(migration, /Existing confirmed bookings were NOT moved/)
+
+assert.match(hardening, /revoke all on function public\.public_book_consultation_slot/)
+assert.match(hardening, /to service_role/)
+assert.match(hardening, /book-consultation-slot/)
+assert.match(clientLib, /functions\/v1\/book-consultation-slot/)
+assert.doesNotMatch(
+  clientLib,
+  /\.rpc\(\s*['"]public_book_consultation_slot['"]/,
+)
 
 assert.ok(BOOKING_KINDS.includes('consultation'))
 assert.ok(BOOKING_KINDS.includes('production'))

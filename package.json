@@ -28,6 +28,7 @@
     "web-atelier:finance-receipt:test": "node --experimental-strip-types scripts/test-web-atelier-finance-receipt.ts",
     "web-atelier:finance-receipt:sql": "node scripts/test-web-atelier-finance-receipt-sql.mjs",
     "smart-booking:test": "node --experimental-strip-types scripts/test-smart-booking.ts",
+    "smart-booking:edge:test": "node --experimental-strip-types scripts/test-smart-booking-edge.ts",
     "smart-booking:sql": "node scripts/test-smart-booking-sql.mjs",
     "save": "node scripts/save.mjs"
   },

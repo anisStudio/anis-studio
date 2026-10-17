@@ -88,9 +88,10 @@ async function runConcurrency() {
     "select t.as_admin(); select public.admin_create_department_availability_window('lrc','Race F26',timestamptz '2027-03-01 08:00:00+01',timestamptz '2027-03-01 18:00:00+01',1,null)",
   )
 
+  // Concurrent bookers simulate Edge (service_role), not anon browser RPC.
   const bookSql = (label, key) => `
 \\set ON_ERROR_STOP on
-select t.as_anon();
+select t.as_service();
 do $body$
 declare
   v_ok boolean := false;
@@ -106,7 +107,7 @@ begin
       '09100000${label === 'a' ? '1' : '2'}',
       'Konkurentni opis rezervacije ${label}.',
       '${key}'::uuid,
-      'fp_${label}',
+      null,
       'booking_lead',
       null
     );
@@ -174,6 +175,7 @@ try {
     'supabase/migrations/20261017010000_f24_comms_finance_availability.sql',
     'supabase/migrations/20261017120000_f24_payment_receipt_confirmation.sql',
     'supabase/migrations/20261017130000_f26_smart_booking_shared_availability.sql',
+    'supabase/migrations/20261017140000_f26_booking_turnstile_edge_hardening.sql',
   ]
 
   const script = [

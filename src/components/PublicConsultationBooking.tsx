@@ -150,7 +150,15 @@ export function PublicConsultationBooking({
       setError(language === 'hr' ? 'Odaberite termin.' : 'Please select a slot.')
       return
     }
-    if (turnstileSiteKey && !turnstileToken) {
+    if (!turnstileSiteKey) {
+      setError(
+        language === 'hr'
+          ? 'Rezervacije nisu konfigurirane (nedostaje Turnstile).'
+          : 'Booking is not configured (missing Turnstile).',
+      )
+      return
+    }
+    if (!turnstileToken) {
       setError(copy.captcha[language])
       return
     }
@@ -166,7 +174,8 @@ export function PublicConsultationBooking({
         contactPhone,
         description,
         idempotencyKey,
-        clientFingerprint: turnstileToken || null,
+        turnstileToken,
+        language,
         entityKind: linkedEntityKind,
         entityId: linkedEntityId,
       })
