@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { trackEvent } from '../lib/analytics'
 import { DecorativeSkyBackdrop } from './DecorativeSkyBackdrop'
+import { WebAtelierConfigurator } from './WebAtelierConfigurator'
 
 interface WebAtelierSectionProps {
   language: 'hr' | 'en'
@@ -52,94 +53,6 @@ export default function WebAtelierSection({ language }: WebAtelierSectionProps) 
       title: { hr: "Vaša stranica je spremna", en: "Your page is ready" },
       desc: { hr: "Objavljujemo i podešavamo sve za Vas", en: "We publish and configure everything for you" }
     },
-    pricingPlans: {
-      hr: [
-        {
-          name: 'Start',
-          price: '299€',
-          description: 'Osnovna jednostranična stranica',
-          features: [
-            'Responzivni dizajn',
-            'Osnovna SEO optimizacija',
-            'Kontakt formular',
-            'Google Analytics',
-            '1 revizija dizajna'
-          ],
-          popular: false
-        },
-        {
-          name: 'Pro',
-          price: '499€',
-          description: 'Dodatne animacije i analitika',
-          features: [
-            'Sve iz Start paketa',
-            'Napredne animacije',
-            'Detaljna analitika',
-            '2 revizije dizajna',
-            'Email integracija'
-          ],
-          popular: true
-        },
-        {
-          name: 'Premium',
-          price: '799€',
-          description: 'Mini branding paket',
-          features: [
-            'Sve iz Pro paketa',
-            'Logo dizajn',
-            'Brand guidelines',
-            '3 revizije dizajna',
-            'Prioritetna podrška'
-          ],
-          popular: false
-        }
-      ],
-      en: [
-        {
-          name: 'Start',
-          price: '299€',
-          description: 'Essential one-pager',
-          features: [
-            'Responsive design',
-            'Basic SEO optimization',
-            'Contact form',
-            'Google Analytics',
-            '1 design revision'
-          ],
-          popular: false
-        },
-        {
-          name: 'Pro',
-          price: '499€',
-          description: 'Extra animations & analytics',
-          features: [
-            'Everything from Start',
-            'Advanced animations',
-            'Detailed analytics',
-            '2 design revisions',
-            'Email integration'
-          ],
-          popular: true
-        },
-        {
-          name: 'Premium',
-          price: '799€',
-          description: 'Mini branding package',
-          features: [
-            'Everything from Pro',
-            'Logo design',
-            'Brand guidelines',
-            '3 design revisions',
-            'Priority support'
-          ],
-          popular: false
-        }
-      ]
-    },
-    popular: {
-      hr: "Najpopularniji",
-      en: "Most Popular"
-    },
     requestQuote: {
       hr: "Zatraži ponudu",
       en: "Request Quote"
@@ -149,13 +62,15 @@ export default function WebAtelierSection({ language }: WebAtelierSectionProps) 
         title: "Spremni za svoju landing stranicu?",
         description:
           "U kratkoj formi za upit opišite što trebate — vratit ću vam prijedlog strukture, dizajna i sljedećih koraka. Suradnja je jasna i usmjerena na stranicu koja donosi klijente, brzo i bez nepotrebnih komplikacija.",
-        paymentNote: "Plaćanja karticom putem Stripe-a.",
+        estimateNote:
+          "Konfigurator daje samo informativnu procjenu. Konačna ponuda dolazi nakon ručne provjere upita.",
       },
       en: {
         title: "Ready for your landing page?",
         description:
           "Use the short inquiry form to describe what you need — I'll reply with a proposed structure, design, and next steps. Clear collaboration focused on a page that brings clients, quickly and without unnecessary friction.",
-        paymentNote: "Card payments via Stripe.",
+        estimateNote:
+          "The configurator provides an indicative estimate only. A final quote follows manual review of your inquiry.",
       },
     },
     reviewCtaTitle: {
@@ -298,56 +213,9 @@ export default function WebAtelierSection({ language }: WebAtelierSectionProps) 
           </div>
         </div>
 
-        {/* Pricing Cards */}
-        <div
-          id="web-atelier-pricing"
-          className="mx-auto mb-10 grid w-full max-w-6xl scroll-mt-28 grid-cols-1 gap-5 sm:mb-12 sm:scroll-mt-32 md:grid-cols-3 md:gap-6"
-        >
-          {translations.pricingPlans[language].map((plan, index) => (
-            <div 
-              key={index} 
-              className={`flex h-full flex-col rounded-2xl p-5 sm:p-6 bg-white/80 dark:bg-white/8 backdrop-blur-sm border shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.02] fade-in ${
-                plan.popular 
-                  ? 'border-2 border-[--color-primary] ring-2 ring-[--color-primary]/20' 
-                  : 'border-[rgba(110,68,255,0.15)] dark:border-lavender/15'
-              }`}
-            >
-              {plan.popular && (
-                <div className="text-center mb-4">
-                  <span 
-                    className="pill px-4 py-1 text-xs font-bold"
-                    style={{
-                      background: 'linear-gradient(135deg, #BDA6FF 0%, #6E44FF 100%)',
-                      color: 'white',
-                      border: 'none'
-                    }}
-                  >
-                    {translations.popular[language]}
-                  </span>
-                </div>
-              )}
-              <h3 className="mb-2 text-center text-xl font-bold text-plum dark:text-pearl">{plan.name}</h3>
-              <div className="mb-4 text-center">
-                <span className="text-3xl font-bold text-[--color-primary]">{plan.price}</span>
-              </div>
-              <p className="mb-4 text-center text-sm text-[--color-ink-muted] dark:text-pearl/75">{plan.description}</p>
-              <ul className="mb-6 flex-1 space-y-2">
-                {plan.features.map((feature, featureIndex) => (
-                  <li key={featureIndex} className="flex items-start gap-2">
-                    <span className="text-[--color-primary] font-bold mt-0.5 shrink-0">✓</span>
-                    <span className="text-xs text-plum dark:text-pearl/90">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-              <Link
-                to={`/web-atelier/upit?paket=${(['start', 'pro', 'premium'] as const)[index]}`}
-                onClick={() => trackEvent('inquiry_cta_click', { source: 'web-atelier' })}
-                className="btn btn-primary mt-auto inline-flex w-full min-h-[48px] touch-manipulation items-center justify-center"
-              >
-                {translations.requestQuote[language]}
-              </Link>
-            </div>
-          ))}
+        {/* F2.5 service configurator (indicative pricing; public WA still gated) */}
+        <div id="web-atelier-pricing" className="mx-auto mb-10 w-full max-w-6xl sm:mb-12">
+          <WebAtelierConfigurator language={language} />
         </div>
 
         {/* Završni CTA — jedan blok: što slijedi + jedan gumb na formu */}
@@ -367,7 +235,7 @@ export default function WebAtelierSection({ language }: WebAtelierSectionProps) 
               {translations.requestQuote[language]}
             </Link>
             <p className="mx-auto max-w-md text-xs text-plum/65 dark:text-pearl/60">
-              {translations.cta[language].paymentNote}
+              {translations.cta[language].estimateNote}
             </p>
           </div>
         </div>

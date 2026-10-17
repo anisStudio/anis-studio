@@ -1,0 +1,105 @@
+/*
+ * Web Atelier F2.5 configurator — self-contained light surface.
+ * Mirrors webProjectForm.css strategy so section-with-bg / dark theme
+ * cannot wash out contrast (no dependency on html.dark).
+ */
+
+.wa-cfg {
+  --wa-cfg-ink: #2e2447;
+  --wa-cfg-ink-soft: #453c5e;
+  --wa-cfg-border: #8b7fa3;
+  --wa-cfg-accent: #6e44ff;
+  --wa-cfg-surface: #f9f7fb;
+  --wa-cfg-panel: #ffffff;
+  --wa-cfg-muted: #6b6280;
+  --wa-cfg-selected: rgba(110, 68, 255, 0.12);
+  color-scheme: light;
+}
+
+html body .wa-cfg.wa-cfg.wa-cfg {
+  background-color: var(--wa-cfg-surface) !important;
+  color: var(--wa-cfg-ink) !important;
+  border-radius: 1.25rem;
+  box-shadow: 0 0 0 1px var(--wa-cfg-border);
+  padding: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  html body .wa-cfg.wa-cfg.wa-cfg {
+    padding: 1.75rem;
+  }
+}
+
+html body .wa-cfg.wa-cfg.wa-cfg,
+html body .wa-cfg.wa-cfg.wa-cfg * {
+  color: var(--wa-cfg-ink) !important;
+  opacity: 1;
+  text-shadow: none !important;
+}
+
+html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-title {
+  color: var(--wa-cfg-ink) !important;
+  font-weight: 700;
+}
+
+html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-help {
+  color: var(--wa-cfg-ink-soft) !important;
+}
+
+html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-muted {
+  color: var(--wa-cfg-muted) !important;
+}
+
+html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-panel {
+  background-color: var(--wa-cfg-panel) !important;
+  border: 1px solid var(--wa-cfg-border);
+  border-radius: 0.875rem;
+}
+
+html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-panel.is-selected {
+  border-color: var(--wa-cfg-accent);
+  background-color: var(--wa-cfg-selected) !important;
+  box-shadow: 0 0 0 2px rgba(110, 68, 255, 0.25);
+}
+
+html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-accent {
+  color: var(--wa-cfg-accent) !important;
+  font-weight: 700;
+}
+
+html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-total {
+  color: var(--wa-cfg-ink) !important;
+  font-weight: 800;
+}
+
+html body .wa-cfg.wa-cfg.wa-cfg input[type='checkbox'],
+html body .wa-cfg.wa-cfg.wa-cfg input[type='radio'],
+html body .wa-cfg.wa-cfg.wa-cfg input[type='number'] {
+  accent-color: var(--wa-cfg-accent);
+}
+
+html body .wa-cfg.wa-cfg.wa-cfg input[type='number'] {
+  background-color: #ffffff !important;
+  border: 1px solid var(--wa-cfg-border);
+  border-radius: 0.5rem;
+  color: var(--wa-cfg-ink) !important;
+  padding: 0.35rem 0.5rem;
+}
+
+html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-btn {
+  background: linear-gradient(135deg, #bda6ff 0%, #6e44ff 100%) !important;
+  color: #ffffff !important;
+  border: none;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  min-height: 48px;
+}
+
+html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-btn * {
+  color: #ffffff !important;
+}

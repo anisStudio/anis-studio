@@ -16,6 +16,7 @@ export default function WebAtelierInquiryPage({ language }: WebAtelierInquiryPag
   const raw = searchParams.get('paket')
   const initialPaket: WebAtelierPaket | undefined =
     raw === 'start' || raw === 'pro' || raw === 'premium' ? raw : undefined
+  const applyStoredConfigurator = searchParams.get('cfg') === '1'
 
   return (
     <AnimatedPage>
@@ -28,7 +29,12 @@ export default function WebAtelierInquiryPage({ language }: WebAtelierInquiryPag
         <ErrorBoundary name="WebAtelierUpit">
           <WebAtelierFormPageLayout language={language} title={title}>
             <div className="mx-auto min-w-0 max-w-4xl">
-              <WebProjectForm language={language} hidePageTitle initialPaket={initialPaket} />
+              <WebProjectForm
+                language={language}
+                hidePageTitle
+                initialPaket={initialPaket}
+                applyStoredConfigurator={applyStoredConfigurator}
+              />
             </div>
           </WebAtelierFormPageLayout>
         </ErrorBoundary>

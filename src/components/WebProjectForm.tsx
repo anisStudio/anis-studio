@@ -3,6 +3,11 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { trackEvent } from '../lib/analytics'
 import {
+  WEB_ATELIER_CONFIG_MARKER_START,
+  inquiryPatchesFromConfigurator,
+  readStoredConfiguratorSelection,
+} from '../lib/webAtelierConfigurator.ts'
+import {
   WEB_ATELIER_FEATURES,
   WEB_ATELIER_FORM_MOODS,
   WEB_ATELIER_GOALS,
@@ -108,15 +113,43 @@ function packageNote(language: 'hr' | 'en', paket: WebAtelierPaket): string {
     : `Informational package label: ${label}. This is not a quote or a final price.\n`
 }
 
-function initialValuesFromPaket(
+function initialValuesFromSources(
   language: 'hr' | 'en',
-  paket?: WebAtelierPaket
+  paket?: WebAtelierPaket,
+  applyStoredConfigurator = false,
 ): WebProjectFormValues {
-  if (!paket) return { ...INITIAL_VALUES }
+  let values: WebProjectFormValues = { ...INITIAL_VALUES }
+
+  if (paket) {
+    values = {
+      ...values,
+      packagePreference: paket,
+      extraNotes: packageNote(language, paket),
+    }
+  }
+
+  if (!applyStoredConfigurator) return values
+
+  const storage = typeof window === 'undefined' ? null : window.sessionStorage
+  const stored = readStoredConfiguratorSelection(storage)
+  if (!stored) return values
+
+  const patches = inquiryPatchesFromConfigurator(stored, language, values.featuresNotes)
+  const packagePreference = patches.packagePreference || values.packagePreference
   return {
-    ...INITIAL_VALUES,
-    packagePreference: paket,
-    extraNotes: packageNote(language, paket),
+    ...values,
+    packagePreference,
+    featuresNotes: patches.featuresNotes,
+    features: [...new Set([...values.features, ...patches.features])],
+    projectTypes:
+      values.projectTypes.length > 0 ? values.projectTypes : patches.projectTypes,
+    budgetRange: values.budgetRange || patches.budgetRange,
+    extraNotes:
+      values.extraNotes.trim().length > 0
+        ? values.extraNotes
+        : packagePreference
+          ? packageNote(language, packagePreference)
+          : values.extraNotes,
   }
 }
 
@@ -126,12 +159,15 @@ interface WebProjectFormProps {
   hidePageTitle?: boolean
   /** Prefill an informational package label from `?paket=` on /web-atelier/upit. */
   initialPaket?: WebAtelierPaket
+  /** Apply F2.5 configurator selection from sessionStorage into existing inquiry fields. */
+  applyStoredConfigurator?: boolean
 }
 
 export function WebProjectForm({
   language = 'hr',
   hidePageTitle = false,
   initialPaket,
+  applyStoredConfigurator = false,
 }: WebProjectFormProps) {
   // Layout-only utility classes. ALL colours live in ./webProjectForm.css (`.wa-*`)
   // so the form never depends on `html.dark`, inherited colour or global !important rules.
@@ -153,8 +189,9 @@ export function WebProjectForm({
   const checkClass = 'wa-check mt-1 h-4 w-4 shrink-0'
 
   const [values, setValues] = useState<WebProjectFormValues>(() =>
-    initialValuesFromPaket(language, initialPaket),
+    initialValuesFromSources(language, initialPaket, applyStoredConfigurator),
   )
+  const hasConfiguratorSummary = values.featuresNotes.includes(WEB_ATELIER_CONFIG_MARKER_START)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isSending, setIsSending] = useState(false)
@@ -354,6 +391,13 @@ export function WebProjectForm({
         {values.packagePreference && (
           <p className={helpClass}>
             {packageNote(language, values.packagePreference).trim()}
+          </p>
+        )}
+        {hasConfiguratorSummary && (
+          <p className={helpClass} role="status">
+            {language === 'hr'
+              ? 'Odabrana konfiguracija iz konfiguratora upisana je u napomene o funkcionalnostima (informativno, neobvezujuće). Možeš je prilagoditi prije slanja.'
+              : 'Your configurator selection was written into the features notes (indicative, nonbinding). You can edit it before sending.'}
           </p>
         )}
 
