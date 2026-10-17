@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { trackEvent } from '../lib/analytics'
 import { DecorativeSkyBackdrop } from './DecorativeSkyBackdrop'
 import { WebAtelierConfigurator } from './WebAtelierConfigurator'
+import { WebAtelierDemoPortfolio } from './webAtelierDemos/WebAtelierDemoPortfolio'
 
 interface WebAtelierSectionProps {
   language: 'hr' | 'en'
@@ -20,14 +21,6 @@ export default function WebAtelierSection({ language }: WebAtelierSectionProps) 
     bridge: {
       hr: "Ani's Web Atelier namijenjen je malim obrtima, poduzetnicima i brendovima kojima treba jasna, uredna i profesionalna web prisutnost. Umjesto kompliciranog procesa, dobivaš konkretan paket, jasan tijek suradnje i stranicu koja je prilagođena tvojoj priči i cilju.",
       en: "Ani's Web Atelier is for small businesses, entrepreneurs, and brands that need a clear, polished, professional web presence. Instead of a complicated process, you get a concrete package, a straightforward collaboration flow, and a page tailored to your story and goals.",
-    },
-    showcaseTitle: {
-      hr: 'Pregled web smjera studija',
-      en: 'A look at the studio’s web direction',
-    },
-    showcaseIntro: {
-      hr: 'Primjeri i prikazi rada dopunjuju se postupno. Ovdje možeš steći dojam smjera, pristupa i vrste web stranica koje studio razvija.',
-      en: 'Examples and previews are added gradually. Here you can get a sense of the direction, approach, and types of websites the studio builds.',
     },
     stepsTitle: {
       hr: "Kako do svoje landing stranice",
@@ -179,38 +172,9 @@ export default function WebAtelierSection({ language }: WebAtelierSectionProps) 
           ))}
         </div>
 
-        {/* Showcase — smjer rada, sadržaj se dopunjuje */}
+        {/* F2.7 demo portfolio — fictional concepts behind WA public guard */}
         <div className="mx-auto mb-10 max-w-6xl sm:mb-12">
-          <div className="mx-auto mb-6 max-w-3xl text-center sm:mb-8">
-            <h3 className="font-heading text-xl font-bold text-balance text-plum dark:text-pearl sm:text-2xl">
-              {translations.showcaseTitle[language]}
-            </h3>
-            <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-plum/78 dark:text-pearl/72 sm:mt-5 sm:text-[0.9375rem] sm:leading-relaxed">
-              {translations.showcaseIntro[language]}
-            </p>
-          </div>
-          <div className="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-3">
-            {[1, 2, 3].map((item) => (
-              <div
-                key={item}
-                className="flex h-full flex-col overflow-hidden rounded-2xl bg-white/80 backdrop-blur-sm border border-[rgba(110,68,255,0.15)] shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.01] dark:bg-white/8 fade-in"
-              >
-                <div
-                  className="aspect-video bg-gradient-to-br from-[rgba(189,166,255,0.2)] to-[rgba(110,68,255,0.15)] flex items-center justify-center"
-                  style={{
-                    borderBottom: '2px solid rgba(110, 68, 255, 0.2)'
-                  }}
-                >
-                  <div className="text-center p-4">
-                    <div className="text-4xl mb-3 opacity-80">💻</div>
-                    <p className="text-xs font-medium text-[--color-ink-muted] opacity-80 dark:text-pearl/70">
-                      {language === 'hr' ? 'Fotografija dolazi uskoro' : 'Photo coming soon'}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <WebAtelierDemoPortfolio language={language} />
         </div>
 
         {/* F2.5 service configurator (indicative pricing; public WA still gated) */}

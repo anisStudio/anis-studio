@@ -20,6 +20,7 @@
     "web-atelier:test": "node --experimental-strip-types scripts/test-web-atelier-inquiry.ts",
     "web-atelier:offers:test": "node --experimental-strip-types scripts/test-web-atelier-offers.ts",
     "web-atelier:configurator:test": "node --experimental-strip-types scripts/test-web-atelier-configurator.ts",
+    "web-atelier:demos:test": "node --experimental-strip-types scripts/test-web-atelier-demos.ts",
     "web-atelier:tracking:test": "node --experimental-strip-types scripts/test-web-atelier-tracking-materials.ts",
     "web-atelier:tracking:sql": "node scripts/test-web-atelier-tracking-materials-sql.mjs",
     "web-atelier:ghi:test": "node --experimental-strip-types scripts/test-web-atelier-ghi.ts",

@@ -25,6 +25,7 @@ const InterijeriClientsPage = lazy(() => import('./pages/InterijeriClientsPage')
 const InterijeriStolariPage = lazy(() => import('./pages/InterijeriStolariPage'))
 const WebAtelierPage = lazy(() => import('./pages/WebAtelierPage'))
 const WebAtelierInquiryPage = lazy(() => import('./pages/WebAtelierInquiryPage'))
+const WebAtelierDemoPage = lazy(() => import('./pages/WebAtelierDemoPage'))
 const AboutPage = lazy(() => import('./pages/AboutPage'))
 const ContactPage = lazy(() => import('./pages/ContactPage'))
 const FAQPage = lazy(() => import('./pages/FAQPage'))
@@ -135,6 +136,7 @@ function AnimatedRoutes({
             >
               <Route index element={<WebAtelierPage language={language} />} />
               <Route path="upit" element={<WebAtelierInquiryPage language={language} />} />
+              <Route path="demo/:slug" element={<WebAtelierDemoPage language={language} />} />
             </Route>
             <Route path="/o-nama" element={<AboutPage language={language} />} />
             <Route path="/kontakt" element={<ContactPage language={language} />} />
