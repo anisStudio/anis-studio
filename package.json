@@ -30,6 +30,7 @@
     "smart-booking:test": "node --experimental-strip-types scripts/test-smart-booking.ts",
     "smart-booking:edge:test": "node --experimental-strip-types scripts/test-smart-booking-edge.ts",
     "smart-booking:sql": "node scripts/test-smart-booking-sql.mjs",
+    "admin-preview:test": "node --experimental-strip-types scripts/test-admin-preview-access.ts",
     "save": "node scripts/save.mjs"
   },
   "dependencies": {

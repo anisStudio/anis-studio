@@ -1,5 +1,6 @@
 import { createPortal } from 'react-dom'
 import { Helmet } from 'react-helmet-async'
+import { useAdminDepartmentPreview } from '../providers/AdminDepartmentPreviewContext'
 
 /** Production origin — keep in sync with public/robots.txt and public/sitemap.xml */
 export const SITE_URL = 'https://anislrc.hr'
@@ -44,11 +45,16 @@ export function PageSEO({
   ogImageAlt,
   jsonLd,
 }: PageSEOProps) {
+  const adminDepartmentPreview = useAdminDepartmentPreview()
+  const effectiveNoIndex = noIndex || adminDepartmentPreview
+
   /** Page-specific title segment; paired with SITE_NAME — see `titleBrandFirst`. */
   const fullTitle = titleBrandFirst ? `${SITE_NAME} | ${title}` : `${title} | ${SITE_NAME}`
   const resolvedOgTitle = ogTitle ?? fullTitle
   const resolvedOgDescription = ogDescription ?? description
-  const canonicalUrl = canonical ? `${SITE_URL}${canonical}` : undefined
+  // Admin preview of a hidden department must not advertise a public canonical.
+  const canonicalUrl =
+    !effectiveNoIndex && canonical ? `${SITE_URL}${canonical}` : undefined
   const resolvedOgImageUrl = ogImage ?? DEFAULT_OG_IMAGE_URL
   const resolvedOgImageAlt = ogImageAlt ?? DEFAULT_OG_IMAGE_ALT
 
@@ -56,7 +62,7 @@ export function PageSEO({
     <Helmet>
       <title>{fullTitle}</title>
       <meta name="description" content={description} />
-      <meta name="robots" content={noIndex ? 'noindex,follow' : 'index,follow'} />
+      <meta name="robots" content={effectiveNoIndex ? 'noindex,follow' : 'index,follow'} />
       {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
 
       <meta property="og:type" content="website" />

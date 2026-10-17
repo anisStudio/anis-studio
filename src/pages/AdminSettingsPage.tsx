@@ -293,8 +293,10 @@ export default function AdminSettingsPage() {
                 Javna vidljivost sekcija
               </h2>
               <p className="mt-1 text-sm text-slate-700">
-                Ove postavke kontroliraju prikaz sekcija u glavnom javnom putu.
-                Direktni URL-ovi ostaju dostupni dok ih posebno ne isključimo.
+                Ove postavke određuju smiju li javni posjetitelji pristupiti odjelu
+                (navigacija i izravni URL). Administratori mogu pregledavati skrivene
+                odjele putem Admin → Pregled stranice. Vidljivost nije isto što i
+                objavljivanje novog koda (za to koristite Vercel Preview).
               </p>
             </div>
 

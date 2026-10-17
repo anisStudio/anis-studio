@@ -2,11 +2,9 @@ import { Link } from 'react-router-dom'
 import { AnimatedPage } from '../components/AnimatedPage'
 import { DecorativeSkyBackdrop } from '../components/DecorativeSkyBackdrop'
 import { PageSEO } from '../components/PageSEO'
-import { InteriorsSettingsLoading } from '../components/InteriorsSettingsLoading'
 import {
   KitchenPricingIllustrationSlot,
 } from '../components/pricing/KitchenPricingIllustrationSlot'
-import { useSettings } from '../hooks/useSettings'
 import {
   formatInteriorsPrice,
   formatInteriorsPriceById,
@@ -25,18 +23,6 @@ import {
 
 interface CjeniciInterijeriPageProps {
   language: 'hr' | 'en'
-}
-
-const unavailableCopy = {
-  title: {
-    hr: 'Usluga je trenutno u pripremi',
-    en: 'This service is currently in preparation',
-  },
-  text: {
-    hr: 'Cjenik trenutno nije javno dostupan. Za upite možete nam se javiti putem kontakt stranice.',
-    en: 'This price list is not publicly available at the moment. You can contact us through the contact page.',
-  },
-  button: { hr: 'Kontakt', en: 'Contact' },
 }
 
 const baseTaglines: Record<string, { hr: string; en: string }> = {
@@ -393,40 +379,8 @@ function InteriorsPriceListContent({ language }: { language: 'hr' | 'en' }) {
   )
 }
 
+/** Visibility gated by PublicServiceGuard (service=interiors). */
 export default function CjeniciInterijeriPage({ language }: CjeniciInterijeriPageProps) {
-  const { settings, isLoading } = useSettings()
-  const interiorsVisible = settings?.interiors_public_visible ?? true
-
-  if (isLoading) {
-    return (
-      <InteriorsSettingsLoading
-        language={language}
-        seoTitle={language === 'hr' ? 'Cjenik Interijera' : 'Interiors price list'}
-      />
-    )
-  }
-
-  if (!interiorsVisible) {
-    return (
-      <AnimatedPage>
-        <PageSEO title="Cjenik Interijera" description="" noIndex />
-        <main className="min-w-0">
-          <section className="Section fade-in">
-            <div className="mx-auto max-w-xl px-4 py-20 text-center">
-              <h1 className="mb-4 font-heading text-2xl font-bold text-plum/95 dark:text-pearl">
-                {unavailableCopy.title[language]}
-              </h1>
-              <p className="mb-8 text-plum/75 dark:text-pearl/70">{unavailableCopy.text[language]}</p>
-              <Link to="/kontakt" className="btn btn-primary inline-flex min-h-[48px] px-8 py-3 font-semibold">
-                {unavailableCopy.button[language]}
-              </Link>
-            </div>
-          </section>
-        </main>
-      </AnimatedPage>
-    )
-  }
-
   return (
     <AnimatedPage>
       <PageSEO
