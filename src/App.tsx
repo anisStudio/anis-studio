@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Outlet, useLocation } from 'react-router-
 import { AnimatePresence } from 'framer-motion'
 import { Toaster } from 'react-hot-toast'
 import CartDrawer from './components/CartDrawer'
+import { AdminAuthCallbackRedirect } from './components/AdminAuthCallbackRedirect'
 import { PublicServiceGuard } from './components/PublicServiceGuard'
 import { RouteFallback } from './components/RouteFallback'
 import { useCart } from './lib/cart.store'
@@ -54,6 +55,8 @@ const AdminWebAtelierProjectDetailPage = lazy(
 )
 const AdminAvailabilityPage = lazy(() => import('./pages/AdminAvailabilityPage'))
 const AdminSitePreviewPage = lazy(() => import('./pages/AdminSitePreviewPage'))
+const AdminForgotPasswordPage = lazy(() => import('./pages/AdminForgotPasswordPage'))
+const AdminResetPasswordPage = lazy(() => import('./pages/AdminResetPasswordPage'))
 const WebAtelierProjectTrackingPage = lazy(() => import('./pages/WebAtelierProjectTrackingPage'))
 const OstaviRecenzijuPage = lazy(() => import('./pages/OstaviRecenzijuPage'))
 const PolitikaPrivatnostiPage = lazy(() => import('./pages/PolitikaPrivatnostiPage'))
@@ -173,8 +176,10 @@ function AnimatedRoutes({
             />
           </Route>
 
-          {/* Admin routes - no public header/footer; login outside persistent shell */}
+          {/* Admin routes - no public header/footer; login/recovery outside AdminRoute */}
           <Route path="/admin/login" element={<AdminLoginPage />} />
+          <Route path="/admin/forgot-password" element={<AdminForgotPasswordPage />} />
+          <Route path="/admin/reset-password" element={<AdminResetPasswordPage />} />
           <Route
             path="/admin"
             element={
@@ -272,6 +277,7 @@ export default function App() {
       <BrowserRouter>
         <CookieBanner language={language} />
         <AdminAuthProvider>
+          <AdminAuthCallbackRedirect />
           <AnimatedRoutes
             language={language}
             cartCount={cartCount}

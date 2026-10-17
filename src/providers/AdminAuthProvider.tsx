@@ -14,6 +14,12 @@ import {
   messageForAdminAuthFailure,
   type AdminAuthFailureKind,
 } from '../lib/adminAuthErrors'
+import {
+  ADMIN_PASSWORD_MIN_LENGTH,
+  buildAdminPasswordRecoveryRedirectTo,
+  messageForPasswordValidation,
+  validateNewPasswordPair,
+} from '../lib/adminPassword'
 import { getSupabasePublicDiagnostics } from '../lib/supabasePublicConfig'
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
 
@@ -24,13 +30,28 @@ export interface AdminLoginResult {
   failureKind?: AdminAuthFailureKind
 }
 
+export interface AdminPasswordActionResult {
+  success: boolean
+  error?: string
+}
+
 interface AdminAuthContextValue {
   session: Session | null
   user: User | null
   isAdmin: boolean
   loading: boolean
+  /** True after Supabase fires PASSWORD_RECOVERY for this tab. */
+  passwordRecoveryActive: boolean
   login: (email: string, password: string) => Promise<AdminLoginResult>
   logout: () => Promise<void>
+  changePassword: (
+    currentPassword: string,
+    newPassword: string,
+  ) => Promise<AdminPasswordActionResult>
+  requestPasswordReset: (email: string) => Promise<AdminPasswordActionResult>
+  completePasswordRecovery: (
+    newPassword: string,
+  ) => Promise<AdminPasswordActionResult>
 }
 
 const AdminAuthContext = createContext<AdminAuthContextValue | undefined>(undefined)
@@ -55,6 +76,7 @@ export const AdminAuthProvider: React.FC<{ children: ReactNode }> = ({ children 
   const [session, setSession] = useState<Session | null>(null)
   const [isAdmin, setIsAdmin] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [passwordRecoveryActive, setPasswordRecoveryActive] = useState(false)
 
   const requestIdRef = useRef(0)
   const resolvedUserIdRef = useRef<string | null>(null)
@@ -68,6 +90,7 @@ export const AdminAuthProvider: React.FC<{ children: ReactNode }> = ({ children 
     inFlightRequestIdRef.current = 0
     setSession(null)
     setIsAdmin(false)
+    setPasswordRecoveryActive(false)
     setLoading(false)
   }, [])
 
@@ -144,7 +167,10 @@ export const AdminAuthProvider: React.FC<{ children: ReactNode }> = ({ children 
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+    } = supabase.auth.onAuthStateChange((event, nextSession) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setPasswordRecoveryActive(true)
+      }
       applySession(nextSession)
     })
 
@@ -235,6 +261,177 @@ export const AdminAuthProvider: React.FC<{ children: ReactNode }> = ({ children 
     applySession(data.session ?? null)
   }, [applySession, clearAuthenticatedState])
 
+  const changePassword = useCallback(
+    async (
+      currentPassword: string,
+      newPassword: string,
+    ): Promise<AdminPasswordActionResult> => {
+      if (!supabase || !isSupabaseConfigured) {
+        return { success: false, error: messageForAdminAuthFailure('not_configured') }
+      }
+      if (!isAdmin) {
+        return { success: false, error: messageForAdminAuthFailure('not_admin') }
+      }
+
+      const email = session?.user?.email?.trim()
+      if (!email) {
+        return {
+          success: false,
+          error: 'Prijava nije potpuna. Odjavite se i prijavite ponovo.',
+        }
+      }
+      if (!currentPassword) {
+        return { success: false, error: messageForPasswordValidation('current_required') }
+      }
+
+      const validation = validateNewPasswordPair({
+        newPassword,
+        confirmPassword: newPassword,
+        currentPassword,
+      })
+      if (validation && validation !== 'mismatch') {
+        return { success: false, error: messageForPasswordValidation(validation) }
+      }
+
+      const { error: reauthError } = await supabase.auth.signInWithPassword({
+        email,
+        password: currentPassword,
+      })
+      if (reauthError) {
+        const failure = failureFromSupabaseAuthError({
+          message: reauthError.message,
+          status: reauthError.status,
+          name: reauthError.name,
+        })
+        if (failure.kind === 'invalid_credentials') {
+          return { success: false, error: 'Trenutačna lozinka nije ispravna.' }
+        }
+        return { success: false, error: failure.message }
+      }
+
+      const allowed = await fetchIsAdmin()
+      if (!allowed) {
+        await supabase.auth.signOut({ scope: 'global' })
+        clearAuthenticatedState()
+        return { success: false, error: messageForAdminAuthFailure('not_admin') }
+      }
+
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: newPassword,
+      })
+      if (updateError) {
+        const msg = updateError.message?.toLowerCase() ?? ''
+        if (msg.includes('same') || msg.includes('should be different')) {
+          return {
+            success: false,
+            error: messageForPasswordValidation('same_as_current'),
+          }
+        }
+        if (msg.includes('weak') || msg.includes('least') || msg.includes('characters')) {
+          return {
+            success: false,
+            error: messageForPasswordValidation('too_short', ADMIN_PASSWORD_MIN_LENGTH),
+          }
+        }
+        return {
+          success: false,
+          error: 'Promjena lozinke nije uspjela. Pokušajte ponovo.',
+        }
+      }
+
+      return { success: true }
+    },
+    [clearAuthenticatedState, isAdmin, session?.user?.email],
+  )
+
+  const requestPasswordReset = useCallback(
+    async (email: string): Promise<AdminPasswordActionResult> => {
+      if (!supabase || !isSupabaseConfigured) {
+        return { success: false, error: messageForAdminAuthFailure('not_configured') }
+      }
+
+      const trimmed = email.trim()
+      if (!trimmed) {
+        return { success: false, error: 'Unesite adresu e-pošte.' }
+      }
+
+      const redirectTo = buildAdminPasswordRecoveryRedirectTo(window.location.origin)
+      const { error } = await supabase.auth.resetPasswordForEmail(trimmed, {
+        redirectTo,
+      })
+
+      // Always return the same success copy when the request was accepted or when
+      // Supabase withholds whether the email exists. Only surface config/network failures.
+      if (error) {
+        const failure = failureFromSupabaseAuthError({
+          message: error.message,
+          status: error.status,
+          name: error.name,
+        })
+        if (
+          failure.kind === 'network' ||
+          failure.kind === 'not_configured' ||
+          failure.kind === 'misconfigured'
+        ) {
+          return { success: false, error: failure.message }
+        }
+      }
+
+      // Intentionally identical success path (no email enumeration).
+      return { success: true }
+    },
+    [],
+  )
+
+  const completePasswordRecovery = useCallback(
+    async (newPassword: string): Promise<AdminPasswordActionResult> => {
+      if (!supabase || !isSupabaseConfigured) {
+        return { success: false, error: messageForAdminAuthFailure('not_configured') }
+      }
+
+      const validation = validateNewPasswordPair({
+        newPassword,
+        confirmPassword: newPassword,
+      })
+      if (validation) {
+        return { success: false, error: messageForPasswordValidation(validation) }
+      }
+
+      const { data: sessionData } = await supabase.auth.getSession()
+      if (!sessionData.session) {
+        return {
+          success: false,
+          error:
+            'Sesija za reset lozinke nije aktivna. Zatražite novu poveznicu e-poštom.',
+        }
+      }
+
+      const allowed = await fetchIsAdmin()
+      if (!allowed) {
+        await supabase.auth.signOut({ scope: 'global' })
+        clearAuthenticatedState()
+        return { success: false, error: messageForAdminAuthFailure('not_admin') }
+      }
+
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: newPassword,
+      })
+      if (updateError) {
+        return {
+          success: false,
+          error:
+            'Promjena lozinke nije uspjela. Pokušajte ponovo ili zatražite novu poveznicu.',
+        }
+      }
+
+      // Force a clean login with the new password (recovery session ends).
+      await supabase.auth.signOut({ scope: 'global' })
+      clearAuthenticatedState()
+      return { success: true }
+    },
+    [clearAuthenticatedState],
+  )
+
   const value = useMemo<AdminAuthContextValue>(() => {
     const user = session?.user ?? null
 
@@ -243,10 +440,24 @@ export const AdminAuthProvider: React.FC<{ children: ReactNode }> = ({ children 
       user,
       isAdmin,
       loading,
+      passwordRecoveryActive,
       login,
       logout,
+      changePassword,
+      requestPasswordReset,
+      completePasswordRecovery,
     }
-  }, [session, isAdmin, loading, login, logout])
+  }, [
+    session,
+    isAdmin,
+    loading,
+    passwordRecoveryActive,
+    login,
+    logout,
+    changePassword,
+    requestPasswordReset,
+    completePasswordRecovery,
+  ])
 
   return (
     <AdminAuthContext.Provider value={value}>{children}</AdminAuthContext.Provider>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { ADMIN_FORGOT_PASSWORD_PATH } from '../lib/adminPassword'
 import { Eye, EyeOff } from 'lucide-react'
 import {
   EXPECTED_SUPABASE_PROJECT_REF,
@@ -174,6 +175,15 @@ export default function AdminLoginPage() {
               >
                 {isSubmitting ? 'Prijava...' : 'Prijava'}
               </button>
+
+              <p className="text-center text-sm text-slate-600">
+                <Link
+                  to={ADMIN_FORGOT_PASSWORD_PATH}
+                  className="font-semibold text-violet-700 underline underline-offset-2"
+                >
+                  Zaboravljena lozinka?
+                </Link>
+              </p>
             </form>
           </div>
         </div>

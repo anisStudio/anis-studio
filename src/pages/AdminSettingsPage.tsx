@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { AdminPasswordChangeForm } from '../components/AdminPasswordChangeForm'
 import { useSettings } from '../hooks/useSettings'
 
 type VisibilityKey =
@@ -422,6 +423,23 @@ export default function AdminSettingsPage() {
                   )}
                 </div>
               )}
+            </div>
+          </div>
+
+          {/* Sigurnost administratorskog računa */}
+          <div className="mt-6 rounded-xl bg-white shadow-sm">
+            <div className="border-b px-6 py-4">
+              <h2 className="text-lg font-semibold text-slate-900">
+                Sigurnost administratorskog računa
+              </h2>
+              <p className="mt-1 text-sm text-slate-700">
+                Promjena lozinke koristi Supabase Auth. Lozinka se ne sprema u
+                tablice aplikacije. Prije promjene potrebna je potvrda trenutačnom
+                lozinkom.
+              </p>
+            </div>
+            <div className="px-6 py-6">
+              <AdminPasswordChangeForm />
             </div>
           </div>
 
