@@ -1,0 +1,379 @@
+/*
+ * F2.10 Web Atelier premium presentation — scoped only.
+ * Does not touch src/index.css or global backgrounds.
+ */
+
+.wa-prem {
+  --wa-ink: #2e2447;
+  --wa-ink-soft: rgba(46, 36, 71, 0.78);
+  --wa-line: rgba(110, 68, 255, 0.16);
+  --wa-accent: #6e44ff;
+  --wa-accent-soft: #bda6ff;
+  --wa-surface: rgba(255, 255, 255, 0.82);
+  --wa-surface-strong: #ffffff;
+}
+
+.dark .wa-prem {
+  --wa-ink: #f4f0fa;
+  --wa-ink-soft: rgba(244, 240, 250, 0.78);
+  --wa-line: rgba(189, 166, 255, 0.22);
+  --wa-surface: rgba(18, 16, 32, 0.72);
+  --wa-surface-strong: rgba(28, 24, 48, 0.92);
+}
+
+.wa-prem-hero {
+  display: grid;
+  gap: 1.75rem;
+  align-items: center;
+}
+
+@media (min-width: 960px) {
+  .wa-prem-hero {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: 2.5rem;
+    min-height: min(72vh, 36rem);
+  }
+}
+
+.wa-prem-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--wa-accent);
+}
+
+.wa-prem-hero h1 {
+  margin: 0.65rem 0 0;
+  font-size: clamp(1.75rem, 4.2vw, 2.85rem);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: var(--wa-ink);
+  text-wrap: balance;
+}
+
+.wa-prem-lead {
+  margin: 1rem 0 0;
+  max-width: 36rem;
+  font-size: clamp(0.95rem, 1.6vw, 1.125rem);
+  line-height: 1.65;
+  color: var(--wa-ink-soft);
+}
+
+.wa-prem-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.wa-prem-cta-row .btn {
+  min-height: 48px;
+  min-width: 10.5rem;
+  justify-content: center;
+}
+
+.wa-prem-cta-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  min-width: 10.5rem;
+  padding: 0.65rem 1.25rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--wa-line);
+  background: var(--wa-surface);
+  color: var(--wa-ink);
+  font-weight: 600;
+  text-decoration: none;
+  backdrop-filter: blur(8px);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.wa-prem-cta-secondary:hover {
+  border-color: var(--wa-accent);
+  background: var(--wa-surface-strong);
+}
+
+.wa-prem-cta-secondary:focus-visible,
+.wa-prem a:focus-visible,
+.wa-prem button:focus-visible {
+  outline: 2px solid var(--wa-accent);
+  outline-offset: 3px;
+}
+
+.wa-prem-hero-panel {
+  border-radius: 1.25rem;
+  border: 1px solid var(--wa-line);
+  background: linear-gradient(
+    155deg,
+    rgba(189, 166, 255, 0.22) 0%,
+    rgba(255, 255, 255, 0.55) 45%,
+    rgba(110, 68, 255, 0.1) 100%
+  );
+  padding: 1.35rem 1.35rem 1.5rem;
+  box-shadow: 0 18px 40px rgba(46, 36, 71, 0.08);
+}
+
+.dark .wa-prem-hero-panel {
+  background: linear-gradient(
+    155deg,
+    rgba(110, 68, 255, 0.28) 0%,
+    rgba(28, 24, 48, 0.85) 50%,
+    rgba(189, 166, 255, 0.12) 100%
+  );
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+}
+
+.wa-prem-hero-panel h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--wa-ink);
+}
+
+.wa-prem-hero-list {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.wa-prem-hero-list li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  align-items: start;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--wa-ink-soft);
+}
+
+.wa-prem-hero-list span {
+  display: inline-flex;
+  width: 1.65rem;
+  height: 1.65rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--wa-accent);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.wa-prem-section {
+  margin-top: 3rem;
+}
+
+@media (min-width: 640px) {
+  .wa-prem-section {
+    margin-top: 3.75rem;
+  }
+}
+
+.wa-prem-section-head {
+  max-width: 40rem;
+  margin: 0 auto 1.5rem;
+  text-align: center;
+}
+
+.wa-prem-section-head h2 {
+  margin: 0;
+  font-size: clamp(1.35rem, 2.6vw, 1.85rem);
+  line-height: 1.2;
+  color: var(--wa-ink);
+  text-wrap: balance;
+}
+
+.wa-prem-section-head p {
+  margin: 0.75rem 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--wa-ink-soft);
+}
+
+.wa-prem-service-grid {
+  display: grid;
+  gap: 0.85rem;
+}
+
+@media (min-width: 768px) {
+  .wa-prem-service-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+  }
+}
+
+.wa-prem-service {
+  border-radius: 1rem;
+  border: 1px solid var(--wa-line);
+  background: var(--wa-surface);
+  padding: 1.15rem 1.2rem 1.25rem;
+  backdrop-filter: blur(8px);
+}
+
+.wa-prem-service h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--wa-ink);
+}
+
+.wa-prem-service .wa-prem-price {
+  margin-top: 0.35rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--wa-accent);
+}
+
+.wa-prem-service p {
+  margin: 0.65rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--wa-ink-soft);
+}
+
+.wa-prem-service ul {
+  margin: 0.75rem 0 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.8125rem;
+  color: var(--wa-ink-soft);
+}
+
+.wa-prem-process {
+  display: grid;
+  gap: 0.65rem;
+  counter-reset: wa-step;
+}
+
+@media (min-width: 768px) {
+  .wa-prem-process {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+}
+
+.wa-prem-process li {
+  list-style: none;
+  counter-increment: wa-step;
+  border-radius: 0.9rem;
+  border: 1px solid var(--wa-line);
+  background: var(--wa-surface);
+  padding: 0.95rem 0.9rem 1rem;
+  min-height: 8.5rem;
+}
+
+.wa-prem-process li::before {
+  content: counter(wa-step);
+  display: inline-flex;
+  width: 1.6rem;
+  height: 1.6rem;
+  margin-bottom: 0.55rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(110, 68, 255, 0.14);
+  color: var(--wa-accent);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.wa-prem-process strong {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--wa-ink);
+}
+
+.wa-prem-process span {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--wa-ink-soft);
+}
+
+.wa-prem-journey {
+  display: grid;
+  gap: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .wa-prem-journey {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.wa-prem-journey article {
+  border-radius: 1rem;
+  border: 1px solid var(--wa-line);
+  background: var(--wa-surface-strong);
+  padding: 1.1rem 1.15rem 1.2rem;
+}
+
+.wa-prem-journey h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--wa-ink);
+}
+
+.wa-prem-journey p {
+  margin: 0.5rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--wa-ink-soft);
+}
+
+.wa-prem-closing {
+  border-radius: 1.25rem;
+  border: 1px solid var(--wa-line);
+  background: linear-gradient(
+    135deg,
+    rgba(189, 166, 255, 0.18),
+    rgba(110, 68, 255, 0.1)
+  );
+  padding: 1.5rem 1.25rem;
+  text-align: center;
+}
+
+@media (min-width: 640px) {
+  .wa-prem-closing {
+    padding: 2rem;
+  }
+}
+
+.wa-prem-closing h2 {
+  margin: 0;
+  font-size: clamp(1.2rem, 2.4vw, 1.6rem);
+  color: var(--wa-ink);
+}
+
+.wa-prem-closing p {
+  margin: 0.75rem auto 0;
+  max-width: 36rem;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--wa-ink-soft);
+}
+
+.wa-prem-note {
+  margin: 0.85rem auto 0;
+  max-width: 28rem;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--wa-ink-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wa-prem * {
+    transition: none !important;
+    animation: none !important;
+  }
+}

@@ -103,3 +103,127 @@ html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-btn:disabled {
 html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-btn * {
   color: #ffffff !important;
 }
+
+html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-progress-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.4rem;
+}
+
+html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-progress-btn {
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  padding: 0.4rem 0.25rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--wa-cfg-border);
+  background: #ffffff !important;
+  color: var(--wa-cfg-ink) !important;
+  font-size: 0.7rem;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+@media (min-width: 640px) {
+  html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-progress-btn {
+    font-size: 0.78rem;
+  }
+}
+
+html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-progress-btn.is-current {
+  border-color: var(--wa-cfg-accent);
+  background: var(--wa-cfg-selected) !important;
+  box-shadow: 0 0 0 2px rgba(110, 68, 255, 0.2);
+}
+
+html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-progress-btn.is-done {
+  border-color: rgba(110, 68, 255, 0.45);
+}
+
+html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-progress-index {
+  display: inline-flex;
+  width: 1.35rem;
+  height: 1.35rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(110, 68, 255, 0.14);
+  color: var(--wa-cfg-accent) !important;
+  font-size: 0.7rem;
+}
+
+html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-layout {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 960px) {
+  html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(15rem, 17.5rem);
+    align-items: start;
+    gap: 1.25rem;
+  }
+}
+
+html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-aside {
+  order: -1;
+}
+
+@media (min-width: 960px) {
+  html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-aside {
+    order: 0;
+  }
+
+  html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-sticky {
+    position: sticky;
+    top: 6.5rem;
+  }
+}
+
+html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-nav-btn {
+  min-height: 44px;
+  padding: 0.55rem 1rem;
+  border-radius: 0.7rem;
+  border: 1px solid var(--wa-cfg-border);
+  background: #ffffff !important;
+  color: var(--wa-cfg-ink) !important;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-nav-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-nav-btn-primary {
+  background: linear-gradient(135deg, #bda6ff 0%, #6e44ff 100%) !important;
+  color: #ffffff !important;
+  border: none;
+}
+
+html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-nav-btn-primary * {
+  color: #ffffff !important;
+}
+
+html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-progress-btn:focus-visible,
+html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-nav-btn:focus-visible,
+html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-btn:focus-visible {
+  outline: 2px solid var(--wa-cfg-accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html body .wa-cfg.wa-cfg.wa-cfg * {
+    transition: none !important;
+  }
+}

@@ -78,10 +78,40 @@
   flex-direction: column;
   height: 100%;
   overflow: hidden;
-  border-radius: 1rem;
+  border-radius: 1.1rem;
   border: 1px solid rgba(110, 68, 255, 0.18);
-  background: rgba(255, 255, 255, 0.88);
-  box-shadow: 0 8px 28px rgba(46, 36, 71, 0.08);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 10px 32px rgba(46, 36, 71, 0.09);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.wa-demo-card:hover {
+  border-color: rgba(110, 68, 255, 0.35);
+  box-shadow: 0 14px 36px rgba(46, 36, 71, 0.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wa-demo-card {
+    transition: none;
+  }
+
+  .wa-demo-card:hover {
+    transform: none;
+  }
+}
+
+.dark .wa-demo-card {
+  background: rgba(28, 24, 48, 0.88);
+  border-color: rgba(189, 166, 255, 0.22);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.35);
+}
+
+.dark .wa-demo-card-body h4 {
+  color: #f4f0fa;
+}
+
+.dark .wa-demo-card-body p {
+  color: rgba(244, 240, 250, 0.76);
 }
 
 .wa-demo-card-visual {
