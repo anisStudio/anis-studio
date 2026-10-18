@@ -37,6 +37,7 @@
     "admin-auth:test": "node --experimental-strip-types scripts/test-admin-auth-diagnostics.ts",
     "admin-password:test": "node --experimental-strip-types scripts/test-admin-password.ts",
     "f2:integration:test": "node --experimental-strip-types scripts/test-f2-controlled-integration.ts",
+    "admin-availability-day:test": "node --experimental-strip-types scripts/test-admin-availability-day.ts",
     "save": "node scripts/save.mjs"
   },
   "dependencies": {

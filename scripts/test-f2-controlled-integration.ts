@@ -47,6 +47,7 @@ assert.equal(calculateConfiguratorEstimate({ packageId: 'start', addons: {} }).f
     'admin-preview:test',
     'admin-password:test',
     'f2:integration:test',
+    'admin-availability-day:test',
   ]) {
     assert.ok(scripts[name], `missing script ${name}`)
   }

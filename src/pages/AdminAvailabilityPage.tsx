@@ -46,6 +46,10 @@ import {
   type DepartmentMonthCapacity,
 } from '../lib/smartBooking'
 import { isCroatianPublicHoliday } from '../lib/croatianHolidays'
+import {
+  adminCalendarToneClass,
+  classifyAdminCalendarDay,
+} from '../lib/adminAvailabilityDay'
 import { studioAnniversaryForYear } from '../lib/studioAnniversary'
 import {
   listCommunicationTemplates,
@@ -778,6 +782,7 @@ export default function AdminAvailabilityPage() {
         <ul className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-slate-600">
           <li>
             <span className="mr-1 inline-block h-2 w-2 rounded-full bg-emerald-500" /> Dostupno
+            (auto / prozor)
           </li>
           <li>
             <span className="mr-1 inline-block h-2 w-2 rounded-full bg-violet-600" /> Rezervacija
@@ -794,6 +799,10 @@ export default function AdminAvailabilityPage() {
           </li>
           <li>
             <span className="mr-1 inline-block h-2 w-2 rounded-full bg-orange-400" /> Godišnje
+          </li>
+          <li>
+            <span className="mr-1 inline-block h-2 w-2 rounded-full bg-slate-400" /> Izvan
+            horizonta / vikend
           </li>
         </ul>
         <div className="mt-2 grid grid-cols-7 gap-0.5 text-center text-xs sm:gap-1">
@@ -814,9 +823,7 @@ export default function AdminAvailabilityPage() {
                 r.status !== 'cancelled' &&
                 slotTouchesZagrebDate(r.starts_at, r.ends_at, cell.isoDate!),
             )
-            const hasClose =
-              isCroatianPublicHoliday(cell.isoDate) ||
-              closures.some((c) => closureTouchesZagrebDate(c, cell.isoDate!))
+            const hasClose = closures.some((c) => closureTouchesZagrebDate(c, cell.isoDate!))
             const hasAnnual = closures.some(
               (c) => c.recurrence === 'annual' && closureTouchesZagrebDate(c, cell.isoDate!),
             )
@@ -824,6 +831,15 @@ export default function AdminAvailabilityPage() {
             const monthFullHint =
               departmentParam != null &&
               monthCapacity.some((m) => m.department === departmentParam && m.is_full)
+            const tone = classifyAdminCalendarDay({
+              isoDate: cell.isoDate,
+              hasLegacyWindow: hasWin,
+              hasReservation: hasRes,
+              hasClosure: hasClose,
+              monthCapacityFull: monthFullHint,
+              autoWeeklyEnabled: f26 && autoWeekly,
+              bookingHorizonDays: horizonDays,
+            })
             const selected = selectedDate === cell.isoDate
             return (
               <button
@@ -832,23 +848,17 @@ export default function AdminAvailabilityPage() {
                 onClick={() => setSelectedDate(cell.isoDate)}
                 className={`min-h-[2.75rem] rounded-md border p-1 text-left sm:min-h-[3.25rem] ${
                   selected ? 'border-violet-600 ring-1 ring-violet-400' : 'border-slate-100'
-                } ${
-                  hasClose
-                    ? 'bg-rose-50'
-                    : monthFullHint
-                      ? 'bg-amber-50'
-                      : hasRes
-                        ? 'bg-violet-50'
-                        : hasWin
-                          ? 'bg-emerald-50'
-                          : 'bg-slate-50'
-                }`}
+                } ${adminCalendarToneClass(tone)}`}
               >
                 <div className="font-medium">{cell.day}</div>
                 <div className="mt-0.5 flex flex-wrap gap-0.5">
-                  {hasWin ? <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> : null}
+                  {tone === 'available' ? (
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  ) : null}
                   {hasRes ? <span className="h-1.5 w-1.5 rounded-full bg-violet-600" /> : null}
-                  {hasClose ? <span className="h-1.5 w-1.5 rounded-full bg-rose-500" /> : null}
+                  {tone === 'closed' ? (
+                    <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
+                  ) : null}
                   {hasAnnual ? <span className="h-1.5 w-1.5 rounded-full bg-orange-400" /> : null}
                   {isAnniv ? <span className="h-1.5 w-1.5 rounded-full bg-sky-500" /> : null}
                 </div>
@@ -993,7 +1003,7 @@ export default function AdminAvailabilityPage() {
 
       <section className="mt-8 grid gap-6 lg:grid-cols-2">
         <form onSubmit={addWindow} className="space-y-2 rounded-xl border border-slate-200 bg-white p-4">
-          <h2 className="font-semibold text-slate-900">Novi prozor dostupnosti</h2>
+          <h2 className="text-sm font-semibold text-slate-900">Novi prozor dostupnosti</h2>
           <select
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
             value={winDepartment}
@@ -1049,7 +1059,7 @@ export default function AdminAvailabilityPage() {
             onSubmit={addClosure}
             className="space-y-2 rounded-xl border border-slate-200 bg-white p-4"
           >
-            <h2 className="font-semibold text-slate-900">Zatvaranje (odmor / blokada)</h2>
+            <h2 className="text-sm font-semibold text-slate-900">Zatvaranje (odmor / blokada)</h2>
             <p className="text-xs text-slate-500">
               Postojeće rezervacije se ne brišu i ne premještaju automatski — prikazuje se upozorenje.
             </p>
@@ -1108,7 +1118,9 @@ export default function AdminAvailabilityPage() {
             onSubmit={addManual}
             className="space-y-2 rounded-xl border border-slate-200 bg-white p-4 lg:col-span-2"
           >
-            <h2 className="font-semibold text-slate-900">Ručna rezervacija (telefon / društvene mreže)</h2>
+            <h2 className="text-sm font-semibold text-slate-900">
+              Ručna rezervacija (telefon / društvene mreže)
+            </h2>
             <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
               <select
                 required
@@ -1281,7 +1293,7 @@ export default function AdminAvailabilityPage() {
       ) : null}
 
       <section className="mt-8">
-        <h2 className="font-semibold text-slate-900">Prozori dostupnosti</h2>
+        <h2 className="text-sm font-semibold text-slate-900">Prozori dostupnosti</h2>
         <ul className="mt-3 space-y-2 text-sm">
           {windows.length === 0 ? (
             <li className="text-slate-500">Nema prozora.</li>
