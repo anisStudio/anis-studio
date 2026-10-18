@@ -66,7 +66,8 @@ export function WebAtelierConfigurator({
         selectedPackage: 'Paket',
         selectedAddons: 'Dodaci',
         noneYet: 'Još nije odabrano',
-        stickyHint: 'Procjena se ažurira dok birate opcije.',
+        stickyHint:
+          'Procjena se ažurira dok birate opcije. Nije ugovor ni prihvat projekta — formalna ponuda dolazi nakon pregleda upita.',
       }
     : {
         title: 'Service configurator',
@@ -96,7 +97,8 @@ export function WebAtelierConfigurator({
         selectedPackage: 'Package',
         selectedAddons: 'Add-ons',
         noneYet: 'Nothing selected yet',
-        stickyHint: 'The estimate updates as you choose options.',
+        stickyHint:
+          'The estimate updates as you choose options. Not a contract or project acceptance — a formal offer follows inquiry review.',
       }
 
   const stepLabels = language === 'hr'

@@ -55,10 +55,11 @@ export const WEB_ATELIER_INFORMATIVE_PRICES_EUR: Record<WebAtelierPackageTier, n
   premium: 800,
 }
 
+/** Derived from EUR floors (×100) so the two maps cannot silently drift. */
 export const WEB_ATELIER_INFORMATIVE_PRICES_CENTS: Record<WebAtelierPackageTier, number> = {
-  start: 30_000,
-  pro: 50_000,
-  premium: 80_000,
+  start: WEB_ATELIER_INFORMATIVE_PRICES_EUR.start * 100,
+  pro: WEB_ATELIER_INFORMATIVE_PRICES_EUR.pro * 100,
+  premium: WEB_ATELIER_INFORMATIVE_PRICES_EUR.premium * 100,
 }
 
 export interface WebAtelierOfferItemInput {

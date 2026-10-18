@@ -233,6 +233,15 @@ function applyExclusiveGroup(
   }
 }
 
+/** Catalog EUR → integer cents for estimate math (whole-euro catalog only). */
+function catalogUnitCents(unitEur: number): number {
+  return Math.round(unitEur * 100)
+}
+
+function centsAsEur(cents: number): number {
+  return cents / 100
+}
+
 export function calculateConfiguratorEstimate(raw: ConfiguratorSelection): ConfiguratorEstimate {
   const selection = normalizeConfiguratorSelection(raw)
   const exclusionsApplied: string[] = []
@@ -250,8 +259,8 @@ export function calculateConfiguratorEstimate(raw: ConfiguratorSelection): Confi
   }
 
   const lines: ConfiguratorLine[] = []
-  let fixedTotalEur = 0
-  let estimateFloorEur = 0
+  let fixedTotalCents = 0
+  let estimateFloorCents = 0
   let hasEstimateOnly = false
   let hasCustomQuote = false
 
@@ -259,16 +268,17 @@ export function calculateConfiguratorEstimate(raw: ConfiguratorSelection): Confi
 
   if (selection.packageId && !packageSupersededByEcommerce) {
     const pkg = PACKAGE_BY_ID[selection.packageId]
+    const unitCents = catalogUnitCents(pkg.fromEur)
     lines.push({
       id: `package:${pkg.id}`,
       kind: 'package',
       quantity: 1,
       unitEur: pkg.fromEur,
-      lineEur: pkg.fromEur,
+      lineEur: centsAsEur(unitCents),
       customQuote: false,
     })
-    fixedTotalEur += pkg.fromEur
-    estimateFloorEur += pkg.fromEur
+    fixedTotalCents += unitCents
+    estimateFloorCents += unitCents
   } else if (selection.packageId && packageSupersededByEcommerce) {
     exclusionsApplied.push('package_superseded_by_new_web_shop')
   }
@@ -278,30 +288,33 @@ export function calculateConfiguratorEstimate(raw: ConfiguratorSelection): Confi
     if (quantity <= 0) continue
 
     if (def.kind === 'fixed' && def.unitEur != null) {
-      const lineEur = def.unitEur * quantity
+      const unitCents = catalogUnitCents(def.unitEur)
+      const lineCents = unitCents * quantity
       lines.push({
         id: def.id,
         kind: 'fixed',
         quantity,
         unitEur: def.unitEur,
-        lineEur,
+        lineEur: centsAsEur(lineCents),
         customQuote: false,
       })
-      fixedTotalEur += lineEur
-      estimateFloorEur += lineEur
+      fixedTotalCents += lineCents
+      estimateFloorCents += lineCents
       continue
     }
 
     if (def.kind === 'estimate_from' && def.unitEur != null) {
+      const unitCents = catalogUnitCents(def.unitEur)
+      const lineCents = unitCents * quantity
       lines.push({
         id: def.id,
         kind: 'estimate_from',
         quantity,
         unitEur: def.unitEur,
-        lineEur: def.unitEur * quantity,
+        lineEur: centsAsEur(lineCents),
         customQuote: false,
       })
-      estimateFloorEur += def.unitEur * quantity
+      estimateFloorCents += lineCents
       hasEstimateOnly = true
       continue
     }
@@ -322,8 +335,8 @@ export function calculateConfiguratorEstimate(raw: ConfiguratorSelection): Confi
   return {
     selection,
     lines,
-    fixedTotalEur,
-    estimateFloorEur: hasAnyPriced ? estimateFloorEur : null,
+    fixedTotalEur: centsAsEur(fixedTotalCents),
+    estimateFloorEur: hasAnyPriced ? centsAsEur(estimateFloorCents) : null,
     hasCustomQuote,
     hasEstimateOnly,
     exclusionsApplied: [...new Set(exclusionsApplied)],
