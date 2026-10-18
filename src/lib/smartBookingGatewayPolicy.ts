@@ -134,7 +134,9 @@ export function mapBookingRpcMessage(message: string | undefined): BookingPublic
     text.includes('shared_consultation_capacity') ||
     text.includes('closed_period') ||
     text.includes('booking_slot_stale') ||
-    text.includes('outside_window')
+    text.includes('outside_window') ||
+    text.includes('booking_month_capacity_full') ||
+    text.includes('month_capacity')
   ) {
     return 'slot_unavailable'
   }

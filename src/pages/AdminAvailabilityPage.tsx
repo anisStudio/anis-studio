@@ -18,6 +18,7 @@ import {
   BOOKING_SOURCE_LABEL_HR,
   CONSULTATION_OUTCOMES,
   CONSULTATION_OUTCOME_LABEL_HR,
+  allocateDepartmentCapacity,
   buildMonthCells,
   cancelReservationWithReason,
   createAvailabilityClosure,
@@ -25,18 +26,27 @@ import {
   formatZagrebDateTime,
   isSmartBookingMigrationPending,
   listBookingCalendar,
+  listDepartmentMonthCapacity,
   listRescheduleHistory,
+  releaseDepartmentCapacity,
   reopenAvailabilityClosure,
   rescheduleReservation,
+  setClosureRecurrence as persistClosureRecurrence,
   setConsultationOutcome,
   slotTouchesZagrebDate,
   updateBookingSharedSettings,
+  updateDepartmentMonthlyCapacitySettings,
   zagrebYearMonth,
   type BookingCalendarBundle,
   type BookingKind,
   type BookingSource,
+  type CapacityAllocation,
+  type ClosureRecurrence,
   type ConsultationOutcome,
+  type DepartmentMonthCapacity,
 } from '../lib/smartBooking'
+import { isCroatianPublicHoliday } from '../lib/croatianHolidays'
+import { studioAnniversaryForYear } from '../lib/studioAnniversary'
 import {
   listCommunicationTemplates,
   upsertCommunicationTemplate,
@@ -47,6 +57,28 @@ import {
 } from '../lib/webAtelierCommunications'
 
 type DeptFilter = Department | 'all'
+
+function closureTouchesZagrebDate(
+  c: BookingCalendarBundle['closures'][number],
+  isoDate: string,
+): boolean {
+  if (c.recurrence === 'annual') {
+    const start = new Date(c.starts_at)
+    const end = new Date(c.ends_at)
+    const fmt = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Europe/Zagreb',
+      month: '2-digit',
+      day: '2-digit',
+    })
+    const startMd = fmt.format(start)
+    const endMd = fmt.format(new Date(end.getTime() - 1))
+    const md = isoDate.slice(5)
+    if (c.recurrence_end_date && isoDate > c.recurrence_end_date) return false
+    if (startMd <= endMd) return md >= startMd && md <= endMd
+    return md >= startMd || md <= endMd
+  }
+  return slotTouchesZagrebDate(c.starts_at, c.ends_at, isoDate)
+}
 
 function entityAdminLink(entityKind: string, entityId: string | null): string | null {
   if (!entityId) return null
@@ -67,6 +99,23 @@ export default function AdminAvailabilityPage() {
   })
   const [closures, setClosures] = useState<BookingCalendarBundle['closures']>([])
   const [settingsCapacity, setSettingsCapacity] = useState(1)
+  const [slotMinutes, setSlotMinutes] = useState(30)
+  const [horizonDays, setHorizonDays] = useState(90)
+  const [autoWeekly, setAutoWeekly] = useState(true)
+  const [autoStart, setAutoStart] = useState('16:00')
+  const [autoEnd, setAutoEnd] = useState('19:00')
+  const [monthCapacity, setMonthCapacity] = useState<DepartmentMonthCapacity[]>([])
+  const [capacityDetail, setCapacityDetail] = useState<
+    (DepartmentMonthCapacity & { allocations: CapacityAllocation[] }) | null
+  >(null)
+  const [capTitle, setCapTitle] = useState('')
+  const [capOverride, setCapOverride] = useState(false)
+  const [capOverrideReason, setCapOverrideReason] = useState('')
+  const [capMaxByDept, setCapMaxByDept] = useState<Record<Department, number>>({
+    web_atelier: 3,
+    interiors: 3,
+    lrc: 3,
+  })
   const [templates, setTemplates] = useState<CommunicationTemplate[]>([])
   const [error, setError] = useState<string | null>(null)
   const [warning, setWarning] = useState<string | null>(null)
@@ -84,6 +133,7 @@ export default function AdminAvailabilityPage() {
   const [closureEnd, setClosureEnd] = useState('')
   const [closureDept, setClosureDept] = useState<Department | ''>('')
   const [closureReason, setClosureReason] = useState('')
+  const [closureRecurrence, setClosureRecurrence] = useState<ClosureRecurrence>('none')
 
   const [manWindowId, setManWindowId] = useState('')
   const [manName, setManName] = useState('')
@@ -94,6 +144,8 @@ export default function AdminAvailabilityPage() {
   const [manKind, setManKind] = useState<BookingKind>('consultation')
   const [manStart, setManStart] = useState('')
   const [manEnd, setManEnd] = useState('')
+  const [manMonthOverride, setManMonthOverride] = useState(false)
+  const [manMonthOverrideReason, setManMonthOverrideReason] = useState('')
 
   const [rescheduleId, setRescheduleId] = useState<string | null>(null)
   const [resWindowId, setResWindowId] = useState('')
@@ -127,6 +179,33 @@ export default function AdminAvailabilityPage() {
         setBundle(data)
         setClosures(data.closures)
         setSettingsCapacity(data.settings.shared_consultation_capacity)
+        setSlotMinutes(data.settings.default_slot_minutes ?? 30)
+        setHorizonDays(data.settings.booking_horizon_days ?? 90)
+        setAutoWeekly(data.settings.auto_weekly_enabled ?? true)
+        setAutoStart((data.settings.auto_weekday_start_time ?? '16:00:00').slice(0, 5))
+        setAutoEnd((data.settings.auto_weekday_end_time ?? '19:00:00').slice(0, 5))
+        setMonthCapacity(data.month_capacity ?? [])
+        if (data.month_capacity?.length) {
+          setCapMaxByDept((prev) => {
+            const next = { ...prev }
+            for (const row of data.month_capacity ?? []) {
+              next[row.department] = row.max_accepted_projects
+            }
+            return next
+          })
+        }
+        if (departmentParam) {
+          const monthIso = `${yearMonth.year}-${String(yearMonth.month).padStart(2, '0')}-01`
+          try {
+            setCapacityDetail(
+              await listDepartmentMonthCapacity({ department: departmentParam, month: monthIso }),
+            )
+          } catch {
+            setCapacityDetail(null)
+          }
+        } else {
+          setCapacityDetail(null)
+        }
         setF26(true)
         return
       } catch (caught) {
@@ -206,6 +285,7 @@ export default function AdminAvailabilityPage() {
         endsAt: new Date(closureEnd).toISOString(),
         department: closureDept || null,
         reason: closureReason || null,
+        recurrence: closureRecurrence,
       })
       if (result.has_conflicts) {
         setWarning(
@@ -214,6 +294,7 @@ export default function AdminAvailabilityPage() {
         )
       }
       setClosureReason('')
+      setClosureRecurrence('none')
       await reload()
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Zatvaranje nije spremljeno.')
@@ -238,9 +319,13 @@ export default function AdminAvailabilityPage() {
         source: manSource,
         bookingKind: manKind,
         status: 'confirmed',
+        monthCapacityOverride: manMonthOverride,
+        monthCapacityOverrideReason: manMonthOverride ? manMonthOverrideReason : null,
       })
       setManName('')
       setManDesc('')
+      setManMonthOverride(false)
+      setManMonthOverrideReason('')
       await reload()
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Ručna rezervacija nije spremljena.')
@@ -256,10 +341,46 @@ export default function AdminAvailabilityPage() {
     try {
       const s = await updateBookingSharedSettings({
         sharedConsultationCapacity: settingsCapacity,
+        defaultSlotMinutes: slotMinutes,
+        bookingHorizonDays: horizonDays,
+        autoWeeklyEnabled: autoWeekly,
+        autoWeekdayStartTime: `${autoStart}:00`,
+        autoWeekdayEndTime: `${autoEnd}:00`,
       })
       setSettingsCapacity(s.shared_consultation_capacity)
+      setSlotMinutes(s.default_slot_minutes)
+      setHorizonDays(s.booking_horizon_days ?? horizonDays)
+      setAutoWeekly(s.auto_weekly_enabled ?? autoWeekly)
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'Kapacitet nije spremljen.')
+      setError(caught instanceof Error ? caught.message : 'Postavke nisu spremljene.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function addCapacityAllocation(e: FormEvent) {
+    e.preventDefault()
+    if (!departmentParam) {
+      setError('Odaberite odjel za registraciju mjesečnog kapaciteta.')
+      return
+    }
+    setBusy(true)
+    setError(null)
+    try {
+      const monthIso = `${yearMonth.year}-${String(yearMonth.month).padStart(2, '0')}-01`
+      await allocateDepartmentCapacity({
+        department: departmentParam,
+        plannedStartMonth: monthIso,
+        title: capTitle,
+        isOverride: capOverride,
+        overrideReason: capOverride ? capOverrideReason : null,
+      })
+      setCapTitle('')
+      setCapOverride(false)
+      setCapOverrideReason('')
+      await reload()
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'Alokacija nije spremljena.')
     } finally {
       setBusy(false)
     }
@@ -355,16 +476,33 @@ export default function AdminAvailabilityPage() {
     ? reservations.filter((r) => slotTouchesZagrebDate(r.starts_at, r.ends_at, selectedDate))
     : []
   const dayClosures = selectedDate
-    ? closures.filter((c) => slotTouchesZagrebDate(c.starts_at, c.ends_at, selectedDate))
+    ? closures.filter((c) => closureTouchesZagrebDate(c, selectedDate))
     : []
+  const anniversary = studioAnniversaryForYear(yearMonth.year)
+  const monthIso = `${yearMonth.year}-${String(yearMonth.month).padStart(2, '0')}-01`
+  const selectedDeptFull =
+    departmentParam != null &&
+    monthCapacity.some((m) => m.department === departmentParam && m.is_full)
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="text-2xl font-semibold text-slate-900">Pametne rezervacije i kapacitet</h1>
-      <p className="mt-2 text-sm text-slate-600">
-        Zajednički konzultacijski kapacitet (web_atelier / interiors / lrc). Prihvat ponude ne
-        rezervira automatski termin. F2.6 ne šalje automatske e-mailove ni SMS.
-      </p>
+    <div className="mx-auto max-w-6xl px-3 py-5 sm:px-4 sm:py-6">
+      <header className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-lg font-semibold text-slate-900 sm:text-xl">Dostupnost</h1>
+          <p className="mt-1 max-w-2xl text-xs text-slate-600 sm:text-sm">
+            Auto termini pon–pet 16–19 (Zagreb), blagdani HR, mjesečni projektni kapacitet (≠
+            istovremene konzultacije). Upiti 24/7; rezervacije termina po pravilima.
+          </p>
+        </div>
+        {anniversary ? (
+          <p
+            className="rounded-md border border-sky-200 bg-sky-50 px-2.5 py-1.5 text-xs text-sky-900"
+            title={anniversary.labelEn}
+          >
+            {anniversary.labelHr} · 1.10.
+          </p>
+        ) : null}
+      </header>
       {!f26 ? (
         <p className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
           F2.6 migracija još nije aktivna u bazi — prikazan je G–I legacy način. Kalendar zatvaranja
@@ -372,13 +510,13 @@ export default function AdminAvailabilityPage() {
         </p>
       ) : null}
 
-      <div className="mt-4 flex flex-wrap gap-2">
+      <div className="mt-3 flex flex-wrap gap-1.5">
         {(['all', ...DEPARTMENTS] as const).map((d) => (
           <button
             key={d}
             type="button"
             onClick={() => setDeptFilter(d)}
-            className={`rounded-lg px-3 py-1.5 text-sm font-medium ${
+            className={`rounded-md px-2.5 py-1 text-xs font-medium sm:text-sm ${
               deptFilter === d
                 ? 'bg-violet-700 text-white'
                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
@@ -403,39 +541,215 @@ export default function AdminAvailabilityPage() {
       {f26 ? (
         <form
           onSubmit={saveCapacity}
-          className="mt-6 flex flex-wrap items-end gap-3 rounded-xl border border-slate-200 bg-white p-4"
+          className="mt-4 grid gap-2 rounded-lg border border-slate-200 bg-white p-3 sm:grid-cols-2 lg:grid-cols-4"
         >
           <label className="text-xs text-slate-600">
-            Zajednički kapacitet konzultacija
+            Istovremene konzultacije (svi odjeli)
             <input
               type="number"
               min={1}
               max={50}
-              className="mt-1 block w-28 rounded-lg border border-slate-300 px-3 py-2 text-sm"
+              className="mt-1 block w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
               value={settingsCapacity}
               onChange={(e) => setSettingsCapacity(Number(e.target.value))}
             />
           </label>
-          <button
-            type="submit"
-            disabled={busy}
-            className="rounded-lg bg-slate-800 px-4 py-2 text-sm text-white disabled:opacity-50"
-          >
-            Spremi kapacitet
-          </button>
-          <p className="text-xs text-slate-500">
-            Default: 1 potvrđeni termin konzultacije istovremeno preko svih odjela.
+          <label className="text-xs text-slate-600">
+            Trajanje termina (min)
+            <input
+              type="number"
+              min={15}
+              max={180}
+              step={15}
+              className="mt-1 block w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+              value={slotMinutes}
+              onChange={(e) => setSlotMinutes(Number(e.target.value))}
+            />
+          </label>
+          <label className="text-xs text-slate-600">
+            Horizont (dani)
+            <input
+              type="number"
+              min={14}
+              max={366}
+              className="mt-1 block w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+              value={horizonDays}
+              onChange={(e) => setHorizonDays(Number(e.target.value))}
+            />
+          </label>
+          <label className="flex items-center gap-2 text-xs text-slate-600">
+            <input
+              type="checkbox"
+              checked={autoWeekly}
+              onChange={(e) => setAutoWeekly(e.target.checked)}
+            />
+            Auto pon–pet
+          </label>
+          <label className="text-xs text-slate-600">
+            Početak (Zagreb)
+            <input
+              type="time"
+              className="mt-1 block w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+              value={autoStart}
+              onChange={(e) => setAutoStart(e.target.value)}
+            />
+          </label>
+          <label className="text-xs text-slate-600">
+            Kraj (Zagreb)
+            <input
+              type="time"
+              className="mt-1 block w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+              value={autoEnd}
+              onChange={(e) => setAutoEnd(e.target.value)}
+            />
+          </label>
+          <div className="flex items-end sm:col-span-2 lg:col-span-2">
+            <button
+              type="submit"
+              disabled={busy}
+              className="rounded-md bg-slate-800 px-3 py-1.5 text-sm text-white disabled:opacity-50"
+            >
+              Spremi tjedne postavke
+            </button>
+          </div>
+          <p className="text-[11px] text-slate-500 sm:col-span-2 lg:col-span-4">
+            Istovremeni konzultacijski kapacitet ≠ mjesečni limit prihvaćenih projekata (default 3 /
+            odjel).
           </p>
         </form>
       ) : null}
 
-      <section className="mt-8 rounded-xl border border-slate-200 bg-white p-4">
+      {f26 && monthCapacity.length > 0 ? (
+        <section className="mt-4 rounded-lg border border-slate-200 bg-white p-3">
+          <h2 className="text-sm font-semibold text-slate-900">
+            Mjesečni projektni kapacitet — {monthLabel}
+          </h2>
+          <p className="mt-1 text-[11px] text-slate-500">
+            Web Atelier: automatski pri kreiranju projekta iz prihvaćene ponude. Interijeri / LRC:
+            ručna registracija dolje (upiti i konzultacije se ne broje).
+          </p>
+          <ul className="mt-2 grid gap-2 sm:grid-cols-3">
+            {monthCapacity.map((row) => (
+              <li
+                key={row.department}
+                className={`rounded-md border px-2 py-1.5 text-xs ${
+                  row.is_full
+                    ? 'border-amber-300 bg-amber-50 text-amber-950'
+                    : 'border-slate-100 bg-slate-50 text-slate-700'
+                }`}
+              >
+                <div className="font-medium">{DEPARTMENT_LABEL_HR[row.department]}</div>
+                <div>
+                  {row.used}/{row.max_accepted_projects} prihvaćeno · ostalo {row.remaining}
+                  {row.is_full ? ' · PUN (nove konzultacije za mjesec off)' : ''}
+                </div>
+                <label className="mt-1 flex items-center gap-1">
+                  max
+                  <input
+                    type="number"
+                    min={0}
+                    max={50}
+                    className="w-14 rounded border px-1 py-0.5"
+                    value={capMaxByDept[row.department]}
+                    onChange={(e) =>
+                      setCapMaxByDept((prev) => ({
+                        ...prev,
+                        [row.department]: Number(e.target.value),
+                      }))
+                    }
+                  />
+                  <button
+                    type="button"
+                    disabled={busy}
+                    className="rounded border px-1.5 py-0.5"
+                    onClick={() =>
+                      void updateDepartmentMonthlyCapacitySettings({
+                        department: row.department,
+                        maxAcceptedProjects: capMaxByDept[row.department],
+                      }).then(reload)
+                    }
+                  >
+                    OK
+                  </button>
+                </label>
+              </li>
+            ))}
+          </ul>
+          {departmentParam ? (
+            <form onSubmit={addCapacityAllocation} className="mt-3 grid gap-2 sm:grid-cols-4">
+              <input
+                required
+                className="rounded-md border border-slate-300 px-2 py-1.5 text-sm sm:col-span-2"
+                placeholder="Naslov prihvaćenog projekta (LRC/manual)"
+                value={capTitle}
+                onChange={(e) => setCapTitle(e.target.value)}
+              />
+              <label className="flex items-center gap-1 text-xs text-slate-600">
+                <input
+                  type="checkbox"
+                  checked={capOverride}
+                  onChange={(e) => setCapOverride(e.target.checked)}
+                />
+                Override (audit)
+              </label>
+              <input
+                className="rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+                placeholder="Razlog overridea"
+                disabled={!capOverride}
+                value={capOverrideReason}
+                onChange={(e) => setCapOverrideReason(e.target.value)}
+              />
+              <button
+                type="submit"
+                disabled={busy}
+                className="rounded-md bg-slate-800 px-3 py-1.5 text-sm text-white disabled:opacity-50 sm:col-span-4 sm:w-fit"
+              >
+                Registriraj kapacitet ({monthIso})
+              </button>
+            </form>
+          ) : (
+            <p className="mt-2 text-xs text-slate-500">
+              Odaberite odjel za ručnu registraciju prihvaćenog projekta.
+            </p>
+          )}
+          {capacityDetail?.allocations?.length ? (
+            <ul className="mt-2 space-y-1 text-xs text-slate-600">
+              {capacityDetail.allocations.map((a) => (
+                <li key={a.id} className="flex flex-wrap items-center justify-between gap-2">
+                  <span>
+                    {a.title}
+                    {a.is_override ? ' · override' : ''} · {a.source_kind}
+                  </span>
+                  <button
+                    type="button"
+                    className="rounded border px-1.5 py-0.5"
+                    disabled={busy}
+                    onClick={() =>
+                      void releaseDepartmentCapacity(a.id, 'admin release').then(reload)
+                    }
+                  >
+                    Oslobodi
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          {selectedDeptFull ? (
+            <p className="mt-2 text-xs text-amber-800" role="status">
+              Odjel je pun za ovaj mjesec — postojeće rezervacije ostaju; nove konzultacije su
+              blokirane (osim admin overridea).
+            </p>
+          ) : null}
+        </section>
+      ) : null}
+
+      <section className="mt-4 rounded-lg border border-slate-200 bg-white p-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="font-semibold text-slate-900">Kalendar — {monthLabel}</h2>
-          <div className="flex gap-2">
+          <h2 className="text-sm font-semibold text-slate-900">Kalendar — {monthLabel}</h2>
+          <div className="flex gap-1.5">
             <button
               type="button"
-              className="rounded-lg border px-3 py-1 text-sm"
+              className="rounded-md border px-2.5 py-1 text-sm"
               onClick={() =>
                 setYearMonth((ym) =>
                   ym.month === 1
@@ -448,7 +762,7 @@ export default function AdminAvailabilityPage() {
             </button>
             <button
               type="button"
-              className="rounded-lg border px-3 py-1 text-sm"
+              className="rounded-md border px-2.5 py-1 text-sm"
               onClick={() =>
                 setYearMonth((ym) =>
                   ym.month === 12
@@ -461,22 +775,28 @@ export default function AdminAvailabilityPage() {
             </button>
           </div>
         </div>
-        <ul className="mt-3 flex flex-wrap gap-3 text-xs text-slate-600">
+        <ul className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-slate-600">
           <li>
-            <span className="mr-1 inline-block h-2.5 w-2.5 rounded-full bg-emerald-500" /> Dostupan
-            prozor
+            <span className="mr-1 inline-block h-2 w-2 rounded-full bg-emerald-500" /> Dostupno
           </li>
           <li>
-            <span className="mr-1 inline-block h-2.5 w-2.5 rounded-full bg-violet-600" /> Rezervacija
+            <span className="mr-1 inline-block h-2 w-2 rounded-full bg-violet-600" /> Rezervacija
           </li>
           <li>
-            <span className="mr-1 inline-block h-2.5 w-2.5 rounded-full bg-rose-500" /> Zatvoreno
+            <span className="mr-1 inline-block h-2 w-2 rounded-full bg-rose-500" /> Zatvoreno /
+            blagdan
           </li>
           <li>
-            <span className="mr-1 inline-block h-2.5 w-2.5 rounded-full bg-amber-500" /> Produkcija
+            <span className="mr-1 inline-block h-2 w-2 rounded-full bg-amber-500" /> Mjesec pun
+          </li>
+          <li>
+            <span className="mr-1 inline-block h-2 w-2 rounded-full bg-sky-500" /> Obljetnica
+          </li>
+          <li>
+            <span className="mr-1 inline-block h-2 w-2 rounded-full bg-orange-400" /> Godišnje
           </li>
         </ul>
-        <div className="mt-3 grid grid-cols-7 gap-1 text-center text-xs">
+        <div className="mt-2 grid grid-cols-7 gap-0.5 text-center text-xs sm:gap-1">
           {['Po', 'Ut', 'Sr', 'Če', 'Pe', 'Su', 'Ne'].map((d) => (
             <div key={d} className="py-1 font-medium text-slate-500">
               {d}
@@ -484,7 +804,7 @@ export default function AdminAvailabilityPage() {
           ))}
           {cells.map((cell) => {
             if (!cell.isoDate || cell.day == null) {
-              return <div key={cell.key} className="min-h-[3.5rem]" />
+              return <div key={cell.key} className="min-h-[2.75rem] sm:min-h-[3.25rem]" />
             }
             const hasWin = windows.some((w) =>
               slotTouchesZagrebDate(w.starts_at, w.ends_at, cell.isoDate!),
@@ -494,24 +814,43 @@ export default function AdminAvailabilityPage() {
                 r.status !== 'cancelled' &&
                 slotTouchesZagrebDate(r.starts_at, r.ends_at, cell.isoDate!),
             )
-            const hasClose = closures.some((c) =>
-              slotTouchesZagrebDate(c.starts_at, c.ends_at, cell.isoDate!),
+            const hasClose =
+              isCroatianPublicHoliday(cell.isoDate) ||
+              closures.some((c) => closureTouchesZagrebDate(c, cell.isoDate!))
+            const hasAnnual = closures.some(
+              (c) => c.recurrence === 'annual' && closureTouchesZagrebDate(c, cell.isoDate!),
             )
+            const isAnniv = cell.isoDate.endsWith('-10-01') && yearMonth.year >= 2025
+            const monthFullHint =
+              departmentParam != null &&
+              monthCapacity.some((m) => m.department === departmentParam && m.is_full)
             const selected = selectedDate === cell.isoDate
             return (
               <button
                 key={cell.key}
                 type="button"
                 onClick={() => setSelectedDate(cell.isoDate)}
-                className={`min-h-[3.5rem] rounded-lg border p-1 text-left ${
+                className={`min-h-[2.75rem] rounded-md border p-1 text-left sm:min-h-[3.25rem] ${
                   selected ? 'border-violet-600 ring-1 ring-violet-400' : 'border-slate-100'
-                } ${hasClose ? 'bg-rose-50' : hasRes ? 'bg-violet-50' : hasWin ? 'bg-emerald-50' : 'bg-slate-50'}`}
+                } ${
+                  hasClose
+                    ? 'bg-rose-50'
+                    : monthFullHint
+                      ? 'bg-amber-50'
+                      : hasRes
+                        ? 'bg-violet-50'
+                        : hasWin
+                          ? 'bg-emerald-50'
+                          : 'bg-slate-50'
+                }`}
               >
                 <div className="font-medium">{cell.day}</div>
-                <div className="mt-0.5 flex gap-0.5">
+                <div className="mt-0.5 flex flex-wrap gap-0.5">
                   {hasWin ? <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> : null}
                   {hasRes ? <span className="h-1.5 w-1.5 rounded-full bg-violet-600" /> : null}
                   {hasClose ? <span className="h-1.5 w-1.5 rounded-full bg-rose-500" /> : null}
+                  {hasAnnual ? <span className="h-1.5 w-1.5 rounded-full bg-orange-400" /> : null}
+                  {isAnniv ? <span className="h-1.5 w-1.5 rounded-full bg-sky-500" /> : null}
                 </div>
               </button>
             )
@@ -521,6 +860,16 @@ export default function AdminAvailabilityPage() {
         {selectedDate ? (
           <div className="mt-4 space-y-2 text-sm">
             <h3 className="font-medium text-slate-900">Dan {selectedDate}</h3>
+            {selectedDate && isCroatianPublicHoliday(selectedDate) ? (
+              <div className="rounded-md border border-rose-200 bg-rose-50 p-2 text-xs">
+                Hrvatski blagdan / neradni dan — nove rezervacije blokirane.
+              </div>
+            ) : null}
+            {selectedDate?.endsWith('-10-01') && anniversary ? (
+              <div className="rounded-md border border-sky-200 bg-sky-50 p-2 text-xs text-sky-900">
+                {anniversary.labelHr} (nije automatsko zatvaranje).
+              </div>
+            ) : null}
             {dayClosures.map((c) => (
               <div
                 key={c.id}
@@ -529,15 +878,47 @@ export default function AdminAvailabilityPage() {
                 <div>
                   Zatvoreno ({c.department ? DEPARTMENT_LABEL_HR[c.department] : 'svi odjeli'})
                   {c.reason ? ` — ${c.reason}` : ''}
+                  {c.recurrence === 'annual' ? ' · godišnje' : ' · jednokratno'}
                 </div>
-                <button
-                  type="button"
-                  disabled={busy}
-                  className="rounded border px-2 py-1 text-xs"
-                  onClick={() => void reopenAvailabilityClosure(c.id).then(reload)}
-                >
-                  Ponovno otvori
-                </button>
+                <div className="flex flex-wrap gap-1">
+                  {c.recurrence !== 'annual' ? (
+                    <button
+                      type="button"
+                      disabled={busy}
+                      className="rounded border px-2 py-1 text-xs"
+                      onClick={() =>
+                        void persistClosureRecurrence({
+                          closureId: c.id,
+                          recurrence: 'annual',
+                        }).then(reload)
+                      }
+                    >
+                      Omogući godišnje
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled={busy}
+                      className="rounded border px-2 py-1 text-xs"
+                      onClick={() =>
+                        void persistClosureRecurrence({
+                          closureId: c.id,
+                          recurrence: 'none',
+                        }).then(reload)
+                      }
+                    >
+                      Samo jednokratno
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    disabled={busy}
+                    className="rounded border px-2 py-1 text-xs"
+                    onClick={() => void reopenAvailabilityClosure(c.id).then(reload)}
+                  >
+                    Ponovno otvori
+                  </button>
+                </div>
               </div>
             ))}
             {dayReservations.length === 0 ? (
@@ -704,6 +1085,14 @@ export default function AdminAvailabilityPage() {
               value={closureReason}
               onChange={(e) => setClosureReason(e.target.value)}
             />
+            <label className="flex items-center gap-2 text-xs text-slate-600">
+              <input
+                type="checkbox"
+                checked={closureRecurrence === 'annual'}
+                onChange={(e) => setClosureRecurrence(e.target.checked ? 'annual' : 'none')}
+              />
+              Ponavljaj godišnje (inače jednokratno — postojeća zatvaranja ostaju one-time)
+            </label>
             <button
               type="submit"
               disabled={busy}
@@ -794,6 +1183,21 @@ export default function AdminAvailabilityPage() {
                 placeholder="Opis (opcionalno)"
                 value={manDesc}
                 onChange={(e) => setManDesc(e.target.value)}
+              />
+              <label className="flex items-center gap-2 text-xs text-slate-600">
+                <input
+                  type="checkbox"
+                  checked={manMonthOverride}
+                  onChange={(e) => setManMonthOverride(e.target.checked)}
+                />
+                Override mjesečnog projektnog kapaciteta
+              </label>
+              <input
+                className="rounded-lg border border-slate-300 px-3 py-2 text-sm sm:col-span-2"
+                placeholder="Razlog overridea (obavezno ako je uključeno)"
+                disabled={!manMonthOverride}
+                value={manMonthOverrideReason}
+                onChange={(e) => setManMonthOverrideReason(e.target.value)}
               />
             </div>
             <button

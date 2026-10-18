@@ -633,17 +633,35 @@ export async function recordWebAtelierOfferDecision(input: {
   return String(data)
 }
 
-export async function createWebAtelierProjectFromOffer(offerId: string): Promise<{
+export async function createWebAtelierProjectFromOffer(
+  offerId: string,
+  options?: {
+    plannedStartMonth?: string | null
+    capacityOverride?: boolean
+    capacityOverrideReason?: string | null
+  },
+): Promise<{
   project_id: string
   project_number: string
   created: boolean
+  planned_start_month?: string | null
+  capacity_allocation_id?: string | null
 }> {
   const supabase = await adminClient()
   const { data, error } = await supabase.rpc('admin_create_web_atelier_project_from_offer', {
     p_offer_id: offerId,
+    p_planned_start_month: options?.plannedStartMonth ?? null,
+    p_capacity_override: options?.capacityOverride ?? false,
+    p_capacity_override_reason: options?.capacityOverrideReason ?? null,
   })
   if (error) rpcError(error)
-  return data as { project_id: string; project_number: string; created: boolean }
+  return data as {
+    project_id: string
+    project_number: string
+    created: boolean
+    planned_start_month?: string | null
+    capacity_allocation_id?: string | null
+  }
 }
 
 export async function fetchWebAtelierProjects(): Promise<WebAtelierProjectListItem[]> {

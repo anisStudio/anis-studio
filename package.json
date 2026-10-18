@@ -32,9 +32,11 @@
     "smart-booking:test": "node --experimental-strip-types scripts/test-smart-booking.ts",
     "smart-booking:edge:test": "node --experimental-strip-types scripts/test-smart-booking-edge.ts",
     "smart-booking:sql": "node scripts/test-smart-booking-sql.mjs",
+    "smart-calendar:test": "node --experimental-strip-types scripts/test-smart-booking.ts",
     "admin-preview:test": "node --experimental-strip-types scripts/test-admin-preview-access.ts",
     "admin-auth:test": "node --experimental-strip-types scripts/test-admin-auth-diagnostics.ts",
     "admin-password:test": "node --experimental-strip-types scripts/test-admin-password.ts",
+    "f2:integration:test": "node --experimental-strip-types scripts/test-f2-controlled-integration.ts",
     "save": "node scripts/save.mjs"
   },
   "dependencies": {
