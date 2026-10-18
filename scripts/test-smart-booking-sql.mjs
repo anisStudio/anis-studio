@@ -226,6 +226,7 @@ try {
     'supabase/migrations/20261017130000_f26_smart_booking_shared_availability.sql',
     'supabase/migrations/20261017140000_f26_booking_turnstile_edge_hardening.sql',
     'supabase/migrations/20261018100000_f26_smart_calendar_2.sql',
+    'supabase/migrations/20261018101000_f26_wa_capacity_sync.sql',
   ]
 
   const script = [

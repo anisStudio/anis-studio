@@ -33,6 +33,10 @@ const calendar2 = readFileSync(
   join(root, 'supabase/migrations/20261018100000_f26_smart_calendar_2.sql'),
   'utf8',
 )
+const waCapacitySync = readFileSync(
+  join(root, 'supabase/migrations/20261018101000_f26_wa_capacity_sync.sql'),
+  'utf8',
+)
 const clientLib = readFileSync(join(root, 'src/lib/smartBooking.ts'), 'utf8')
 const settingsHook = readFileSync(join(root, 'src/hooks/useSettings.ts'), 'utf8')
 
@@ -108,6 +112,10 @@ assert.match(calendar2, /recurrence/)
 assert.match(calendar2, /f26_auto_slot/)
 assert.match(calendar2, /admin_allocate_department_capacity/)
 assert.doesNotMatch(calendar2, /web_atelier_public_visible\s*=\s*true/)
+assert.match(waCapacitySync, /booking_sync_web_atelier_capacity_allocate/)
+assert.match(waCapacitySync, /booking_sync_web_atelier_capacity_release/)
+assert.match(waCapacitySync, /planned_start_month/)
+assert.match(waCapacitySync, /drop function if exists public\.admin_create_web_atelier_project_from_offer\(uuid\)/)
 assert.match(clientLib, /functions\/v1\/book-consultation-slot/)
 assert.match(settingsHook, /web_atelier_public_visible:\s*false/)
 

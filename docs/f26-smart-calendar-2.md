@@ -14,7 +14,18 @@ Additive booking upgrade after `20261017140000`. **Do not apply to production wi
 
 ## Migration
 
-`supabase/migrations/20261018100000_f26_smart_calendar_2.sql`
+1. `supabase/migrations/20261018100000_f26_smart_calendar_2.sql`
+2. `supabase/migrations/20261018101000_f26_wa_capacity_sync.sql` — WA project create/cancel/month sync
+
+### What counts toward monthly capacity (admin action)
+
+| Department | Counts when… | Automatic? |
+|---|---|---|
+| **Web Atelier** | Admin creates project from an **accepted** offer (`admin_create_web_atelier_project_from_offer`) | **Yes** — allocates `web_atelier_project` row for `planned_start_month` (default: current Zagreb month). Cancel → release. Month change → move (capacity-checked). |
+| **Interijeri** | Admin registers via **Dostupnost → Registriraj kapacitet** (manual). Public inquiry / `create_public_inquiry_project` does **not** count. Status values (`inquiry`…`presented`) are workflow labels, not acceptance. | **Manual** |
+| **LRC** | Admin registers via **Registriraj kapacitet**. Inquiry statuses (`new`/`read`/`archived`) never count. | **Manual** |
+
+Consultation bookings never count. Shared simultaneous consultation capacity remains separate (default 1).
 
 ## Local tests
 

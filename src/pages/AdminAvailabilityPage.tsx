@@ -624,6 +624,10 @@ export default function AdminAvailabilityPage() {
           <h2 className="text-sm font-semibold text-slate-900">
             Mjesečni projektni kapacitet — {monthLabel}
           </h2>
+          <p className="mt-1 text-[11px] text-slate-500">
+            Web Atelier: automatski pri kreiranju projekta iz prihvaćene ponude. Interijeri / LRC:
+            ručna registracija dolje (upiti i konzultacije se ne broje).
+          </p>
           <ul className="mt-2 grid gap-2 sm:grid-cols-3">
             {monthCapacity.map((row) => (
               <li

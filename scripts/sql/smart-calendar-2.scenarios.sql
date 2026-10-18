@@ -213,6 +213,28 @@ select t.ok(
   'anon cannot execute public_book_consultation_slot'
 );
 
+-- WA capacity sync helpers present (full offer→project E2E covered by WA suites)
+select t.ok(
+  to_regprocedure(
+    'public.booking_sync_web_atelier_capacity_allocate(uuid,text,date,boolean,text)'
+  ) is not null,
+  'WA capacity allocate helper exists'
+);
+select t.ok(
+  to_regprocedure(
+    'public.admin_create_web_atelier_project_from_offer(uuid,date,boolean,text)'
+  ) is not null,
+  'WA create-from-offer includes capacity args'
+);
+select t.ok(
+  not has_function_privilege(
+    'anon',
+    'public.admin_create_web_atelier_project_from_offer(uuid,date,boolean,text)',
+    'execute'
+  ),
+  'anon cannot create WA projects / allocate capacity'
+);
+
 do $done$
 begin
   raise notice 'PASS: Smart Calendar 2.0 scenario block complete';
