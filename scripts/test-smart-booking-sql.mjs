@@ -139,6 +139,55 @@ COMMIT;
   console.log('  ok  concurrent public bookings: exactly one winner (shared/window capacity)')
 }
 
+async function runCapacityConcurrency() {
+  psqlExec('select t.as_postgres()')
+  // Use a fresh month never touched by scenarios; pre-fill 2 of 3.
+  // psqlExec uses -tAc + JSON.stringify — keep SQL single-line (no raw newlines).
+  psqlExec(
+    "select t.as_admin(); select public.admin_allocate_department_capacity('web_atelier', date '2028-02-01', 'WA pre1', 'manual', null, null, false, null); select public.admin_allocate_department_capacity('web_atelier', date '2028-02-01', 'WA pre2', 'manual', null, null, false, null)",
+  )
+
+  const allocSql = (label) => `
+\\set ON_ERROR_STOP on
+select t.as_admin();
+do $body$
+declare
+  v_ok boolean := false;
+  v_err text;
+begin
+  begin
+    perform public.admin_allocate_department_capacity(
+      'web_atelier', date '2028-02-01', 'WA race ${label}', 'manual', null, null, false, null
+    );
+    v_ok := true;
+  exception when others then
+    v_err := sqlerrm;
+  end;
+  raise notice 'RACE_OUTcome cap_${label}=%',
+    case when v_ok then 'ok' else coalesce(v_err, 'err') end;
+end
+$body$;
+COMMIT;
+`
+
+  const [a, b] = await Promise.all([psqlAsync(allocSql('a')), psqlAsync(allocSql('b'))])
+  const outcomes = [raceOutcomeFrom(a, 'cap_a'), raceOutcomeFrom(b, 'cap_b')]
+  const oks = outcomes.filter((value) => value === 'ok').length
+  const denied = outcomes.filter((value) => /booking_month_capacity_full/.test(value)).length
+  if (oks !== 1 || denied !== 1) {
+    throw new Error(
+      `expected one capacity winner and one refusal, got: ${outcomes.join(', ') || '(empty)'}`,
+    )
+  }
+  const used = psqlExec(
+    "select t.as_admin(); select (public.admin_list_department_month_capacity('web_atelier', date '2028-02-01')->>'used')",
+  )
+  if (used !== '3') {
+    throw new Error(`expected used=3 after race, got ${used}`)
+  }
+  console.log('  ok  concurrent capacity allocations: exactly one winner (month limit)')
+}
+
 let exitCode = 1
 try {
   const run = docker([
@@ -176,6 +225,7 @@ try {
     'supabase/migrations/20261017120000_f24_payment_receipt_confirmation.sql',
     'supabase/migrations/20261017130000_f26_smart_booking_shared_availability.sql',
     'supabase/migrations/20261017140000_f26_booking_turnstile_edge_hardening.sql',
+    'supabase/migrations/20261018100000_f26_smart_calendar_2.sql',
   ]
 
   const script = [
@@ -183,6 +233,7 @@ try {
     read('scripts/sql/web-atelier-offers.bootstrap.sql'),
     ...migrations.map((file) => `\\echo APPLY ${file}\n${read(file)}`),
     read('scripts/sql/smart-booking.scenarios.sql'),
+    read('scripts/sql/smart-calendar-2.scenarios.sql'),
   ].join('\n')
 
   const result = docker(
@@ -196,7 +247,12 @@ try {
 
   for (const name of passes) console.log(`  ok  ${name}`)
 
-  if (result.status !== 0 || failures.length > 0 || !output.includes('ALL_F26_SCENARIOS_DONE')) {
+  if (
+    result.status !== 0 ||
+    failures.length > 0 ||
+    !output.includes('ALL_F26_SCENARIOS_DONE') ||
+    !output.includes('ALL_F26_SC2_SCENARIOS_DONE')
+  ) {
     console.log('\n--- failures ---')
     for (const line of failures) console.log(line)
     if (failures.length === 0) console.log(output.split('\n').slice(-80).join('\n'))
@@ -204,7 +260,10 @@ try {
   } else {
     console.log(`\nF2.6 smart-booking SQL scenarios passed (${passes.length} checks)`)
     await runConcurrency()
-    console.log(`\nF2.6 smart-booking SQL tests passed (${passes.length} checks + concurrency)`)
+    await runCapacityConcurrency()
+    console.log(
+      `\nF2.6 smart-booking SQL tests passed (${passes.length} checks + concurrency + capacity race)`,
+    )
     exitCode = 0
   }
 } catch (error) {
