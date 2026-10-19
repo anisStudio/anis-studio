@@ -31,5 +31,8 @@ out/
 # Env files
 .env*
 
-git checkout -b feature/content-i18n
+# Supabase CLI local cache
+supabase/.temp/
 
+# Windows accidental file
+/NUL
