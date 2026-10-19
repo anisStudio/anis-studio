@@ -119,10 +119,13 @@ export default function CjeniciPage({ language }: CjeniciPageProps) {
         image: '/images/pricing/web-atelier.png',
         title: { hr: 'Web Atelier', en: 'Web Atelier' },
         description: {
-          hr: 'Web stranice i digitalna rješenja.',
-          en: 'Websites and digital solutions.',
+          hr: 'START od 300 €, PRO od 500 €, PREMIUM od 800 € — orijentacijski. U svakom paketu: responzivni prikaz, osnovni SEO i kontaktni obrazac. Hosting, domena i održavanje definiraju se ponudom.',
+          en: 'START from €300, PRO from €500, PREMIUM from €800 — indicative. Every package: responsive layout, basic SEO, and a contact form. Hosting, domain, and maintenance are defined in the quote.',
         },
-        status: { hr: 'Objašnjenje uskoro', en: 'Explanation coming soon' },
+        status: {
+          hr: 'Detalji i konfigurator u Web Atelier sekciji (kada je odjel javno dostupan)',
+          en: 'Details and configurator in the Web Atelier section (when the department is publicly available)',
+        },
       },
       lrc: {
         image: '/images/pricing/lrc.png',
