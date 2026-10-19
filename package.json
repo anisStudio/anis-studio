@@ -17,6 +17,8 @@
     "pricing:web-visibility:test": "node --experimental-strip-types scripts/test-interiors-web-pricing-visibility.mjs",
     "pricing:kitchen-example:test": "node --experimental-strip-types scripts/test-interiors-kitchen-pricing-example.mjs",
     "form:test": "node --experimental-strip-types scripts/test-interiors-inspiration-files.mjs",
+    "edge:sync-shared": "node scripts/sync-edge-shared.mjs",
+    "edge:sync-shared:check": "node scripts/sync-edge-shared.mjs --check",
     "web-atelier:test": "node --experimental-strip-types scripts/test-web-atelier-inquiry.ts",
     "web-atelier:offers:test": "node --experimental-strip-types scripts/test-web-atelier-offers.ts",
     "web-atelier:configurator:test": "node --experimental-strip-types scripts/test-web-atelier-configurator.ts",

@@ -324,6 +324,38 @@ assert.equal(resolveDevHostAccess('http://127.0.0.1:54321', true), true)
 assert.equal(resolveDevHostAccess('http://kong:8000', true), true)
 assert.equal(resolveDevHostAccess('http://127.0.0.1:54321', false), false)
 
+const cfDummyBlockedOnProd = mockFetch([
+  rpcOk(null),
+  siteverify({ success: true, hostname: 'example.com', 'error-codes': [] }),
+])
+assert.deepEqual(
+  (await submit({ env: env({ allowDevHosts: true }), fetchImpl: cfDummyBlockedOnProd.fetchImpl })).json,
+  { error: 'captcha_failed' },
+)
+assert.equal(
+  cfDummyBlockedOnProd.calls.some((call) => call.url.includes('submit_web_atelier_inquiry')),
+  false,
+)
+
+const cfDummyAllowedLocal = mockFetch([
+  rpcOk(null),
+  siteverify({ success: true, hostname: 'example.com', 'error-codes': [] }),
+  rpcOk({ inquiry_id: INQUIRY_ID, reference_code: REFERENCE }),
+])
+assert.equal(
+  (
+    await submit({
+      env: env({ allowDevHosts: true, supabaseUrl: 'http://127.0.0.1:54421' }),
+      fetchImpl: cfDummyAllowedLocal.fetchImpl,
+    })
+  ).status,
+  200,
+)
+assert.equal(
+  cfDummyAllowedLocal.calls.some((call) => call.url.includes('submit_web_atelier_inquiry')),
+  true,
+)
+
 const devAllowed = mockFetch([
   rpcOk(null),
   siteverify({ success: true, hostname: '127.0.0.1', 'error-codes': [] }),

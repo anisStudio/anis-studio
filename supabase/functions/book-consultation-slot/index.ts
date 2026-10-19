@@ -1,8 +1,10 @@
+// Shared modules live under ../_shared (synced from src/lib via npm run edge:sync-shared)
+// so the Edge Docker mount can resolve them without the repo root.
 import {
   handleBookingRequest,
   type BookingGatewayEnv,
-} from '../../../src/lib/smartBookingEdgeHandler.ts'
-import { resolveDevHostAccess } from '../../../src/lib/webAtelierGatewayPolicy.ts'
+} from '../_shared/smartBookingEdgeHandler.ts'
+import { resolveDevHostAccess } from '../_shared/webAtelierGatewayPolicy.ts'
 
 function envFlag(name: string): boolean {
   return Deno.env.get(name) === 'true'

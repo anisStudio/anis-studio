@@ -30,9 +30,12 @@ out/
 
 # Env files
 .env*
+# F2.11 local-only secrets, runners, and results (never commit)
+scripts/.f211-*
 
 # Supabase CLI local cache
 supabase/.temp/
+supabase/.branches/
 
 # Windows accidental file
 /NUL

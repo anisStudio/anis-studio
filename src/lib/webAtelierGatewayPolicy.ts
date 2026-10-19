@@ -17,6 +17,14 @@ export type PublicErrorCode = (typeof PUBLIC_ERRORS)[number]
 export const PRODUCTION_TURNSTILE_HOST = 'anislrc.hr'
 export const WWW_TURNSTILE_HOST = 'www.anislrc.hr'
 export const DEV_TURNSTILE_HOSTS = ['localhost', '127.0.0.1'] as const
+/**
+ * Cloudflare's documented dummy hostname for always-pass test keys
+ * (secret/sitekey `1x0000000000000000000000000000000AA`).
+ * Accepted ONLY when `allowDevHosts` is already true — and that flag is
+ * gated by `resolveDevHostAccess` to local Supabase hosts, so it cannot
+ * activate against production (`*.supabase.co` / anislrc).
+ */
+export const CLOUDFLARE_TURNSTILE_DUMMY_HOSTNAME = 'example.com'
 
 export const PRODUCTION_BROWSER_ORIGINS = ['https://anislrc.hr', 'https://www.anislrc.hr'] as const
 
@@ -136,7 +144,11 @@ export function isAllowedTurnstileHostname(
   const host = hostname.trim().toLowerCase()
   if (host === PRODUCTION_TURNSTILE_HOST) return true
   if (policy.allowWww && host === WWW_TURNSTILE_HOST) return true
-  if (policy.allowDevHosts && (DEV_TURNSTILE_HOSTS as readonly string[]).includes(host)) return true
+  if (policy.allowDevHosts) {
+    if ((DEV_TURNSTILE_HOSTS as readonly string[]).includes(host)) return true
+    // Local-only: Cloudflare always-pass dummy keys report this hostname.
+    if (host === CLOUDFLARE_TURNSTILE_DUMMY_HOSTNAME) return true
+  }
   return false
 }
 
