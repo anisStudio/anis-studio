@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { useSettings } from '../hooks/useSettings'
+import { usePublicDepartmentVisibility } from '../hooks/usePublicDepartmentVisibility'
 
 /** Interiors-first copy when loading or when Interiors is the only visible line. */
 const INTERIORS_FIRST = {
@@ -48,10 +48,8 @@ export function BrandDescriptor({
   className?: string
   language?: 'hr' | 'en'
 }) {
-  const { settings } = useSettings()
-  const lrcVisible = settings?.lrc_public_visible ?? false
-  const interiorsVisible = settings?.interiors_public_visible ?? true
-  const webAtelierVisible = settings?.web_atelier_public_visible ?? false
+  const { lrc: lrcVisible, interiors: interiorsVisible, webAtelier: webAtelierVisible } =
+    usePublicDepartmentVisibility()
 
   const labelClass =
     'text-[0.625rem] sm:text-[0.6875rem] font-normal tracking-[0.04em] text-plum/58 dark:text-pearl/52'

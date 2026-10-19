@@ -4,7 +4,7 @@ import { AnimatedPage } from '../components/AnimatedPage'
 import { PageSEO } from '../components/PageSEO'
 import { CONTACT_INFO } from '../config/contact'
 import { ErrorBoundary } from '../ErrorBoundary'
-import { useSettings } from '../hooks/useSettings'
+import { usePublicDepartmentVisibility } from '../hooks/usePublicDepartmentVisibility'
 
 interface ContactPageProps {
   language: 'hr' | 'en'
@@ -84,12 +84,7 @@ function getServiceRoutingCopy(
 }
 
 export default function ContactPage({ language }: ContactPageProps) {
-  const { settings } = useSettings()
-  const contactServiceVisibility = {
-    lrc: settings?.lrc_public_visible ?? false,
-    interiors: settings?.interiors_public_visible ?? true,
-    webAtelier: settings?.web_atelier_public_visible ?? false,
-  }
+  const contactServiceVisibility = usePublicDepartmentVisibility()
 
   const translations = {
     introTitle: {

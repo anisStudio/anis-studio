@@ -56,6 +56,54 @@ export const PUBLIC_SERVICE_LABEL: Record<PublicService, string> = {
   webAtelier: "Ani's Web Atelier",
 }
 
+export type PublicDepartmentVisibility = Record<PublicService, boolean>
+
+export const PUBLIC_DEPARTMENTS_HIDDEN: PublicDepartmentVisibility = {
+  interiors: false,
+  lrc: false,
+  webAtelier: false,
+}
+
+/**
+ * Public listing / nav / hub cards — not admin preview.
+ * Only `=== true` counts as visible. While settings are not ready
+ * (loading or error), every department stays hidden (fail closed).
+ */
+export function publicDepartmentVisibilityFromSettings(
+  settings: Partial<Record<PublicServiceSettingKey, boolean>> | null | undefined,
+  options?: { ready?: boolean },
+): PublicDepartmentVisibility {
+  if (options?.ready === false) {
+    return { ...PUBLIC_DEPARTMENTS_HIDDEN }
+  }
+  return {
+    interiors: settings?.interiors_public_visible === true,
+    lrc: settings?.lrc_public_visible === true,
+    webAtelier: settings?.web_atelier_public_visible === true,
+  }
+}
+
+export function isPublicDepartmentListed(
+  visibility: PublicDepartmentVisibility,
+  service: PublicService,
+): boolean {
+  return visibility[service] === true
+}
+
+/** All 8 flag combinations for regression matrices (interiors × lrc × webAtelier). */
+export function allPublicVisibilityCombinations(): PublicDepartmentVisibility[] {
+  const bits = [false, true] as const
+  const out: PublicDepartmentVisibility[] = []
+  for (const interiors of bits) {
+    for (const lrc of bits) {
+      for (const webAtelier of bits) {
+        out.push({ interiors, lrc, webAtelier })
+      }
+    }
+  }
+  return out
+}
+
 export interface DepartmentPreviewLink {
   label: string
   path: string

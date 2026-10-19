@@ -4,7 +4,7 @@ import { DecorativeSkyBackdrop } from '../components/DecorativeSkyBackdrop'
 import TestimonialMarquee, {
   type TestimonialMarqueeRowBlock,
 } from '../components/TestimonialMarquee'
-import { useSettings } from '../hooks/useSettings'
+import { usePublicDepartmentVisibility } from '../hooks/usePublicDepartmentVisibility'
 import type { Testimonial, TestimonialCategory } from '../data/testimonials'
 import { TESTIMONIALS } from '../data/testimonials'
 import {
@@ -128,7 +128,7 @@ export default function TestimonialsSection({
   const { pathname } = useLocation()
   const useGlobalCanvasOnly =
     blendWithGlobalCanvas !== undefined ? blendWithGlobalCanvas : pathname === '/'
-  const { settings } = useSettings()
+  const publicSectionFlags = usePublicDepartmentVisibility()
   const [dbTestimonials, setDbTestimonials] = useState<Testimonial[]>([])
 
   useEffect(() => {
@@ -155,13 +155,11 @@ export default function TestimonialsSection({
     [dbTestimonials],
   )
 
-  const publicSectionFlags: PublicSectionFlags = {
-    interiors: settings?.interiors_public_visible ?? true,
-    lrc: settings?.lrc_public_visible ?? false,
-    webAtelier: settings?.web_atelier_public_visible ?? false,
-  }
-
-  const rowBlocks = buildTestimonialRowBlocks(allTestimonials, publicSectionFlags)
+  const rowBlocks = buildTestimonialRowBlocks(allTestimonials, {
+    interiors: publicSectionFlags.interiors,
+    lrc: publicSectionFlags.lrc,
+    webAtelier: publicSectionFlags.webAtelier,
+  })
 
   const translations = {
     title: {

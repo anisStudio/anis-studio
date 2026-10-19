@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { usePortfolioItems, type PortfolioGridItem } from '../hooks/usePortfolioItems'
-import { useSettings } from '../hooks/useSettings'
+import { usePublicDepartmentVisibility } from '../hooks/usePublicDepartmentVisibility'
 
 type PortfolioFilterCategory = 'all' | 'lrc' | 'interiors' | 'web-atelier'
 
@@ -19,7 +19,7 @@ interface PortfolioSectionProps {
 }
 
 export default function PortfolioSection({ language }: PortfolioSectionProps) {
-  const { settings } = useSettings()
+  const serviceVisibility = usePublicDepartmentVisibility()
   const translations = {
     title: {
       hr: 'Odabrani projekti 3D vizualizacije prostora',
@@ -58,15 +58,6 @@ export default function PortfolioSection({ language }: PortfolioSectionProps) {
 
   const { items: portfolioItems, resolvedKind } = usePortfolioItems(language)
   const portfolioLoading = resolvedKind === 'loading'
-
-  const serviceVisibility = useMemo(
-    () => ({
-      lrc: settings?.lrc_public_visible ?? false,
-      interiors: settings?.interiors_public_visible ?? true,
-      webAtelier: settings?.web_atelier_public_visible ?? false,
-    }),
-    [settings]
-  )
 
   const visibleFilterCategories = useMemo(() => {
     const categoriesPresent = new Set(portfolioItems.map((item) => item.category))

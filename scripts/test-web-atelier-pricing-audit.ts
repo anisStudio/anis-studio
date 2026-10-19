@@ -62,7 +62,19 @@ for (const tier of ['start', 'pro', 'premium'] as const) {
 
 for (const pkg of WEB_ATELIER_PACKAGE_DEFINITIONS) {
   assert.equal(pkg.fromEur, WEB_ATELIER_INFORMATIVE_PRICES_EUR[pkg.id])
+  assert.ok(pkg.includes.includes('responsive'), `missing responsive:${pkg.id}`)
+  assert.ok(pkg.includes.includes('basic_seo'), `missing basic_seo:${pkg.id}`)
+  assert.ok(pkg.includes.includes('basic_contact_form'), `missing contact:${pkg.id}`)
 }
+assert.ok(WEB_ATELIER_PACKAGE_DEFINITIONS.find((p) => p.id === 'start')!.pages === 1)
+assert.ok(WEB_ATELIER_PACKAGE_DEFINITIONS.find((p) => p.id === 'pro')!.pages === 5)
+assert.ok(WEB_ATELIER_PACKAGE_DEFINITIONS.find((p) => p.id === 'premium')!.pages === 7)
+assert.ok(WEB_ATELIER_PACKAGE_DEFINITIONS.find((p) => p.id === 'premium')!.includes.includes('mini_branding'))
+assert.ok(
+  WEB_ATELIER_PACKAGE_DEFINITIONS.find((p) => p.id === 'premium')!.includes.includes(
+    'priority_support_30d',
+  ),
+)
 
 // --- Each package alone ---
 {
@@ -236,7 +248,13 @@ for (const pkg of WEB_ATELIER_PACKAGE_DEFINITIONS) {
     const line = suggestedLineForTier(tier)
     assert.equal(line.unit_price_cents, WEB_ATELIER_INFORMATIVE_PRICES_CENTS[tier])
     assert.ok(line.description.toLowerCase().includes('informativ'))
+    assert.ok(line.details?.includes('responzivni') || line.details?.includes('SEO'))
+    assert.ok(line.details?.toLowerCase().includes('hosting'))
+    assert.ok(line.details?.toLowerCase().includes('ponud'))
   }
+  const premium = suggestedLineForTier('premium')
+  assert.ok(premium.details?.toLowerCase().includes('mini branding'))
+  assert.ok(premium.details?.includes('30'))
 }
 
 // --- Persistence roundtrip (selection serialize/parse) ---
@@ -285,14 +303,25 @@ for (const pkg of WEB_ATELIER_PACKAGE_DEFINITIONS) {
   assert.equal(parsed!.packageId, null)
 }
 
-// --- UX copy: estimate ≠ contract (HR) ---
+// --- UX copy: estimate ≠ contract (HR) + package content alignment ---
 {
   const configurator = read('src/components/WebAtelierConfigurator.tsx')
   assert.ok(configurator.includes('informativan') || configurator.includes('neobvezujuć'))
   assert.ok(configurator.includes('Nije ugovor') || configurator.includes('nije ugovor'))
+  assert.ok(configurator.includes('packageIncludes') || configurator.includes('responzivni'))
 
   const section = read('src/components/WebAtelierSection.tsx')
   assert.ok(section.includes('Informativna procjena') || section.includes('informativ'))
+  assert.ok(section.includes('packageMarketingBullets'))
+  assert.ok(section.includes('hosting') || section.includes('Hosting'))
+
+  const faq = read('src/sections/FAQSection.tsx')
+  assert.ok(faq.includes('responzivni prikaz'))
+  assert.ok(faq.includes('osnovna SEO optimizacija') || faq.includes('osnovni kontaktni'))
+  assert.ok(faq.includes('Hosting, domena i održavanje'))
+  assert.ok(faq.includes('nisu automatski dio paketa') || faq.includes('nisu automatski'))
+  // Must not promise Analytics as a default package inclusion
+  assert.equal(/uključuje[^\n.]{0,120}Google Analytics/i.test(faq), false)
 
   // No VAT invention on WA pricing surfaces
   assert.equal(/\bPDV\b/i.test(configurator), false)

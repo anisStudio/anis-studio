@@ -9,6 +9,8 @@ import {
   emptyConfiguratorSelection,
   formatEur,
   packageLabel,
+  packageScopeHeadline,
+  sharedPackageIncludesCopy,
   writeStoredConfiguratorSelection,
   type ConfiguratorAddonId,
   type ConfiguratorPackageId,
@@ -43,7 +45,10 @@ export function WebAtelierConfigurator({
         intro:
           'Odaberite paket i opcionalne dodatke korak po korak. Izračun je informativan, neobvezujući i podložan ručnoj provjeri — nije ponuda, narudžba ni plaćanje.',
         packages: 'Osnovni paketi',
-        addons: 'Opcionalne usluge',
+        packageIncludes:
+          'U svakom paketu (osnovna cijena): responzivni prikaz, osnovna SEO optimizacija, osnovni kontaktni obrazac. Hosting, domena i održavanje definiraju se ponudom.',
+        addons: 'Opcionalne usluge / dodaci',
+        customServices: 'Individualno dogovorene usluge',
         ecommerce: 'Složeniji e-commerce',
         summary: 'Sažetak procjene',
         totalFixed: 'Fiksni zbroj',
@@ -74,7 +79,10 @@ export function WebAtelierConfigurator({
         intro:
           'Choose a package and optional add-ons step by step. The total is indicative, nonbinding, and subject to manual review — not an offer, order, or payment.',
         packages: 'Base packages',
-        addons: 'Optional services',
+        packageIncludes:
+          'Every package (base price): responsive layout, basic SEO, basic contact form. Hosting, domain, and maintenance are defined in the quote.',
+        addons: 'Optional services / add-ons',
+        customServices: 'Individually quoted services',
         ecommerce: 'Complex ecommerce',
         summary: 'Estimate summary',
         totalFixed: 'Fixed subtotal',
@@ -242,6 +250,7 @@ export function WebAtelierConfigurator({
               <legend className="wa-cfg-title mb-3 text-sm font-semibold sm:text-base">
                 {copy.packages}
               </legend>
+              <p className="wa-cfg-help mb-3 text-xs leading-relaxed">{copy.packageIncludes}</p>
               <div
                 className="grid grid-cols-1 gap-3 md:grid-cols-3 md:gap-4"
                 role="radiogroup"
@@ -281,18 +290,13 @@ export function WebAtelierConfigurator({
                               {copy.from} {formatEur(pkg.fromEur, language)}
                             </span>
                             <span className="wa-cfg-help mt-2 block text-xs leading-relaxed">
-                              {language === 'hr'
-                                ? `${pkg.pages === 1 ? 'Jednostranična stranica' : `Do ${pkg.pages} stranica`}, ${pkg.revisions} ${pkg.revisions === 1 ? 'revizija' : 'revizije'}${
-                                    pkg.id === 'premium'
-                                      ? ', mini branding, 30 dana prioritetne tehničke podrške'
-                                      : ''
-                                  }.`
-                                : `${pkg.pages === 1 ? 'One-page site' : `Up to ${pkg.pages} pages`}, ${pkg.revisions} revision${pkg.revisions === 1 ? '' : 's'}${
-                                    pkg.id === 'premium'
-                                      ? ', mini branding, 30-day priority technical support'
-                                      : ''
-                                  }.`}
+                              {packageScopeHeadline(pkg.id, language)}
                             </span>
+                            <ul className="wa-cfg-muted mt-2 list-disc space-y-0.5 pl-4 text-[0.7rem] leading-snug">
+                              {sharedPackageIncludesCopy(language).map((line) => (
+                                <li key={line}>{line}</li>
+                              ))}
+                            </ul>
                           </span>
                         </span>
                       </label>
@@ -372,6 +376,7 @@ export function WebAtelierConfigurator({
               <legend className="wa-cfg-title mb-3 text-sm font-semibold sm:text-base">
                 {copy.ecommerce}
               </legend>
+              <p className="wa-cfg-help mb-3 text-xs leading-relaxed">{copy.customServices}</p>
               <ul className="space-y-2">
                 {ecommerceAddons.map((def) => {
                   const checked = (selection.addons[def.id] ?? 0) > 0

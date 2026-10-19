@@ -230,16 +230,38 @@ export function calculateOfferTotals(items: WebAtelierOfferItemInput[]): WebAtel
   }
 }
 
+/** Scope mirrors WEB_ATELIER_PACKAGE_DEFINITIONS (kept local to avoid circular imports). */
+const INFORMATIVE_TIER_SCOPE: Record<
+  WebAtelierPackageTier,
+  { pages: number; revisions: number; premiumExtras: boolean }
+> = {
+  start: { pages: 1, revisions: 1, premiumExtras: false },
+  pro: { pages: 5, revisions: 2, premiumExtras: false },
+  premium: { pages: 7, revisions: 3, premiumExtras: true },
+}
+
 export function suggestedLineForTier(tier: WebAtelierPackageTier): WebAtelierOfferItemInput {
   const labels: Record<WebAtelierPackageTier, string> = {
     start: 'Web projekt START (informativno)',
     pro: 'Web projekt PRO (informativno)',
     premium: 'Web projekt PREMIUM (informativno)',
   }
+  const scope = INFORMATIVE_TIER_SCOPE[tier]
+  const pages = scope.pages === 1 ? '1 stranica' : `do ${scope.pages} stranica`
+  const revisions = scope.revisions === 1 ? '1 korekcija' : `${scope.revisions} korekcije`
+  const premium = scope.premiumExtras
+    ? ' Mini branding i 30 dana prioritetne tehničke podrške.'
+    : ''
+  const details =
+    `Opseg: ${pages}, ${revisions}.` +
+    ' Uključeno u osnovnu cijenu: responzivni prikaz, osnovna SEO optimizacija, osnovni kontaktni obrazac.' +
+    premium +
+    ' Hosting, domena i održavanje definiraju se ponudom (nisu automatski uključeni).' +
+    ' Informativna cijena do izdavanja službene ponude. Nije račun.'
   return {
     item_type: 'service',
     description: labels[tier],
-    details: 'Informativna cijena do izdavanja službene ponude. Nije račun.',
+    details,
     quantity: 1,
     unit_price_cents: WEB_ATELIER_INFORMATIVE_PRICES_CENTS[tier],
   }

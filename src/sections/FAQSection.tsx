@@ -214,8 +214,10 @@ export const FAQ_ITEMS: FAQItem[] = [
       en: 'What is included in the Web Atelier package?'
     },
     answer: {
-      hr: 'Web Atelier paket uključuje dizajn, razvoj, osnovnu SEO optimizaciju, kontakt formular i Google Analytics integraciju. Za detalje pogledajte cjenovni plan u Web Atelier sekciji.',
-      en: 'The Web Atelier package includes design, development, basic SEO optimization, contact form, and Google Analytics integration. For details, see the pricing plan in the Web Atelier section.'
+      hr:
+        'Tri osnovna paketa (orijentacijske cijene):\n\n• START — od 300 €: 1 stranica, 1 korekcija\n• PRO — od 500 €: do 5 stranica, 2 korekcije\n• PREMIUM — od 800 €: do 7 stranica, 3 korekcije, mini branding i 30 dana prioritetne tehničke podrške\n\nU svakom paketu, u osnovnoj cijeni: responzivni prikaz, osnovna SEO optimizacija i osnovni kontaktni obrazac.\n\nOpcionalni dodaci (npr. dodatne stranice, booking, newsletter) biraju se u konfiguratoru. Složenije ili napredne usluge dogovaraju se individualno.\n\nHosting, domena i održavanje nisu automatski uključeni — definiraju se u ponudi.\n\nGoogle Analytics i slična analitika nisu automatski dio paketa; dogovaraju se prema potrebama projekta i zahtjevima privatnosti.\n\nKonfigurator daje informativnu procjenu; formalna ponuda dolazi nakon pregleda upita.',
+      en:
+        'Three base packages (indicative prices):\n\n• START — from €300: 1 page, 1 correction round\n• PRO — from €500: up to 5 pages, 2 correction rounds\n• PREMIUM — from €800: up to 7 pages, 3 correction rounds, mini branding, and 30 days of priority technical support\n\nEvery package includes, at the base price: responsive layout, basic SEO optimization, and a basic contact form.\n\nOptional add-ons (e.g. extra pages, booking, newsletter) are chosen in the configurator. More complex or advanced services are quoted individually.\n\nHosting, domain, and maintenance are not included automatically — they are defined in the quote.\n\nGoogle Analytics and similar analytics are not included automatically; they are agreed according to project needs and privacy requirements.\n\nThe configurator provides an indicative estimate; a formal offer follows inquiry review.'
     }
   }
 ]

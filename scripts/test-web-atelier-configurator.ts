@@ -6,6 +6,8 @@ import { WEB_ATELIER_INFORMATIVE_PRICES_EUR } from '../src/lib/webAtelierOffers.
 import {
   WEB_ATELIER_CONFIG_MARKER_END,
   WEB_ATELIER_CONFIG_MARKER_START,
+  WEB_ATELIER_PACKAGE_DEFINITIONS,
+  WEB_ATELIER_SHARED_PACKAGE_INCLUDES,
   calculateConfiguratorEstimate,
   emptyConfiguratorSelection,
   featuresFromConfigurator,
@@ -13,6 +15,8 @@ import {
   inquiryPatchesFromConfigurator,
   mergeConfiguratorIntoFeaturesNotes,
   normalizeConfiguratorSelection,
+  packageMarketingBullets,
+  packageScopeHeadline,
   parseConfiguratorSelection,
   projectTypesFromConfigurator,
   suggestBudgetRange,
@@ -47,6 +51,27 @@ assert.equal(WEB_ATELIER_INFORMATIVE_PRICES_EUR.premium, 800)
 {
   const premium = calculateConfiguratorEstimate({ packageId: 'premium', addons: {} })
   assert.equal(premium.fixedTotalEur, 800)
+}
+
+// --- Shared package inclusions (content alignment) ---
+{
+  for (const token of WEB_ATELIER_SHARED_PACKAGE_INCLUDES) {
+    for (const pkg of WEB_ATELIER_PACKAGE_DEFINITIONS) {
+      assert.ok(pkg.includes.includes(token), `${pkg.id} missing ${token}`)
+    }
+  }
+  const startBullets = packageMarketingBullets('start', 'hr')
+  assert.ok(startBullets.some((b) => b.includes('1 stranica')))
+  assert.ok(startBullets.some((b) => /SEO/i.test(b)))
+  assert.ok(startBullets.some((b) => /kontakt/i.test(b)))
+  assert.ok(packageScopeHeadline('pro', 'hr').includes('5'))
+  assert.ok(packageScopeHeadline('premium', 'hr').toLowerCase().includes('mini branding'))
+  const summary = formatConfiguratorSummary(
+    calculateConfiguratorEstimate({ packageId: 'start', addons: {} }),
+    'hr',
+  )
+  assert.ok(summary.includes('responzivni') || summary.includes('SEO'))
+  assert.ok(summary.includes('korekcija'))
 }
 
 // --- Fixed add-ons ---
