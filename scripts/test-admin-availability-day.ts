@@ -104,6 +104,9 @@ assert.ok(adminCalendarToneClass('neutral').includes('slate'))
   assert.ok(page.includes('text-sm font-semibold text-slate-900">Prozori dostupnosti'))
   assert.ok(page.includes('Ručna rezervacija'))
   assert.ok(page.includes('auto / prozor'))
+  assert.ok(page.includes('text-sm font-semibold text-slate-900'))
+  assert.ok(page.includes('Predlošci komunikacije (Web Atelier)'))
+  assert.ok(page.includes('selectedDate.startsWith(`${monthPrefix}-`)'))
 }
 
 console.log('admin availability day tests: OK')

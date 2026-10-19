@@ -243,6 +243,14 @@ export default function AdminAvailabilityPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deptFilter, yearMonth.year, yearMonth.month, f26])
 
+  useEffect(() => {
+    if (!selectedDate) return
+    const monthPrefix = `${yearMonth.year}-${String(yearMonth.month).padStart(2, '0')}`
+    if (!selectedDate.startsWith(`${monthPrefix}-`)) {
+      setSelectedDate(null)
+    }
+  }, [yearMonth.year, yearMonth.month, selectedDate])
+
   const reservations = bundle.reservations as BookingCalendarBundle['reservations'] | AvailabilityBundle['reservations']
   const windows = bundle.windows
 
@@ -1314,7 +1322,9 @@ export default function AdminAvailabilityPage() {
       </section>
 
       <section className="mt-10 rounded-xl border border-slate-200 bg-white p-4">
-        <h2 className="font-semibold text-slate-900">Predlošci komunikacije (Web Atelier)</h2>
+        <h2 className="text-sm font-semibold text-slate-900">
+          Predlošci komunikacije (Web Atelier)
+        </h2>
         <form onSubmit={addTemplate} className="mt-4 grid gap-3 sm:grid-cols-2">
           <input
             required
