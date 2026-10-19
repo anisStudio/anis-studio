@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useSettings } from '../hooks/useSettings'
+import { usePublicDepartmentVisibility } from '../hooks/usePublicDepartmentVisibility'
 import { useAuth } from '../providers/AuthProvider'
 import { ThemeToggle } from './ThemeToggle'
 
@@ -15,12 +15,12 @@ type NavKey = 'lrc' | 'interiors' | 'webAtelier' | 'about' | 'faq' | 'contact'
 
 /**
  * Order and static links: about / faq / contact use `visible` in the header.
- * LRC, Interijeri, Web Atelier visibility comes from `useSettings()` (public flags), with safe
- * fallbacks while settings load: interiors on, LRC and Web Atelier off.
+ * LRC, Interijeri, Web Atelier visibility comes from central public flags
+ * (fail closed until settings are ready).
  */
 const PUBLIC_HEADER_NAV_ITEMS: { key: NavKey; visible: boolean }[] = [
   { key: 'lrc', visible: false },
-  { key: 'interiors', visible: true },
+  { key: 'interiors', visible: false },
   { key: 'webAtelier', visible: false },
   { key: 'about', visible: true },
   { key: 'faq', visible: true },
@@ -38,14 +38,8 @@ const NAV_ROUTES: Record<NavKey, string> = {
 
 export default function Header({ language, onLanguageChange, cartItemCount, onCartClick }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const { settings } = useSettings()
+  const serviceVisibility = usePublicDepartmentVisibility()
   const { isAuthenticated, logout } = useAuth()
-
-  const serviceVisibility = {
-    lrc: settings?.lrc_public_visible ?? false,
-    interiors: settings?.interiors_public_visible ?? true,
-    webAtelier: settings?.web_atelier_public_visible ?? false,
-  }
 
   const visibleHeaderNavKeys = PUBLIC_HEADER_NAV_ITEMS.filter((item) => {
     switch (item.key) {

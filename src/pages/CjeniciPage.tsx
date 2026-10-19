@@ -1,10 +1,12 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { AnimatedPage } from '../components/AnimatedPage'
 import { DecorativeSkyBackdrop } from '../components/DecorativeSkyBackdrop'
 import { PageSEO } from '../components/PageSEO'
 import { OfficialParraPriceListHubCta } from '../components/pricing/OfficialParraPriceListLink'
+import { usePublicDepartmentVisibility } from '../hooks/usePublicDepartmentVisibility'
 import { formatInteriorsPriceById } from '../lib/interiorsPricing'
+import type { PublicService } from '../lib/publicServiceAccess'
 
 interface CjeniciPageProps {
   language: 'hr' | 'en'
@@ -81,8 +83,17 @@ function PricingHubCard({
   )
 }
 
+const HUB_TO_SERVICE: Record<HubDepartmentId, PublicService> = {
+  interijeri: 'interiors',
+  lrc: 'lrc',
+  webAtelier: 'webAtelier',
+}
+
+const HUB_DEPARTMENT_ORDER: readonly HubDepartmentId[] = ['lrc', 'interijeri', 'webAtelier']
+
 export default function CjeniciPage({ language }: CjeniciPageProps) {
   const navigate = useNavigate()
+  const visibility = usePublicDepartmentVisibility()
 
   useEffect(() => {
     if (window.location.hash === '#interijeri') {
@@ -140,15 +151,29 @@ export default function CjeniciPage({ language }: CjeniciPageProps) {
     },
   }
 
-  const departments: HubDepartmentId[] = ['lrc', 'interijeri', 'webAtelier']
+  const departments = useMemo(
+    () => HUB_DEPARTMENT_ORDER.filter((id) => visibility[HUB_TO_SERVICE[id]] === true),
+    [visibility],
+  )
+
+  const seoDescription = useMemo(() => {
+    const names: string[] = []
+    if (visibility.interiors) names.push(language === 'hr' ? 'Interijeri' : 'Interiors')
+    if (visibility.webAtelier) names.push('Web Atelier')
+    if (visibility.lrc) names.push('LRC')
+    if (names.length === 0) {
+      return language === 'hr'
+        ? "Pregled cjenika Ani's Studija."
+        : "Ani's Studio price list overview."
+    }
+    return language === 'hr'
+      ? `Pregled cjenika po odjelima Ani's Studija — ${names.join(', ')}.`
+      : `Price lists by Ani's Studio department — ${names.join(', ')}.`
+  }, [visibility.interiors, visibility.lrc, visibility.webAtelier, language])
 
   return (
     <AnimatedPage>
-      <PageSEO
-        title="Cjenici"
-        description="Pregled cjenika po odjelima Ani's Studija — Interijeri, Web Atelier i LRC."
-        canonical="/cjenici"
-      />
+      <PageSEO title="Cjenici" description={seoDescription} canonical="/cjenici" />
       <main className="min-w-0">
         <section className="Section fade-in relative section-with-bg overflow-x-clip">
           <div className="absolute inset-0 -z-10 overflow-hidden">
@@ -179,50 +204,71 @@ export default function CjeniciPage({ language }: CjeniciPageProps) {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 items-start gap-x-4 gap-y-20 pt-2 sm:grid-cols-2 sm:gap-y-16 sm:pt-3 lg:grid-cols-3 lg:items-stretch lg:gap-x-4 lg:gap-y-6 lg:pt-4">
-
-              {departments.map((id) => {
-                const dept = copy.departments[id]
-                if (id === 'interijeri') {
+            {!visibility.ready ? (
+              <div
+                className="flex min-h-[12rem] items-center justify-center py-10"
+                aria-busy="true"
+                aria-live="polite"
+              >
+                <div
+                  className="h-9 w-9 animate-spin rounded-full border-2 border-[var(--clr-primary)] border-t-transparent"
+                  role="status"
+                />
+                <span className="sr-only">
+                  {language === 'hr' ? 'Učitavanje…' : 'Loading…'}
+                </span>
+              </div>
+            ) : departments.length === 0 ? (
+              <p className="mx-auto max-w-xl py-10 text-center text-sm text-plum/70 dark:text-pearl/65">
+                {language === 'hr'
+                  ? 'Trenutačno nema javno objavljenih odjelskih cjenika. Za upite koristite kontakt stranicu.'
+                  : 'No department price lists are publicly available right now. Please use the contact page for inquiries.'}
+              </p>
+            ) : (
+              <div className="grid grid-cols-1 items-start gap-x-4 gap-y-20 pt-2 sm:grid-cols-2 sm:gap-y-16 sm:pt-3 lg:grid-cols-3 lg:items-stretch lg:gap-x-4 lg:gap-y-6 lg:pt-4">
+                {departments.map((id) => {
+                  const dept = copy.departments[id]
+                  if (id === 'interijeri') {
+                    return (
+                      <PricingHubCard
+                        key={id}
+                        image={dept.image}
+                        title={dept.title[language]}
+                        description={dept.description[language]}
+                        priceLine={interiorsFromPrice}
+                        cta={{
+                          label: copy.departments.interijeri.cta[language],
+                          to: '/cjenici/interijeri',
+                        }}
+                      />
+                    )
+                  }
+                  const lrcDept = copy.departments.lrc
+                  const webDept = copy.departments.webAtelier
+                  if (id === 'lrc') {
+                    return (
+                      <PricingHubCard
+                        key={id}
+                        image={lrcDept.image}
+                        title={lrcDept.title[language]}
+                        subtitle={lrcDept.acronym[language]}
+                        description={lrcDept.description[language]}
+                        status={lrcDept.status[language]}
+                      />
+                    )
+                  }
                   return (
                     <PricingHubCard
                       key={id}
-                      image={dept.image}
-                      title={dept.title[language]}
-                      description={dept.description[language]}
-                      priceLine={interiorsFromPrice}
-                      cta={{
-                        label: copy.departments.interijeri.cta[language],
-                        to: '/cjenici/interijeri',
-                      }}
+                      image={webDept.image}
+                      title={webDept.title[language]}
+                      description={webDept.description[language]}
+                      status={webDept.status[language]}
                     />
                   )
-                }
-                const lrcDept = copy.departments.lrc
-                const webDept = copy.departments.webAtelier
-                if (id === 'lrc') {
-                  return (
-                    <PricingHubCard
-                      key={id}
-                      image={lrcDept.image}
-                      title={lrcDept.title[language]}
-                      subtitle={lrcDept.acronym[language]}
-                      description={lrcDept.description[language]}
-                      status={lrcDept.status[language]}
-                    />
-                  )
-                }
-                return (
-                  <PricingHubCard
-                    key={id}
-                    image={webDept.image}
-                    title={webDept.title[language]}
-                    description={webDept.description[language]}
-                    status={webDept.status[language]}
-                  />
-                )
-              })}
-            </div>
+                })}
+              </div>
+            )}
           </div>
         </section>
       </main>

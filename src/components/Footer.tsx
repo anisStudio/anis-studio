@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { useSettings } from '../hooks/useSettings'
+import { usePublicDepartmentVisibility } from '../hooks/usePublicDepartmentVisibility'
 import { BrandDescriptor } from './BrandDescriptor'
 
 interface FooterProps {
@@ -7,9 +7,7 @@ interface FooterProps {
 }
 
 export default function Footer({ language = 'hr' }: FooterProps) {
-  const { settings } = useSettings()
-  const showInteriorsSocial = settings?.interiors_public_visible ?? true
-  const showLrcSocial = settings?.lrc_public_visible ?? false
+  const { interiors: showInteriorsSocial, lrc: showLrcSocial } = usePublicDepartmentVisibility()
   const hasFooterSocialIcons = showInteriorsSocial || showLrcSocial
 
   return (

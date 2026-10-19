@@ -34,6 +34,7 @@
     "smart-booking:sql": "node scripts/test-smart-booking-sql.mjs",
     "smart-calendar:test": "node --experimental-strip-types scripts/test-smart-booking.ts",
     "admin-preview:test": "node --experimental-strip-types scripts/test-admin-preview-access.ts",
+    "public-visibility:test": "node --experimental-strip-types scripts/test-public-department-visibility.ts",
     "admin-auth:test": "node --experimental-strip-types scripts/test-admin-auth-diagnostics.ts",
     "admin-password:test": "node --experimental-strip-types scripts/test-admin-password.ts",
     "f2:integration:test": "node --experimental-strip-types scripts/test-f2-controlled-integration.ts",

@@ -45,6 +45,7 @@ assert.equal(calculateConfiguratorEstimate({ packageId: 'start', addons: {} }).f
     'web-atelier:pricing-audit:test',
     'web-atelier:premium-ux:test',
     'admin-preview:test',
+    'public-visibility:test',
     'admin-password:test',
     'f2:integration:test',
     'admin-availability-day:test',
@@ -81,6 +82,17 @@ assert.equal(calculateConfiguratorEstimate({ packageId: 'start', addons: {} }).f
   assert.ok(app.includes('PublicServiceGuard') || app.includes('webAtelier'))
   const previewTest = read('scripts/test-admin-preview-access.ts')
   assert.ok(previewTest.includes('is_admin') || previewTest.includes('admin'))
+}
+
+// --- Unified public listing visibility (nav / cjenici / home) ---
+{
+  assert.ok(existsSync(join(root, 'src/hooks/usePublicDepartmentVisibility.ts')))
+  assert.ok(existsSync(join(root, 'scripts/test-public-department-visibility.ts')))
+  const access = read('src/lib/publicServiceAccess.ts')
+  assert.ok(access.includes('publicDepartmentVisibilityFromSettings'))
+  const cjenici = read('src/pages/CjeniciPage.tsx')
+  assert.ok(cjenici.includes('usePublicDepartmentVisibility'))
+  assert.equal(cjenici.includes('interiors_public_visible ?? true'), false)
 }
 
 // --- WA premium UX still wired ---

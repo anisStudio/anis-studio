@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { DecorativeSkyBackdrop } from '../components/DecorativeSkyBackdrop'
-import { useSettings } from '../hooks/useSettings'
+import { usePublicDepartmentVisibility } from '../hooks/usePublicDepartmentVisibility'
 import { trackEvent } from '../lib/analytics'
 
 interface WelcomeSectionProps {
@@ -9,13 +9,7 @@ interface WelcomeSectionProps {
 
 export default function WelcomeSection({ language = 'hr' }: WelcomeSectionProps) {
   const USE_IMAGE_BG = true
-  const { settings } = useSettings()
-
-  const serviceCardVisibility = {
-    lrc: settings?.lrc_public_visible ?? false,
-    interiors: settings?.interiors_public_visible ?? true,
-    webAtelier: settings?.web_atelier_public_visible ?? false,
-  }
+  const serviceCardVisibility = usePublicDepartmentVisibility()
 
   const translations = {
     headline: {

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { useSettings } from '../hooks/useSettings'
+import { usePublicDepartmentVisibility } from '../hooks/usePublicDepartmentVisibility'
 import { DecorativeSkyBackdrop } from './DecorativeSkyBackdrop'
 import aboutStudioImage from '../assets/about/anamarija-about.png'
 
@@ -8,12 +8,7 @@ interface AboutSectionProps {
 }
 
 export default function AboutSection({ language }: AboutSectionProps) {
-  const { settings } = useSettings()
-  const aboutBadgeVisibility = {
-    lrc: settings?.lrc_public_visible ?? false,
-    interiors: settings?.interiors_public_visible ?? true,
-    webAtelier: settings?.web_atelier_public_visible ?? false,
-  }
+  const aboutBadgeVisibility = usePublicDepartmentVisibility()
 
   const translations = {
     title: {
