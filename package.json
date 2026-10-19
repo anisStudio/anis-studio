@@ -20,6 +20,8 @@
     "web-atelier:test": "node --experimental-strip-types scripts/test-web-atelier-inquiry.ts",
     "web-atelier:offers:test": "node --experimental-strip-types scripts/test-web-atelier-offers.ts",
     "web-atelier:configurator:test": "node --experimental-strip-types scripts/test-web-atelier-configurator.ts",
+    "web-atelier:pricing-audit:test": "node --experimental-strip-types scripts/test-web-atelier-pricing-audit.ts",
+    "web-atelier:premium-ux:test": "node --experimental-strip-types scripts/test-web-atelier-premium-ux.ts",
     "web-atelier:demos:test": "node --experimental-strip-types scripts/test-web-atelier-demos.ts",
     "web-atelier:tracking:test": "node --experimental-strip-types scripts/test-web-atelier-tracking-materials.ts",
     "web-atelier:tracking:sql": "node scripts/test-web-atelier-tracking-materials-sql.mjs",
@@ -30,6 +32,12 @@
     "smart-booking:test": "node --experimental-strip-types scripts/test-smart-booking.ts",
     "smart-booking:edge:test": "node --experimental-strip-types scripts/test-smart-booking-edge.ts",
     "smart-booking:sql": "node scripts/test-smart-booking-sql.mjs",
+    "smart-calendar:test": "node --experimental-strip-types scripts/test-smart-booking.ts",
+    "admin-preview:test": "node --experimental-strip-types scripts/test-admin-preview-access.ts",
+    "admin-auth:test": "node --experimental-strip-types scripts/test-admin-auth-diagnostics.ts",
+    "admin-password:test": "node --experimental-strip-types scripts/test-admin-password.ts",
+    "f2:integration:test": "node --experimental-strip-types scripts/test-f2-controlled-integration.ts",
+    "admin-availability-day:test": "node --experimental-strip-types scripts/test-admin-availability-day.ts",
     "save": "node scripts/save.mjs"
   },
   "dependencies": {

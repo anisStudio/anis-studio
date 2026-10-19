@@ -13,6 +13,12 @@ import {
   slotTouchesZagrebDate,
   zagrebYearMonth,
 } from '../src/lib/smartBooking.ts'
+import {
+  croatianPublicHolidays,
+  easterSundayUtc,
+  isCroatianPublicHoliday,
+} from '../src/lib/croatianHolidays.ts'
+import { studioAnniversaryForYear } from '../src/lib/studioAnniversary.ts'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const migration = readFileSync(
@@ -23,7 +29,16 @@ const hardening = readFileSync(
   join(root, 'supabase/migrations/20261017140000_f26_booking_turnstile_edge_hardening.sql'),
   'utf8',
 )
+const calendar2 = readFileSync(
+  join(root, 'supabase/migrations/20261018100000_f26_smart_calendar_2.sql'),
+  'utf8',
+)
+const waCapacitySync = readFileSync(
+  join(root, 'supabase/migrations/20261018101000_f26_wa_capacity_sync.sql'),
+  'utf8',
+)
 const clientLib = readFileSync(join(root, 'src/lib/smartBooking.ts'), 'utf8')
+const settingsHook = readFileSync(join(root, 'src/hooks/useSettings.ts'), 'utf8')
 
 assert.match(migration, /create table public\.booking_shared_settings/)
 assert.match(migration, /create table public\.availability_closures/)
@@ -87,5 +102,39 @@ assert.equal(
 const ym = zagrebYearMonth(new Date('2026-10-17T12:00:00Z'))
 assert.equal(typeof ym.year, 'number')
 assert.equal(typeof ym.month, 'number')
+
+assert.match(calendar2, /booking_horizon_days/)
+assert.match(calendar2, /auto_weekly_enabled/)
+assert.match(calendar2, /department_capacity_allocations/)
+assert.match(calendar2, /booking_is_croatian_holiday/)
+assert.match(calendar2, /booking_month_capacity_full/)
+assert.match(calendar2, /recurrence/)
+assert.match(calendar2, /f26_auto_slot/)
+assert.match(calendar2, /admin_allocate_department_capacity/)
+assert.doesNotMatch(calendar2, /web_atelier_public_visible\s*=\s*true/)
+assert.match(waCapacitySync, /booking_sync_web_atelier_capacity_allocate/)
+assert.match(waCapacitySync, /booking_sync_web_atelier_capacity_release/)
+assert.match(waCapacitySync, /planned_start_month/)
+assert.match(waCapacitySync, /drop function if exists public\.admin_create_web_atelier_project_from_offer\(uuid\)/)
+assert.match(clientLib, /functions\/v1\/book-consultation-slot/)
+assert.match(settingsHook, /web_atelier_public_visible:\s*false/)
+
+const easter2026 = easterSundayUtc(2026)
+assert.equal(
+  `${easter2026.getUTCFullYear()}-${String(easter2026.getUTCMonth() + 1).padStart(2, '0')}-${String(easter2026.getUTCDate()).padStart(2, '0')}`,
+  '2026-04-05',
+)
+const holidays2026 = croatianPublicHolidays(2026)
+assert.ok(holidays2026.includes('2026-04-05'))
+assert.ok(holidays2026.includes('2026-04-06'))
+assert.ok(holidays2026.includes('2026-06-04'))
+assert.ok(holidays2026.includes('2026-11-18'))
+assert.equal(isCroatianPublicHoliday('2026-10-02'), false)
+
+const ann2026 = studioAnniversaryForYear(2026)
+assert.ok(ann2026)
+assert.equal(ann2026.ordinal, 2)
+assert.equal(ann2026.isoDate, '2026-10-01')
+assert.equal(studioAnniversaryForYear(2024), null)
 
 console.log('smart-booking F2.6 unit tests passed')

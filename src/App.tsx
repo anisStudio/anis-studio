@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Outlet, useLocation } from 'react-router-
 import { AnimatePresence } from 'framer-motion'
 import { Toaster } from 'react-hot-toast'
 import CartDrawer from './components/CartDrawer'
+import { AdminAuthCallbackRedirect } from './components/AdminAuthCallbackRedirect'
 import { PublicServiceGuard } from './components/PublicServiceGuard'
 import { RouteFallback } from './components/RouteFallback'
 import { useCart } from './lib/cart.store'
@@ -53,6 +54,9 @@ const AdminWebAtelierProjectDetailPage = lazy(
   () => import('./pages/AdminWebAtelierProjectDetailPage'),
 )
 const AdminAvailabilityPage = lazy(() => import('./pages/AdminAvailabilityPage'))
+const AdminSitePreviewPage = lazy(() => import('./pages/AdminSitePreviewPage'))
+const AdminForgotPasswordPage = lazy(() => import('./pages/AdminForgotPasswordPage'))
+const AdminResetPasswordPage = lazy(() => import('./pages/AdminResetPasswordPage'))
 const WebAtelierProjectTrackingPage = lazy(() => import('./pages/WebAtelierProjectTrackingPage'))
 const OstaviRecenzijuPage = lazy(() => import('./pages/OstaviRecenzijuPage'))
 const PolitikaPrivatnostiPage = lazy(() => import('./pages/PolitikaPrivatnostiPage'))
@@ -118,14 +122,17 @@ function AnimatedRoutes({
               <Route path="upit" element={<LrcInquiryPage language={language} />} />
             </Route>
             <Route
-              path="/interijeri/klijenti"
-              element={<InterijeriClientsPage language={language} />}
-            />
-            <Route
-              path="/interijeri/stolari"
-              element={<InterijeriStolariPage language={language} />}
-            />
-            <Route path="/interijeri" element={<InterijeriPage language={language} />} />
+              path="/interijeri"
+              element={
+                <PublicServiceGuard service="interiors" language={language}>
+                  <Outlet />
+                </PublicServiceGuard>
+              }
+            >
+              <Route index element={<InterijeriPage language={language} />} />
+              <Route path="klijenti" element={<InterijeriClientsPage language={language} />} />
+              <Route path="stolari" element={<InterijeriStolariPage language={language} />} />
+            </Route>
             <Route
               path="/web-atelier"
               element={
@@ -143,7 +150,11 @@ function AnimatedRoutes({
             <Route path="/faq" element={<FAQPage language={language} />} />
             <Route
               path="/cjenici/interijeri"
-              element={<CjeniciInterijeriPage language={language} />}
+              element={
+                <PublicServiceGuard service="interiors" language={language}>
+                  <CjeniciInterijeriPage language={language} />
+                </PublicServiceGuard>
+              }
             />
             <Route path="/cjenici" element={<CjeniciPage language={language} />} />
             <Route path="/vr/:projectId" element={<PublicProjectVrPage />} />
@@ -165,8 +176,10 @@ function AnimatedRoutes({
             />
           </Route>
 
-          {/* Admin routes - no public header/footer; login outside persistent shell */}
+          {/* Admin routes - no public header/footer; login/recovery outside AdminRoute */}
           <Route path="/admin/login" element={<AdminLoginPage />} />
+          <Route path="/admin/forgot-password" element={<AdminForgotPasswordPage />} />
+          <Route path="/admin/reset-password" element={<AdminResetPasswordPage />} />
           <Route
             path="/admin"
             element={
@@ -176,6 +189,7 @@ function AnimatedRoutes({
             }
           >
             <Route path="settings" element={<AdminSettingsPage />} />
+            <Route path="preview" element={<AdminSitePreviewPage />} />
             <Route path="lrc-inquiries" element={<AdminLrcInquiriesPage />} />
             <Route path="interiors-projects" element={<AdminInteriorsProjectsPage />} />
             <Route path="interiors-projects/:id" element={<AdminInteriorsProjectDetailPage />} />
@@ -263,6 +277,7 @@ export default function App() {
       <BrowserRouter>
         <CookieBanner language={language} />
         <AdminAuthProvider>
+          <AdminAuthCallbackRedirect />
           <AnimatedRoutes
             language={language}
             cartCount={cartCount}

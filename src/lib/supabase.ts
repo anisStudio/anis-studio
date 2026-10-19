@@ -17,7 +17,13 @@ if (!isSupabaseConfigured) {
       'Aplikacija radi u fallback modu (LRC forma uključena, bez pravog spajanja na Supabase).'
   )
 } else {
-  client = createClient(supabaseUrl!, supabaseAnonKey!)
+  client = createClient(supabaseUrl!, supabaseAnonKey!, {
+    auth: {
+      detectSessionInUrl: true,
+      persistSession: true,
+      autoRefreshToken: true,
+    },
+  })
 }
 
 export const supabase = client

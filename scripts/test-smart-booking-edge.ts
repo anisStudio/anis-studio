@@ -135,6 +135,7 @@ assert.equal(
   false,
 )
 assert.equal(mapBookingRpcMessage('booking_slot_unavailable'), 'slot_unavailable')
+assert.equal(mapBookingRpcMessage('booking_month_capacity_full'), 'slot_unavailable')
 assert.equal(mapBookingRpcMessage('booking_rate_limited'), 'rate_limited')
 
 // --- Handler flows ---

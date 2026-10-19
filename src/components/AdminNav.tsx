@@ -27,6 +27,18 @@ const AdminNav: React.FC = () => {
 
             <nav className="flex flex-wrap items-center gap-4">
               <NavLink
+                to="/admin/preview"
+                className={({ isActive }) =>
+                  `text-sm font-medium transition-colors duration-200 px-3 py-1.5 rounded-lg ${
+                    isActive
+                      ? 'text-violet-700 bg-violet-50 font-semibold'
+                      : 'text-slate-700 hover:text-violet-700 hover:bg-slate-100'
+                  }`
+                }
+              >
+                Pregled stranice
+              </NavLink>
+              <NavLink
                 to="/admin/settings"
                 className={({ isActive }) =>
                   `text-sm font-medium transition-colors duration-200 px-3 py-1.5 rounded-lg ${

@@ -19,16 +19,16 @@ export function WebAtelierDemoPortfolio({ language }: Props) {
   return (
     <div className="wa-demo-portfolio" id="web-atelier-demos">
       <div className="mx-auto mb-6 max-w-3xl text-center sm:mb-8">
-        <h3 className="font-heading text-xl font-bold text-balance text-plum dark:text-pearl sm:text-2xl">
-          {hr ? 'Demo portfolio koncepata' : 'Demo concept portfolio'}
+        <p className="text-xs font-bold uppercase tracking-[0.08em] text-amethyst dark:text-lavender">
+          {demoBannerText(language)}
+        </p>
+        <h3 className="mt-2 font-heading text-xl font-bold text-balance text-plum dark:text-pearl sm:text-2xl">
+          {hr ? 'Tri demo koncepta' : 'Three demo concepts'}
         </h3>
         <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-plum/78 dark:text-pearl/72 sm:text-[0.9375rem]">
           {hr
-            ? 'Tri fiktivna koncepta — START, PRO i PREMIUM — kako bi se vidio smjer studija. Nisu klijentski projekti.'
-            : 'Three fictional concepts — START, PRO and PREMIUM — to show the studio’s direction. Not client projects.'}
-        </p>
-        <p className="mx-auto mt-3 text-xs font-semibold uppercase tracking-wide text-amethyst dark:text-lavender">
-          {demoBannerText(language)}
+            ? 'Fiktivni primjeri za START, PRO i PREMIUM — da se vidi vizualni smjer studija. Nisu stvarni klijentski projekti ni rezultati suradnje.'
+            : 'Fictional START, PRO, and PREMIUM examples that show the studio’s visual direction. Not real client projects or collaboration results.'}
         </p>
       </div>
 

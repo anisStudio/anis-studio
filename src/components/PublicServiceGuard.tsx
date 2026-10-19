@@ -1,14 +1,18 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { useSettings } from '../hooks/useSettings'
+import {
+  PUBLIC_SERVICE_SETTING_KEY,
+  resolvePublicServiceAccess,
+  type PublicService,
+} from '../lib/publicServiceAccess'
+import { useAdminAuth } from '../providers/AdminAuthProvider'
+import { AdminDepartmentPreviewContext } from '../providers/AdminDepartmentPreviewContext'
+import { AdminPreviewBanner } from './AdminPreviewBanner'
 import { AnimatedPage } from './AnimatedPage'
 import { PageSEO } from './PageSEO'
 
-export type PublicService = 'lrc' | 'webAtelier'
-
-type PublicServiceSettingKey =
-  | 'lrc_public_visible'
-  | 'web_atelier_public_visible'
+export type { PublicService }
 
 interface PublicServiceGuardProps {
   service: PublicService
@@ -16,21 +20,10 @@ interface PublicServiceGuardProps {
   children: ReactNode
 }
 
-const SERVICE_CONFIG: Record<
-  PublicService,
-  {
-    settingsKey: PublicServiceSettingKey
-    seoTitle: string
-  }
-> = {
-  lrc: {
-    settingsKey: 'lrc_public_visible',
-    seoTitle: "Ani's LRC",
-  },
-  webAtelier: {
-    settingsKey: 'web_atelier_public_visible',
-    seoTitle: "Ani's Web Atelier",
-  },
+const SERVICE_SEO_TITLE: Record<PublicService, string> = {
+  interiors: "Ani's Interijeri",
+  lrc: "Ani's LRC",
+  webAtelier: "Ani's Web Atelier",
 }
 
 const unavailableCopy = {
@@ -107,25 +100,48 @@ function ServiceUnavailable({ language }: { language: 'hr' | 'en' }) {
   )
 }
 
+/**
+ * Gates department public routes by settings flag.
+ * Confirmed admins (public.is_admin via AdminAuthProvider) may preview when the flag is off.
+ * Content stays hidden until settings + admin checks finish (fail closed).
+ */
 export function PublicServiceGuard({
   service,
   language,
   children,
 }: PublicServiceGuardProps) {
   const { settings, isLoading, error } = useSettings()
-  const { settingsKey, seoTitle } = SERVICE_CONFIG[service]
+  const { isAdmin, loading: adminLoading } = useAdminAuth()
+  const settingsKey = PUBLIC_SERVICE_SETTING_KEY[service]
+  const seoTitle = SERVICE_SEO_TITLE[service]
 
-  if (isLoading) {
+  const access = resolvePublicServiceAccess({
+    publicVisible: settings?.[settingsKey] === true,
+    isAdmin,
+    loading: isLoading || adminLoading,
+    settingsUnavailable: !isLoading && (error !== null || settings === null),
+  })
+
+  if (access === 'loading') {
     return <SettingsLoading language={language} seoTitle={seoTitle} />
   }
 
-  if (error !== null || settings === null) {
+  if (access === 'denied') {
     return <ServiceUnavailable language={language} />
   }
 
-  if (settings[settingsKey] !== true) {
-    return <ServiceUnavailable language={language} />
+  if (access === 'allowed_admin_preview') {
+    return (
+      <AdminDepartmentPreviewContext.Provider value={true}>
+        <AdminPreviewBanner service={service} language={language} />
+        {children}
+      </AdminDepartmentPreviewContext.Provider>
+    )
   }
 
-  return <>{children}</>
+  return (
+    <AdminDepartmentPreviewContext.Provider value={false}>
+      {children}
+    </AdminDepartmentPreviewContext.Provider>
+  )
 }

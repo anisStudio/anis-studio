@@ -52,8 +52,14 @@ export interface BookingSharedSettings {
   shared_consultation_capacity: number
   default_slot_minutes: number
   notes: string | null
+  booking_horizon_days?: number
+  auto_weekly_enabled?: boolean
+  auto_weekday_start_time?: string
+  auto_weekday_end_time?: string
   updated_at?: string
 }
+
+export type ClosureRecurrence = 'none' | 'annual'
 
 export interface AvailabilityClosure {
   id: string
@@ -62,6 +68,31 @@ export interface AvailabilityClosure {
   ends_at: string
   reason: string | null
   is_active: boolean
+  recurrence?: ClosureRecurrence
+  recurrence_end_date?: string | null
+  created_at: string
+}
+
+export interface DepartmentMonthCapacity {
+  department: Department
+  planned_start_month: string
+  max_accepted_projects: number
+  used: number
+  remaining: number
+  is_full: boolean
+}
+
+export interface CapacityAllocation {
+  id: string
+  department: Department
+  planned_start_month: string
+  source_kind: 'manual' | 'web_atelier_project' | 'interiors_project'
+  source_id: string | null
+  status: 'active' | 'released'
+  title: string
+  notes: string | null
+  is_override: boolean
+  override_reason: string | null
   created_at: string
 }
 
@@ -103,6 +134,7 @@ export interface BookingCalendarBundle {
   reservations: BookingReservation[]
   closures: AvailabilityClosure[]
   settings: BookingSharedSettings
+  month_capacity?: DepartmentMonthCapacity[]
 }
 
 export interface PublicConsultationSlot {
@@ -111,6 +143,7 @@ export interface PublicConsultationSlot {
   starts_at: string
   ends_at: string
   remaining: number
+  source?: 'manual_window' | 'auto_weekly'
 }
 
 export interface PublicAvailabilityResponse {
@@ -186,9 +219,14 @@ export async function listBookingCalendar(filter?: {
     closures: bundle.closures ?? [],
     settings: bundle.settings ?? {
       shared_consultation_capacity: 1,
-      default_slot_minutes: 60,
+      default_slot_minutes: 30,
       notes: null,
+      booking_horizon_days: 90,
+      auto_weekly_enabled: true,
+      auto_weekday_start_time: '16:00:00',
+      auto_weekday_end_time: '19:00:00',
     },
+    month_capacity: bundle.month_capacity ?? [],
   }
 }
 
@@ -196,12 +234,20 @@ export async function updateBookingSharedSettings(input: {
   sharedConsultationCapacity?: number
   defaultSlotMinutes?: number
   notes?: string | null
+  bookingHorizonDays?: number
+  autoWeeklyEnabled?: boolean
+  autoWeekdayStartTime?: string | null
+  autoWeekdayEndTime?: string | null
 }): Promise<BookingSharedSettings> {
   const client = await requireClient()
   const { data, error } = await client.rpc('admin_update_booking_shared_settings', {
     p_shared_consultation_capacity: input.sharedConsultationCapacity ?? null,
     p_default_slot_minutes: input.defaultSlotMinutes ?? null,
     p_notes: input.notes ?? null,
+    p_booking_horizon_days: input.bookingHorizonDays ?? null,
+    p_auto_weekly_enabled: input.autoWeeklyEnabled ?? null,
+    p_auto_weekday_start_time: input.autoWeekdayStartTime ?? null,
+    p_auto_weekday_end_time: input.autoWeekdayEndTime ?? null,
   })
   if (error) {
     if (isMissingRpcError(error)) throw new SmartBookingUnavailableError()
@@ -215,6 +261,8 @@ export async function createAvailabilityClosure(input: {
   endsAt: string
   department?: Department | null
   reason?: string | null
+  recurrence?: ClosureRecurrence
+  recurrenceEndDate?: string | null
 }): Promise<{
   closure_id: string
   conflicting_reservations: Array<{ id: string; title: string; starts_at: string }>
@@ -227,6 +275,8 @@ export async function createAvailabilityClosure(input: {
     p_ends_at: input.endsAt,
     p_department: input.department ?? null,
     p_reason: input.reason ?? null,
+    p_recurrence: input.recurrence ?? 'none',
+    p_recurrence_end_date: input.recurrenceEndDate ?? null,
   })
   if (error) {
     if (isMissingRpcError(error)) throw new SmartBookingUnavailableError()
@@ -237,6 +287,98 @@ export async function createAvailabilityClosure(input: {
     conflicting_reservations: Array<{ id: string; title: string; starts_at: string }>
     has_conflicts: boolean
     warning: string | null
+  }
+}
+
+export async function setClosureRecurrence(input: {
+  closureId: string
+  recurrence: ClosureRecurrence
+  recurrenceEndDate?: string | null
+}): Promise<void> {
+  const client = await requireClient()
+  const { error } = await client.rpc('admin_set_closure_recurrence', {
+    p_closure_id: input.closureId,
+    p_recurrence: input.recurrence,
+    p_recurrence_end_date: input.recurrenceEndDate ?? null,
+  })
+  if (error) {
+    if (isMissingRpcError(error)) throw new SmartBookingUnavailableError()
+    throw new Error(error.message)
+  }
+}
+
+export async function listDepartmentMonthCapacity(input: {
+  department: Department
+  month: string
+}): Promise<DepartmentMonthCapacity & { allocations: CapacityAllocation[] }> {
+  const client = await requireClient()
+  const { data, error } = await client.rpc('admin_list_department_month_capacity', {
+    p_department: input.department,
+    p_month: input.month,
+  })
+  if (error) {
+    if (isMissingRpcError(error)) throw new SmartBookingUnavailableError()
+    throw new Error(error.message)
+  }
+  return data as DepartmentMonthCapacity & { allocations: CapacityAllocation[] }
+}
+
+export async function updateDepartmentMonthlyCapacitySettings(input: {
+  department: Department
+  maxAcceptedProjects: number
+}): Promise<DepartmentMonthCapacity & { allocations?: CapacityAllocation[] }> {
+  const client = await requireClient()
+  const { data, error } = await client.rpc('admin_update_department_monthly_capacity_settings', {
+    p_department: input.department,
+    p_max_accepted_projects: input.maxAcceptedProjects,
+  })
+  if (error) {
+    if (isMissingRpcError(error)) throw new SmartBookingUnavailableError()
+    throw new Error(error.message)
+  }
+  return data as DepartmentMonthCapacity & { allocations?: CapacityAllocation[] }
+}
+
+export async function allocateDepartmentCapacity(input: {
+  department: Department
+  plannedStartMonth: string
+  title: string
+  sourceKind?: CapacityAllocation['source_kind']
+  sourceId?: string | null
+  notes?: string | null
+  isOverride?: boolean
+  overrideReason?: string | null
+}): Promise<{ allocation_id: string; is_override: boolean }> {
+  const client = await requireClient()
+  const { data, error } = await client.rpc('admin_allocate_department_capacity', {
+    p_department: input.department,
+    p_planned_start_month: input.plannedStartMonth,
+    p_title: input.title,
+    p_source_kind: input.sourceKind ?? 'manual',
+    p_source_id: input.sourceId ?? null,
+    p_notes: input.notes ?? null,
+    p_is_override: input.isOverride ?? false,
+    p_override_reason: input.overrideReason ?? null,
+  })
+  if (error) {
+    if (isMissingRpcError(error)) throw new SmartBookingUnavailableError()
+    throw new Error(error.message)
+  }
+  return data as { allocation_id: string; is_override: boolean }
+}
+
+export async function releaseDepartmentCapacity(
+  allocationId: string,
+  reason?: string | null,
+): Promise<void> {
+  const client = await requireClient()
+  const { error } = await client.rpc('admin_release_department_capacity', {
+    p_allocation_id: allocationId,
+    p_reason: reason ?? null,
+  })
+  if (error) {
+    if (isMissingRpcError(error)) throw new SmartBookingUnavailableError()
+    throw new Error(error.message)
   }
 }
 
@@ -263,6 +405,8 @@ export async function createManualBooking(input: {
   bookingKind?: BookingKind
   status?: ReservationStatus
   notes?: string | null
+  monthCapacityOverride?: boolean
+  monthCapacityOverrideReason?: string | null
 }): Promise<string> {
   const client = await requireClient()
   const { data, error } = await client.rpc('admin_create_manual_booking', {
@@ -279,6 +423,8 @@ export async function createManualBooking(input: {
     p_notes: input.notes ?? null,
     p_entity_kind: 'booking_lead',
     p_entity_id: null,
+    p_month_capacity_override: input.monthCapacityOverride ?? false,
+    p_month_capacity_override_reason: input.monthCapacityOverrideReason ?? null,
   })
   if (error) {
     if (isMissingRpcError(error)) throw new SmartBookingUnavailableError()

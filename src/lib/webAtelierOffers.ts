@@ -55,10 +55,11 @@ export const WEB_ATELIER_INFORMATIVE_PRICES_EUR: Record<WebAtelierPackageTier, n
   premium: 800,
 }
 
+/** Derived from EUR floors (×100) so the two maps cannot silently drift. */
 export const WEB_ATELIER_INFORMATIVE_PRICES_CENTS: Record<WebAtelierPackageTier, number> = {
-  start: 30_000,
-  pro: 50_000,
-  premium: 80_000,
+  start: WEB_ATELIER_INFORMATIVE_PRICES_EUR.start * 100,
+  pro: WEB_ATELIER_INFORMATIVE_PRICES_EUR.pro * 100,
+  premium: WEB_ATELIER_INFORMATIVE_PRICES_EUR.premium * 100,
 }
 
 export interface WebAtelierOfferItemInput {
@@ -632,17 +633,35 @@ export async function recordWebAtelierOfferDecision(input: {
   return String(data)
 }
 
-export async function createWebAtelierProjectFromOffer(offerId: string): Promise<{
+export async function createWebAtelierProjectFromOffer(
+  offerId: string,
+  options?: {
+    plannedStartMonth?: string | null
+    capacityOverride?: boolean
+    capacityOverrideReason?: string | null
+  },
+): Promise<{
   project_id: string
   project_number: string
   created: boolean
+  planned_start_month?: string | null
+  capacity_allocation_id?: string | null
 }> {
   const supabase = await adminClient()
   const { data, error } = await supabase.rpc('admin_create_web_atelier_project_from_offer', {
     p_offer_id: offerId,
+    p_planned_start_month: options?.plannedStartMonth ?? null,
+    p_capacity_override: options?.capacityOverride ?? false,
+    p_capacity_override_reason: options?.capacityOverrideReason ?? null,
   })
   if (error) rpcError(error)
-  return data as { project_id: string; project_number: string; created: boolean }
+  return data as {
+    project_id: string
+    project_number: string
+    created: boolean
+    planned_start_month?: string | null
+    capacity_allocation_id?: string | null
+  }
 }
 
 export async function fetchWebAtelierProjects(): Promise<WebAtelierProjectListItem[]> {
