@@ -4,3 +4,6 @@ project_id = "anis-studio"
 
 [functions.submit-web-atelier-inquiry]
 verify_jwt = false
+
+[functions.book-consultation-slot]
+verify_jwt = false

@@ -1,5 +1,7 @@
-import { handleInquiryRequest, type GatewayEnv } from '../../../src/lib/webAtelierEdgeHandler.ts'
-import { resolveDevHostAccess } from '../../../src/lib/webAtelierGatewayPolicy.ts'
+// Shared modules live under ../_shared (synced from src/lib via npm run edge:sync-shared)
+// so the Edge Docker mount can resolve them without the repo root.
+import { handleInquiryRequest, type GatewayEnv } from '../_shared/webAtelierEdgeHandler.ts'
+import { resolveDevHostAccess } from '../_shared/webAtelierGatewayPolicy.ts'
 
 function envFlag(name: string): boolean {
   return Deno.env.get(name) === 'true'
