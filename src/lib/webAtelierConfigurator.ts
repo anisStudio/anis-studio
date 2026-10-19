@@ -32,12 +32,32 @@ export type ConfiguratorAddonId = FixedAddonId | EstimateAddonId | CustomQuoteId
 
 export type AddonPricingKind = 'fixed' | 'estimate_from' | 'custom_quote'
 
+/** Included in every package floor (no extra charge). */
+export const WEB_ATELIER_SHARED_PACKAGE_INCLUDES = [
+  'responsive',
+  'basic_seo',
+  'basic_contact_form',
+] as const
+
+export type SharedPackageIncludeId = (typeof WEB_ATELIER_SHARED_PACKAGE_INCLUDES)[number]
+
+export type PackageIncludeId =
+  | SharedPackageIncludeId
+  | 'one_page'
+  | 'up_to_5_pages'
+  | 'up_to_7_pages'
+  | 'one_revision'
+  | 'two_revisions'
+  | 'three_revisions'
+  | 'mini_branding'
+  | 'priority_support_30d'
+
 export interface PackageDefinition {
   id: ConfiguratorPackageId
   fromEur: number
   pages: number
   revisions: number
-  includes: readonly string[]
+  includes: readonly PackageIncludeId[]
 }
 
 export interface AddonDefinition {
@@ -86,21 +106,27 @@ export const WEB_ATELIER_PACKAGE_DEFINITIONS: readonly PackageDefinition[] = [
     fromEur: WEB_ATELIER_INFORMATIVE_PRICES_EUR.start,
     pages: 1,
     revisions: 1,
-    includes: ['one_page', 'one_revision'],
+    includes: ['one_page', 'one_revision', ...WEB_ATELIER_SHARED_PACKAGE_INCLUDES],
   },
   {
     id: 'pro',
     fromEur: WEB_ATELIER_INFORMATIVE_PRICES_EUR.pro,
     pages: 5,
     revisions: 2,
-    includes: ['up_to_5_pages', 'two_revisions'],
+    includes: ['up_to_5_pages', 'two_revisions', ...WEB_ATELIER_SHARED_PACKAGE_INCLUDES],
   },
   {
     id: 'premium',
     fromEur: WEB_ATELIER_INFORMATIVE_PRICES_EUR.premium,
     pages: 7,
     revisions: 3,
-    includes: ['up_to_7_pages', 'mini_branding', 'priority_support_30d', 'three_revisions'],
+    includes: [
+      'up_to_7_pages',
+      'three_revisions',
+      'mini_branding',
+      'priority_support_30d',
+      ...WEB_ATELIER_SHARED_PACKAGE_INCLUDES,
+    ],
   },
 ] as const
 
@@ -374,9 +400,21 @@ export function formatConfiguratorSummary(
     } else {
       lines.push(
         language === 'hr'
-          ? `Paket: ${label} — od ${formatEur(def.fromEur, language)} (${def.pages} stranica, ${def.revisions} revizija).`
-          : `Package: ${label} — from ${formatEur(def.fromEur, language)} (${def.pages} pages, ${def.revisions} revisions).`,
+          ? `Paket: ${label} — od ${formatEur(def.fromEur, language)} (${def.pages === 1 ? '1 stranica' : `do ${def.pages} stranica`}, ${def.revisions === 1 ? '1 korekcija' : `${def.revisions} korekcije`}).`
+          : `Package: ${label} — from ${formatEur(def.fromEur, language)} (${def.pages === 1 ? '1 page' : `up to ${def.pages} pages`}, ${def.revisions === 1 ? '1 correction' : `${def.revisions} corrections`}).`,
       )
+      lines.push(
+        language === 'hr'
+          ? 'U paketu (osnovna cijena): responzivni prikaz, osnovna SEO optimizacija, osnovni kontaktni obrazac.'
+          : 'In package (base price): responsive layout, basic SEO, basic contact form.',
+      )
+      if (pkg === 'premium') {
+        lines.push(
+          language === 'hr'
+            ? 'PREMIUM također: mini branding, 30 dana prioritetne tehničke podrške.'
+            : 'PREMIUM also: mini branding, 30-day priority technical support.',
+        )
+      }
     }
   } else {
     lines.push(language === 'hr' ? 'Paket: nije odabran.' : 'Package: not selected.')
@@ -475,6 +513,79 @@ export function packageLabel(id: ConfiguratorPackageId, language: 'hr' | 'en'): 
   return language === 'hr'
     ? `${name} — od ${formatEur(def.fromEur, language)}`
     : `${name} — from ${formatEur(def.fromEur, language)}`
+}
+
+/** Shared floor inclusions — same wording for FAQ, packages, configurator, offers. */
+export function sharedPackageIncludesCopy(language: 'hr' | 'en'): readonly string[] {
+  return language === 'hr'
+    ? [
+        'Responzivni prikaz (mobitel, tablet, desktop)',
+        'Osnovna SEO optimizacija',
+        'Osnovni kontaktni obrazac',
+      ]
+    : [
+        'Responsive layout (mobile, tablet, desktop)',
+        'Basic SEO optimization',
+        'Basic contact form',
+      ]
+}
+
+export function packageScopeHeadline(id: ConfiguratorPackageId, language: 'hr' | 'en'): string {
+  const def = PACKAGE_BY_ID[id]
+  if (language === 'hr') {
+    const pages =
+      def.pages === 1 ? 'Jednostranična stranica' : `Do ${def.pages} stranica`
+    const revisions =
+      def.revisions === 1 ? '1 korekcija' : `${def.revisions} korekcije`
+    const premium =
+      id === 'premium' ? ', mini branding, 30 dana prioritetne tehničke podrške' : ''
+    return `${pages}, ${revisions}${premium}.`
+  }
+  const pages = def.pages === 1 ? 'One-page site' : `Up to ${def.pages} pages`
+  const revisions =
+    def.revisions === 1 ? '1 correction round' : `${def.revisions} correction rounds`
+  const premium =
+    id === 'premium' ? ', mini branding, 30-day priority technical support' : ''
+  return `${pages}, ${revisions}${premium}.`
+}
+
+/** Marketing bullets aligned with authoritative package definitions. */
+export function packageMarketingBullets(
+  id: ConfiguratorPackageId,
+  language: 'hr' | 'en',
+): readonly string[] {
+  const def = PACKAGE_BY_ID[id]
+  const shared = sharedPackageIncludesCopy(language)
+  if (language === 'hr') {
+    const pages =
+      def.pages === 1 ? '1 stranica' : `Do ${def.pages} stranica`
+    const revisions =
+      def.revisions === 1 ? '1 korekcija' : `${def.revisions} korekcije`
+    const tierExtra =
+      id === 'premium'
+        ? (['Mini branding', '30 dana prioritetne tehničke podrške'] as const)
+        : ([] as const)
+    return [pages, revisions, ...shared, ...tierExtra]
+  }
+  const pages = def.pages === 1 ? '1 page' : `Up to ${def.pages} pages`
+  const revisions =
+    def.revisions === 1 ? '1 correction round' : `${def.revisions} correction rounds`
+  const tierExtra =
+    id === 'premium'
+      ? (['Mini branding', '30-day priority technical support'] as const)
+      : ([] as const)
+  return [pages, revisions, ...shared, ...tierExtra]
+}
+
+export function packagePositioningLine(id: ConfiguratorPackageId, language: 'hr' | 'en'): string {
+  if (language === 'hr') {
+    if (id === 'start') return 'Jednostavna, fokusirana prezentacija ponude.'
+    if (id === 'pro') return 'Više prostora za usluge, galeriju i jasan poziv na akciju.'
+    return 'Širi opseg za brendove kojima treba bogatiji vizualni sloj.'
+  }
+  if (id === 'start') return 'A simple, focused presentation of your offer.'
+  if (id === 'pro') return 'More room for services, gallery, and a clear call to action.'
+  return 'Broader scope for brands that need a richer visual layer.'
 }
 
 /** Suggested inquiry budget band from indicative floor (soft hint only). */

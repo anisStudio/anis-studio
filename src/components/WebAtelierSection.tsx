@@ -3,6 +3,8 @@ import { trackEvent } from '../lib/analytics'
 import {
   WEB_ATELIER_PACKAGE_DEFINITIONS,
   formatEur,
+  packageMarketingBullets,
+  packagePositioningLine,
 } from '../lib/webAtelierConfigurator'
 import { DecorativeSkyBackdrop } from './DecorativeSkyBackdrop'
 import { WebAtelierConfigurator } from './WebAtelierConfigurator'
@@ -50,8 +52,8 @@ export default function WebAtelierSection({ language }: WebAtelierSectionProps) 
       en: 'Service packages',
     },
     servicesIntro: {
-      hr: 'Tri osnovna smjera. Cijene su orijentacijske; detalji i dodaci biraju se u konfiguratoru.',
-      en: 'Three base directions. Prices are indicative; details and add-ons are chosen in the configurator.',
+      hr: 'Tri osnovna smjera. U svakom paketu: responzivni prikaz, osnovna SEO optimizacija i osnovni kontaktni obrazac. Opcionalni dodaci biraju se u konfiguratoru; hosting, domena i održavanje definiraju se ponudom.',
+      en: 'Three base directions. Every package includes responsive layout, basic SEO, and a basic contact form. Optional add-ons are chosen in the configurator; hosting, domain, and maintenance are defined in the quote.',
     },
     from: { hr: 'od', en: 'from' },
     processTitle: {
@@ -94,8 +96,8 @@ export default function WebAtelierSection({ language }: WebAtelierSectionProps) 
       {
         title: { hr: 'Objava', en: 'Publish' },
         desc: {
-          hr: 'Postavljanje i osnovna podešavanja.',
-          en: 'Launch and basic setup.',
+          hr: 'Objava prema dogovoru. Hosting, domena i održavanje definiraju se ponudom.',
+          en: 'Launch as agreed. Hosting, domain, and maintenance are defined in the quote.',
         },
       },
     ],
@@ -155,21 +157,6 @@ export default function WebAtelierSection({ language }: WebAtelierSectionProps) 
       en: 'Leave a short review and help others understand what working together is like.',
     },
     reviewButton: { hr: 'Ostavi recenziju', en: 'Leave a review' },
-  }
-
-  const packageBullets: Record<string, { hr: string[]; en: string[] }> = {
-    start: {
-      hr: ['Jedna fokusirana stranica', 'Osnovna struktura i dizajn', '1 krug revizija'],
-      en: ['One focused page', 'Core structure and design', '1 revision round'],
-    },
-    pro: {
-      hr: ['Do nekoliko stranica', 'Jasnija navigacija i sadržaj', 'Više prostora za ponudu'],
-      en: ['Several pages', 'Clearer navigation and content', 'More room for your offer'],
-    },
-    premium: {
-      hr: ['Širi opseg i detaljniji dizajn', 'Mini branding podrška', 'Prioritetna tehnička podrška 30 dana'],
-      en: ['Broader scope and richer design', 'Mini branding support', '30-day priority technical support'],
-    },
   }
 
   return (
@@ -235,9 +222,9 @@ export default function WebAtelierSection({ language }: WebAtelierSectionProps) 
                 <p className="wa-prem-price">
                   {copy.from[language]} {formatEur(pkg.fromEur, language)}
                 </p>
-                <p>{language === 'hr' ? packageLabelHr(pkg.id) : packageLabelEn(pkg.id)}</p>
+                <p>{packagePositioningLine(pkg.id, language)}</p>
                 <ul>
-                  {(packageBullets[pkg.id]?.[language] ?? []).map((line) => (
+                  {packageMarketingBullets(pkg.id, language).map((line) => (
                     <li key={line}>{line}</li>
                   ))}
                 </ul>
@@ -328,16 +315,4 @@ export default function WebAtelierSection({ language }: WebAtelierSectionProps) 
       </div>
     </section>
   )
-}
-
-function packageLabelHr(id: string): string {
-  if (id === 'start') return 'Jednostavna, fokusirana prezentacija ponude.'
-  if (id === 'pro') return 'Više prostora za usluge, galeriju i jasan poziv na akciju.'
-  return 'Širi opseg za brendove kojima treba bogatiji vizualni sloj.'
-}
-
-function packageLabelEn(id: string): string {
-  if (id === 'start') return 'A simple, focused presentation of your offer.'
-  if (id === 'pro') return 'More room for services, gallery, and a clear call to action.'
-  return 'Broader scope for brands that need a richer visual layer.'
 }

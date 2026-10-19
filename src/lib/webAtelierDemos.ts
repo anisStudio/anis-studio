@@ -41,8 +41,8 @@ export const WEB_ATELIER_DEMOS: readonly WebAtelierDemoDefinition[] = [
       en: 'Single-page demo for a fictional carpenter: hero, services, project gallery and contact CTA.',
     },
     packageNote: {
-      hr: 'Prikazuje opseg START paketa: jednostranična stranica, jedna revizija. Informativni koncept.',
-      en: 'Shows START package scope: one-page site, one revision. Indicative concept only.',
+      hr: 'Prikazuje opseg START paketa: 1 stranica, 1 korekcija; responzivni prikaz, osnovni SEO i kontaktni obrazac u osnovnoj cijeni. Informativni koncept.',
+      en: 'Shows START package scope: 1 page, 1 correction; responsive layout, basic SEO, and contact form in the base price. Indicative concept only.',
     },
     accentLabel: { hr: 'START', en: 'START' },
   },
@@ -63,8 +63,8 @@ export const WEB_ATELIER_DEMOS: readonly WebAtelierDemoDefinition[] = [
       en: 'Multi-section salon demo: services, indicative prices, gallery and demo booking (UI only).',
     },
     packageNote: {
-      hr: 'Prikazuje PRO opseg (do 5 stranica, dvije revizije). Booking je opcionalna usluga — nije uključen besplatno.',
-      en: 'Shows PRO scope (up to 5 pages, two revisions). Booking is an optional add-on — not included free.',
+      hr: 'Prikazuje PRO opseg (do 5 stranica, 2 korekcije; responzivni prikaz, osnovni SEO i kontaktni obrazac u osnovnoj cijeni). Booking je opcionalna usluga — nije uključen besplatno.',
+      en: 'Shows PRO scope (up to 5 pages, 2 corrections; responsive layout, basic SEO, and contact form in the base price). Booking is an optional add-on — not included free.',
     },
     accentLabel: { hr: 'PRO + booking', en: 'PRO + booking' },
   },
@@ -85,8 +85,8 @@ export const WEB_ATELIER_DEMOS: readonly WebAtelierDemoDefinition[] = [
       en: 'Premium visual demo: collections, occasions, gallery and sample ordering without payment.',
     },
     packageNote: {
-      hr: 'Prikazuje PREMIUM opseg (do 7 stranica, mini branding, prioritetna podrška). E-commerce nije uključen u bazni paket.',
-      en: 'Shows PREMIUM scope (up to 7 pages, mini branding, priority support). Ecommerce is not included in the base package.',
+      hr: 'Prikazuje PREMIUM opseg (do 7 stranica, 3 korekcije, mini branding, 30 dana prioritetne podrške; responzivni prikaz, osnovni SEO i kontaktni obrazac u osnovnoj cijeni). E-commerce nije uključen u bazni paket.',
+      en: 'Shows PREMIUM scope (up to 7 pages, 3 corrections, mini branding, 30-day priority support; responsive layout, basic SEO, and contact form in the base price). Ecommerce is not included in the base package.',
     },
     accentLabel: { hr: 'PREMIUM', en: 'PREMIUM' },
   },
