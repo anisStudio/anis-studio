@@ -11,6 +11,7 @@ import {
   packageLabel,
   packageScopeHeadline,
   sharedPackageIncludesCopy,
+  updateConfiguratorAddon,
   writeStoredConfiguratorSelection,
   type ConfiguratorAddonId,
   type ConfiguratorPackageId,
@@ -121,16 +122,11 @@ export function WebAtelierConfigurator({
   }
 
   function setAddonQuantity(id: ConfiguratorAddonId, quantity: number) {
-    setSelection((prev) => {
-      const addons = { ...prev.addons }
-      if (quantity <= 0) delete addons[id]
-      else addons[id] = quantity
-      return { ...prev, addons }
-    })
+    setSelection((prev) => updateConfiguratorAddon(prev, id, quantity))
   }
 
   function toggleAddon(id: ConfiguratorAddonId) {
-    const current = selection.addons[id] ?? 0
+    const current = estimate.selection.addons[id] ?? 0
     setAddonQuantity(id, current > 0 ? 0 : 1)
   }
 
@@ -162,7 +158,7 @@ export function WebAtelierConfigurator({
       def.id === 'advanced_ecommerce',
   )
 
-  const addonCount = Object.keys(selection.addons).length
+  const addonCount = Object.keys(estimate.selection.addons).length
 
   function SummaryBlock({ compact = false }: { compact?: boolean }) {
     return (
@@ -315,7 +311,7 @@ export function WebAtelierConfigurator({
               </legend>
               <ul className="space-y-2">
                 {standardAddons.map((def) => {
-                  const checked = (selection.addons[def.id] ?? 0) > 0
+                  const checked = (estimate.selection.addons[def.id] ?? 0) > 0
                   const inputId = `${baseId}-addon-${def.id}`
                   const isQty = QTY_ADDONS.includes(def.id as FixedAddonId)
                   return (
@@ -354,7 +350,7 @@ export function WebAtelierConfigurator({
                               type="number"
                               min={1}
                               max={def.maxQuantity}
-                              value={selection.addons[def.id] ?? 1}
+                              value={estimate.selection.addons[def.id] ?? 1}
                               onChange={(e) =>
                                 setAddonQuantity(def.id, Number(e.target.value) || 0)
                               }
@@ -379,7 +375,7 @@ export function WebAtelierConfigurator({
               <p className="wa-cfg-help mb-3 text-xs leading-relaxed">{copy.customServices}</p>
               <ul className="space-y-2">
                 {ecommerceAddons.map((def) => {
-                  const checked = (selection.addons[def.id] ?? 0) > 0
+                  const checked = (estimate.selection.addons[def.id] ?? 0) > 0
                   const inputId = `${baseId}-ecom-${def.id}`
                   return (
                     <li key={def.id} className="wa-cfg-panel p-3 sm:p-3.5">

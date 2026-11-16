@@ -61,6 +61,18 @@ const WebAtelierProjectTrackingPage = lazy(() => import('./pages/WebAtelierProje
 const OstaviRecenzijuPage = lazy(() => import('./pages/OstaviRecenzijuPage'))
 const PolitikaPrivatnostiPage = lazy(() => import('./pages/PolitikaPrivatnostiPage'))
 const StarlinkHrvatskaPage = lazy(() => import('./pages/StarlinkHrvatskaPage'))
+const WebAtelierDevPreviewPage = import.meta.env.DEV
+  ? lazy(() => import('./pages/WebAtelierDevPreviewPage'))
+  : null
+const WebAtelierDevPriceListPage = import.meta.env.DEV
+  ? lazy(() => import('./pages/WebAtelierDevPriceListPage'))
+  : null
+const WebAtelierDevPagePreview = import.meta.env.DEV
+  ? lazy(() => import('./pages/WebAtelierDevPagePreview'))
+  : null
+const CjeniciDevPreviewPage = import.meta.env.DEV
+  ? lazy(() => import('./pages/CjeniciDevPreviewPage'))
+  : null
 
 // Routes component with AnimatePresence
 function AnimatedRoutes({
@@ -174,6 +186,36 @@ function AnimatedRoutes({
               path="/starlink-hrvatska"
               element={<StarlinkHrvatskaPage language={language} />}
             />
+            {import.meta.env.DEV && WebAtelierDevPagePreview ? (
+              <Route
+                path="/dev/web-atelier"
+                element={<WebAtelierDevPagePreview language={language} />}
+              />
+            ) : null}
+            {import.meta.env.DEV && WebAtelierDevPagePreview ? (
+              <Route
+                path="/dev/web-atelier/demo/:slug"
+                element={<WebAtelierDemoPage language={language} enableInquiryLinks={false} />}
+              />
+            ) : null}
+            {import.meta.env.DEV && CjeniciDevPreviewPage ? (
+              <Route
+                path="/dev/cjenici"
+                element={<CjeniciDevPreviewPage language={language} />}
+              />
+            ) : null}
+            {import.meta.env.DEV && WebAtelierDevPriceListPage ? (
+              <Route
+                path="/dev/cjenici/web-atelier"
+                element={<WebAtelierDevPriceListPage language={language} />}
+              />
+            ) : null}
+            {import.meta.env.DEV && WebAtelierDevPreviewPage ? (
+              <Route
+                path="/dev/web-atelier-pregled"
+                element={<WebAtelierDevPreviewPage language={language} />}
+              />
+            ) : null}
           </Route>
 
           {/* Admin routes - no public header/footer; login/recovery outside AdminRoute */}

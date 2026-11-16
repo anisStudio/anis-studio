@@ -5,6 +5,8 @@ import './webAtelierDemos.css'
 
 interface Props {
   language: 'hr' | 'en'
+  /** Public pages keep the inquiry link. DEV preview passes false. */
+  enableInquiryLinks?: boolean
 }
 
 const visualClass: Record<string, string> = {
@@ -13,7 +15,7 @@ const visualClass: Record<string, string> = {
   cvjecarna: 'wa-flor-swatch',
 }
 
-export function WebAtelierDemoPortfolio({ language }: Props) {
+export function WebAtelierDemoPortfolio({ language, enableInquiryLinks = true }: Props) {
   const hr = language === 'hr'
 
   return (
@@ -41,7 +43,7 @@ export function WebAtelierDemoPortfolio({ language }: Props) {
               <h4>{demo.title[language]}</h4>
               <p>{demo.summary[language]}</p>
               <Link
-                to={demo.path}
+                to={enableInquiryLinks ? demo.path : `/dev/web-atelier/demo/${demo.slug}`}
                 className="wa-demo-card-link"
                 onClick={() =>
                   trackEvent('inquiry_cta_click', {
@@ -64,9 +66,13 @@ export function WebAtelierDemoPortfolio({ language }: Props) {
               konfigurator
             </a>{' '}
             ili{' '}
-            <Link className="underline" to="/web-atelier/upit">
-              formu za upit
-            </Link>
+            {enableInquiryLinks ? (
+              <Link className="underline" to="/web-atelier/upit">
+                formu za upit
+              </Link>
+            ) : (
+              <span>formu za upit</span>
+            )}
             .
           </>
         ) : (
@@ -76,9 +82,13 @@ export function WebAtelierDemoPortfolio({ language }: Props) {
               configurator
             </a>{' '}
             or{' '}
-            <Link className="underline" to="/web-atelier/upit">
-              inquiry form
-            </Link>
+            {enableInquiryLinks ? (
+              <Link className="underline" to="/web-atelier/upit">
+                inquiry form
+              </Link>
+            ) : (
+              <span>inquiry form</span>
+            )}
             .
           </>
         )}

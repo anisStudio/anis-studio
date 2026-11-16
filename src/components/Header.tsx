@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { usePublicDepartmentVisibility } from '../hooks/usePublicDepartmentVisibility'
 import { useAuth } from '../providers/AuthProvider'
 import { ThemeToggle } from './ThemeToggle'
@@ -36,8 +36,14 @@ const NAV_ROUTES: Record<NavKey, string> = {
   faq: '/faq',
 }
 
+function isDevPreviewPath(pathname: string): boolean {
+  return pathname === '/dev' || pathname.startsWith('/dev/')
+}
+
 export default function Header({ language, onLanguageChange, cartItemCount, onCartClick }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const location = useLocation()
+  const devPreviewChrome = isDevPreviewPath(location.pathname)
   const serviceVisibility = usePublicDepartmentVisibility()
   const { isAuthenticated, logout } = useAuth()
 
@@ -78,6 +84,55 @@ export default function Header({ language, onLanguageChange, cartItemCount, onCa
     en: { logout: 'Logout' },
   }
 
+  const contactDevTitle =
+    language === 'hr'
+      ? 'Kontakt je onemogućen u DEV pregledu'
+      : 'Contact is disabled in DEV preview'
+
+  const renderNavItem = (key: NavKey, mobile: boolean) => {
+    const label = navigation[language][key]
+    if (key === 'contact' && devPreviewChrome) {
+      const baseClass = mobile
+        ? 'mobile-menu-item text-left px-3 py-2.5 font-medium text-plum/45 dark:text-pearl/40 cursor-not-allowed'
+        : 'relative text-sm font-medium py-2 text-plum/45 dark:text-pearl/40 cursor-not-allowed'
+      return (
+        <span
+          key={key}
+          aria-disabled="true"
+          title={contactDevTitle}
+          className={baseClass}
+          style={mobile ? { minHeight: '48px' } : undefined}
+        >
+          {label}
+        </span>
+      )
+    }
+    if (mobile) {
+      return (
+        <Link
+          key={key}
+          to={NAV_ROUTES[key]}
+          onClick={() => setIsMobileMenuOpen(false)}
+          className="mobile-menu-item text-left px-3 py-2.5 active:bg-[rgba(110,68,255,0.05)] dark:active:bg-[rgba(110,68,255,0.2)] transition-all rounded-lg font-medium text-plum/90 dark:text-pearl hover:text-amethyst dark:hover:text-lavender active:text-amethyst dark:active:text-lavender"
+          style={{ minHeight: '48px' }}
+        >
+          {label}
+        </Link>
+      )
+    }
+    return (
+      <Link
+        key={key}
+        to={NAV_ROUTES[key]}
+        className="relative text-sm font-medium py-2 transition-colors duration-200 text-plum/90 dark:text-pearl/90 hover:text-amethyst dark:hover:text-lavender"
+      >
+        <span className="after:absolute after:-bottom-0.5 after:left-0 after:h-[2px] after:w-0 after:bg-[--color-primary] after:transition-[width] after:duration-300 hover:after:w-full">
+          {label}
+        </span>
+      </Link>
+    )
+  }
+
   return (
     <header className="sticky top-0 z-50 overflow-x-clip header-glass text-plum dark:text-pearl">
       <nav className="mx-auto max-w-7xl min-w-0 px-3 sm:px-6 md:px-8 flex items-center justify-between gap-1.5 sm:gap-3 py-2 sm:py-2.5">
@@ -102,19 +157,7 @@ export default function Header({ language, onLanguageChange, cartItemCount, onCa
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex flex-1 min-w-0 items-center justify-center gap-4 lg:gap-6 px-2">
-          {visibleHeaderNavKeys.map((key) => {
-            return (
-              <Link
-                key={key}
-                to={NAV_ROUTES[key]}
-                className="relative text-sm font-medium py-2 transition-colors duration-200 text-plum/90 dark:text-pearl/90 hover:text-amethyst dark:hover:text-lavender"
-              >
-                <span className="after:absolute after:-bottom-0.5 after:left-0 after:h-[2px] after:w-0 after:bg-[--color-primary] after:transition-[width] after:duration-300 hover:after:w-full">
-                  {navigation[language][key]}
-                </span>
-              </Link>
-            )
-          })}
+          {visibleHeaderNavKeys.map((key) => renderNavItem(key, false))}
         </div>
 
         {/* Right side - Auth, Cart, Language */}
@@ -306,19 +349,7 @@ export default function Header({ language, onLanguageChange, cartItemCount, onCa
       {isMobileMenuOpen && (
         <div className="md:hidden border-t py-3 sm:py-4 backdrop-blur-sm dark:backdrop-blur-none mobile-menu-enter border-[rgba(110,68,255,0.12)] dark:border-lavender/25 bg-pearl/95 dark:bg-[#070812] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]">
           <nav className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8 flex flex-col gap-2 text-plum dark:text-pearl">
-            {visibleHeaderNavKeys.map((key) => {
-              return (
-                <Link
-                  key={key}
-                  to={NAV_ROUTES[key]}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="mobile-menu-item text-left px-3 py-2.5 active:bg-[rgba(110,68,255,0.05)] dark:active:bg-[rgba(110,68,255,0.2)] transition-all rounded-lg font-medium text-plum/90 dark:text-pearl hover:text-amethyst dark:hover:text-lavender active:text-amethyst dark:active:text-lavender"
-                  style={{ minHeight: '48px' }}
-                >
-                  {navigation[language][key]}
-                </Link>
-              )
-            })}
+            {visibleHeaderNavKeys.map((key) => renderNavItem(key, true))}
             {isAuthenticated ? (
               <button
                 onClick={() => {
