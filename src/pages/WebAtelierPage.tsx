@@ -6,9 +6,14 @@ import { PageSEO } from '../components/PageSEO'
 
 interface WebAtelierPageProps {
   language: 'hr' | 'en'
+  /** Public pages keep inquiry links. DEV preview passes false. */
+  enableInquiryLinks?: boolean
 }
 
-export default function WebAtelierPage({ language }: WebAtelierPageProps) {
+export default function WebAtelierPage({
+  language,
+  enableInquiryLinks = true,
+}: WebAtelierPageProps) {
   const description =
     language === 'hr'
       ? 'Anis Web Atelier — profesionalne web stranice za male obrte i poduzetnike. Informativna procjena, upit i opcionalna konzultacija. Javno lansiranje još nije aktivno.'
@@ -35,7 +40,7 @@ export default function WebAtelierPage({ language }: WebAtelierPageProps) {
       />
       <main className="min-w-0 space-y-0">
         <ErrorBoundary name="WebAtelier">
-          <WebAtelierSection language={language} />
+          <WebAtelierSection language={language} enableInquiryLinks={enableInquiryLinks} />
         </ErrorBoundary>
 
         <ErrorBoundary name="FAQ">

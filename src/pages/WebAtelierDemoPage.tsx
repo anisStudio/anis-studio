@@ -9,9 +9,11 @@ import { getWebAtelierDemo } from '../lib/webAtelierDemos'
 
 interface Props {
   language: 'hr' | 'en'
+  /** Public demo route keeps inquiry links. DEV preview passes false. */
+  enableInquiryLinks?: boolean
 }
 
-export default function WebAtelierDemoPage({ language }: Props) {
+export default function WebAtelierDemoPage({ language, enableInquiryLinks = true }: Props) {
   const { slug } = useParams<{ slug: string }>()
   const demo = getWebAtelierDemo(slug)
 
@@ -28,7 +30,11 @@ export default function WebAtelierDemoPage({ language }: Props) {
           <h1 className="font-heading text-2xl font-bold text-plum dark:text-pearl">{title}</h1>
           <p className="mx-auto mt-3 max-w-md text-sm text-plum/75 dark:text-pearl/70">{body}</p>
           <Link
-            to="/web-atelier#web-atelier-demos"
+            to={
+              enableInquiryLinks
+                ? '/web-atelier#web-atelier-demos'
+                : '/dev/web-atelier#web-atelier-demos'
+            }
             className="btn btn-primary mt-6 inline-flex min-h-[48px] items-center px-6"
           >
             {language === 'hr' ? 'Natrag na portfolio' : 'Back to portfolio'}
@@ -48,7 +54,11 @@ export default function WebAtelierDemoPage({ language }: Props) {
         noIndex
       />
       <main className="min-w-0">
-        <WebAtelierDemoChrome language={language} demo={demo} />
+        <WebAtelierDemoChrome
+          language={language}
+          demo={demo}
+          enableInquiryLinks={enableInquiryLinks}
+        />
         {demo.slug === 'stolarija' && <CarpentryDemo language={language} demo={demo} />}
         {demo.slug === 'grooming' && <GroomingDemo language={language} demo={demo} />}
         {demo.slug === 'cvjecarna' && <FloristDemo language={language} demo={demo} />}

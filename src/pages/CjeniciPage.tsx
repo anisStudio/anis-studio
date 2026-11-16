@@ -10,6 +10,11 @@ import type { PublicService } from '../lib/publicServiceAccess'
 
 interface CjeniciPageProps {
   language: 'hr' | 'en'
+  /**
+   * Local preview only. Public /cjenici leaves this empty, so the card stays
+   * on its published status and does not gain a DEV price-list link.
+   */
+  webAtelierPreview?: { priceLine: string; href: string }
 }
 
 type HubDepartmentId = 'interijeri' | 'webAtelier' | 'lrc'
@@ -91,7 +96,7 @@ const HUB_TO_SERVICE: Record<HubDepartmentId, PublicService> = {
 
 const HUB_DEPARTMENT_ORDER: readonly HubDepartmentId[] = ['lrc', 'interijeri', 'webAtelier']
 
-export default function CjeniciPage({ language }: CjeniciPageProps) {
+export default function CjeniciPage({ language, webAtelierPreview }: CjeniciPageProps) {
   const navigate = useNavigate()
   const visibility = usePublicDepartmentVisibility()
 
@@ -151,10 +156,13 @@ export default function CjeniciPage({ language }: CjeniciPageProps) {
     },
   }
 
-  const departments = useMemo(
-    () => HUB_DEPARTMENT_ORDER.filter((id) => visibility[HUB_TO_SERVICE[id]] === true),
-    [visibility],
-  )
+  const departments = useMemo((): HubDepartmentId[] => {
+    const visible = HUB_DEPARTMENT_ORDER.filter((id) => visibility[HUB_TO_SERVICE[id]] === true)
+    if (webAtelierPreview && !visible.includes('webAtelier')) {
+      return [...visible, 'webAtelier']
+    }
+    return visible
+  }, [visibility, webAtelierPreview])
 
   const seoDescription = useMemo(() => {
     const names: string[] = []
@@ -204,7 +212,7 @@ export default function CjeniciPage({ language }: CjeniciPageProps) {
               </p>
             </div>
 
-            {!visibility.ready ? (
+            {!visibility.ready && !webAtelierPreview ? (
               <div
                 className="flex min-h-[12rem] items-center justify-center py-10"
                 aria-busy="true"
@@ -263,7 +271,16 @@ export default function CjeniciPage({ language }: CjeniciPageProps) {
                       image={webDept.image}
                       title={webDept.title[language]}
                       description={webDept.description[language]}
-                      status={webDept.status[language]}
+                      priceLine={webAtelierPreview?.priceLine}
+                      status={webAtelierPreview ? undefined : webDept.status[language]}
+                      cta={
+                        webAtelierPreview
+                          ? {
+                              label: copy.departments.interijeri.cta[language],
+                              to: webAtelierPreview.href,
+                            }
+                          : undefined
+                      }
                     />
                   )
                 })}

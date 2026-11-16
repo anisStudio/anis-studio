@@ -13,9 +13,14 @@ import './webAtelier/webAtelierPremium.css'
 
 interface WebAtelierSectionProps {
   language: 'hr' | 'en'
+  /** Public pages keep inquiry links. DEV preview passes false. */
+  enableInquiryLinks?: boolean
 }
 
-export default function WebAtelierSection({ language }: WebAtelierSectionProps) {
+export default function WebAtelierSection({
+  language,
+  enableInquiryLinks = true,
+}: WebAtelierSectionProps) {
   const copy = {
     kicker: { hr: "Ani's Web Atelier", en: "Ani's Web Atelier" },
     h1: {
@@ -89,15 +94,15 @@ export default function WebAtelierSection({ language }: WebAtelierSectionProps) 
       {
         title: { hr: 'Pregled', en: 'Review' },
         desc: {
-          hr: 'Revizije prema odabranom paketu.',
-          en: 'Revisions according to the selected package.',
+          hr: 'Korekcije dizajna prema broju uključenim u odabrani paket.',
+          en: 'Design corrections according to the number included in your chosen package.',
         },
       },
       {
         title: { hr: 'Objava', en: 'Publish' },
         desc: {
-          hr: 'Objava prema dogovoru. Hosting, domena i održavanje definiraju se ponudom.',
-          en: 'Launch as agreed. Hosting, domain, and maintenance are defined in the quote.',
+          hr: 'Nakon odobrenja tehnički postavljamo stranicu na dogovoreni kompatibilni hosting klijenta. Hosting, domenu i vanjske servise klijent plaća izravno pružateljima.',
+          en: 'After approval, we set up the site on the client’s agreed compatible hosting. The client pays hosting, the domain, and external services directly to providers.',
         },
       },
     ],
@@ -173,13 +178,19 @@ export default function WebAtelierSection({ language }: WebAtelierSectionProps) 
             <h1>{copy.h1[language]}</h1>
             <p className="wa-prem-lead">{copy.lead[language]}</p>
             <div className="wa-prem-cta-row">
-              <Link
-                to="/web-atelier/upit"
-                className="btn btn-primary"
-                onClick={() => trackEvent('inquiry_cta_click', { source: 'web-atelier-hero-primary' })}
-              >
-                {copy.ctaPrimary[language]}
-              </Link>
+              {enableInquiryLinks ? (
+                <Link
+                  to="/web-atelier/upit"
+                  className="btn btn-primary"
+                  onClick={() => trackEvent('inquiry_cta_click', { source: 'web-atelier-hero-primary' })}
+                >
+                  {copy.ctaPrimary[language]}
+                </Link>
+              ) : (
+                <span className="btn btn-primary" aria-disabled="true">
+                  {copy.ctaPrimary[language]}
+                </span>
+              )}
               <a
                 href="#web-atelier-configurator"
                 className="wa-prem-cta-secondary"
@@ -265,24 +276,30 @@ export default function WebAtelierSection({ language }: WebAtelierSectionProps) 
         </section>
 
         <div className="wa-prem-section mx-auto max-w-6xl">
-          <WebAtelierDemoPortfolio language={language} />
+          <WebAtelierDemoPortfolio language={language} enableInquiryLinks={enableInquiryLinks} />
         </div>
 
         <div id="web-atelier-pricing" className="wa-prem-section mx-auto w-full max-w-6xl">
-          <WebAtelierConfigurator language={language} />
+          <WebAtelierConfigurator language={language} enableInquiryCta={enableInquiryLinks} />
         </div>
 
         <div className="wa-prem-section wa-prem-closing fade-in">
           <h2>{copy.closingTitle[language]}</h2>
           <p>{copy.closingDesc[language]}</p>
           <div className="wa-prem-cta-row justify-center">
-            <Link
-              to="/web-atelier/upit"
-              className="btn btn-primary"
-              onClick={() => trackEvent('inquiry_cta_click', { source: 'web-atelier-closing' })}
-            >
-              {copy.ctaPrimary[language]}
-            </Link>
+            {enableInquiryLinks ? (
+              <Link
+                to="/web-atelier/upit"
+                className="btn btn-primary"
+                onClick={() => trackEvent('inquiry_cta_click', { source: 'web-atelier-closing' })}
+              >
+                {copy.ctaPrimary[language]}
+              </Link>
+            ) : (
+              <span className="btn btn-primary" aria-disabled="true">
+                {copy.ctaPrimary[language]}
+              </span>
+            )}
             <a href="#web-atelier-configurator" className="wa-prem-cta-secondary">
               {copy.ctaSecondary[language]}
             </a>
@@ -298,18 +315,24 @@ export default function WebAtelierSection({ language }: WebAtelierSectionProps) 
             <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-plum/72 dark:text-pearl/68 sm:text-[0.8125rem]">
               {copy.reviewText[language]}
             </p>
-            <Link
-              to="/ostavi-recenziju?category=webAtelier"
-              onClick={() =>
-                trackEvent('review_cta_click', {
-                  category: 'webAtelier',
-                  source: 'web-atelier-section',
-                })
-              }
-              className="mt-4 inline-flex min-h-[44px] w-full max-w-[14rem] items-center justify-center rounded-xl border border-amethyst/30 bg-white/65 px-4 py-2 text-xs font-semibold text-plum/88 dark:border-lavender/28 dark:bg-white/[0.08] dark:text-pearl sm:text-sm"
-            >
-              {copy.reviewButton[language]}
-            </Link>
+            {enableInquiryLinks ? (
+              <Link
+                to="/ostavi-recenziju?category=webAtelier"
+                onClick={() =>
+                  trackEvent('review_cta_click', {
+                    category: 'webAtelier',
+                    source: 'web-atelier-section',
+                  })
+                }
+                className="mt-4 inline-flex min-h-[44px] w-full max-w-[14rem] items-center justify-center rounded-xl border border-amethyst/30 bg-white/65 px-4 py-2 text-xs font-semibold text-plum/88 dark:border-lavender/28 dark:bg-white/[0.08] dark:text-pearl sm:text-sm"
+              >
+                {copy.reviewButton[language]}
+              </Link>
+            ) : (
+              <span className="mt-4 inline-flex min-h-[44px] w-full max-w-[14rem] items-center justify-center rounded-xl border border-amethyst/30 bg-white/65 px-4 py-2 text-xs font-semibold text-plum/88 dark:border-lavender/28 dark:bg-white/[0.08] dark:text-pearl sm:text-sm" aria-disabled="true">
+                {copy.reviewButton[language]}
+              </span>
+            )}
           </div>
         </div>
       </div>

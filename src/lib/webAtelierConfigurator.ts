@@ -201,6 +201,52 @@ export function clampAddonQuantity(id: ConfiguratorAddonId, raw: number): number
   return Math.min(n, def.maxQuantity)
 }
 
+const BOOKING_EXCLUSIVE_IDS: ConfiguratorAddonId[] = ['external_booking', 'own_booking']
+const ECOMMERCE_PRICED_IDS: ConfiguratorAddonId[] = ['shop_integration', 'new_web_shop']
+
+/** Clears mutually exclusive peers when the user enables an add-on (UI selection). */
+export function clearExclusivePeersOnEnable(
+  addons: Partial<Record<ConfiguratorAddonId, number>>,
+  enabledId: ConfiguratorAddonId,
+): void {
+  const def = ADDON_BY_ID[enabledId]
+  if (!def) return
+
+  if (def.exclusiveGroup === 'booking') {
+    for (const id of BOOKING_EXCLUSIVE_IDS) {
+      if (id !== enabledId) delete addons[id]
+    }
+    return
+  }
+
+  if (enabledId === 'advanced_ecommerce') {
+    for (const id of ECOMMERCE_PRICED_IDS) delete addons[id]
+    return
+  }
+
+  if (enabledId === 'shop_integration' || enabledId === 'new_web_shop') {
+    delete addons.advanced_ecommerce
+    for (const id of ECOMMERCE_PRICED_IDS) {
+      if (id !== enabledId) delete addons[id]
+    }
+  }
+}
+
+/** Update one add-on quantity and return a normalized selection for UI + estimate. */
+export function updateConfiguratorAddon(
+  selection: ConfiguratorSelection,
+  id: ConfiguratorAddonId,
+  quantity: number,
+): ConfiguratorSelection {
+  const addons = { ...selection.addons }
+  if (quantity <= 0) delete addons[id]
+  else {
+    addons[id] = clampAddonQuantity(id, quantity)
+    clearExclusivePeersOnEnable(addons, id)
+  }
+  return normalizeConfiguratorSelection({ ...selection, addons })
+}
+
 /**
  * Normalize selection: clamp quantities, enforce exclusive groups
  * (last-enabled wins within a group when both present).
@@ -487,7 +533,7 @@ function describeLine(line: ConfiguratorLine, language: 'hr' | 'en'): string {
 export function addonLabel(id: ConfiguratorAddonId, language: 'hr' | 'en'): string {
   const labels: Record<ConfiguratorAddonId, { hr: string; en: string }> = {
     extra_page: { hr: 'Dodatna stranica', en: 'Extra page' },
-    minor_revision: { hr: 'Manja dodatna revizija', en: 'Minor additional revision' },
+    minor_revision: { hr: 'Manja dodatna korekcija', en: 'Minor additional correction' },
     ai_localization: { hr: 'AI lokalizacija', en: 'AI localization' },
     external_booking: { hr: 'Integracija vanjskog bookinga', en: 'External booking integration' },
     own_booking: { hr: 'Vlastiti booking sustav', en: 'Own booking system' },

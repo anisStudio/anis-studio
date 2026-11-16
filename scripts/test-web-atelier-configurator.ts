@@ -15,6 +15,7 @@ import {
   inquiryPatchesFromConfigurator,
   mergeConfiguratorIntoFeaturesNotes,
   normalizeConfiguratorSelection,
+  updateConfiguratorAddon,
   packageMarketingBullets,
   packageScopeHeadline,
   parseConfiguratorSelection,
@@ -83,6 +84,57 @@ assert.equal(WEB_ATELIER_INFORMATIVE_PRICES_EUR.premium, 800)
   // 300 + 2*60 + 80 + 50 = 550
   assert.equal(est.fixedTotalEur, 550)
   assert.equal(est.estimateFloorEur, 550)
+}
+
+// --- UI enable: newly enabled exclusive option wins ---
+{
+  let sel = updateConfiguratorAddon(
+    { packageId: 'pro', addons: { own_booking: 1 } },
+    'external_booking',
+    1,
+  )
+  assert.equal(sel.addons.own_booking, undefined)
+  assert.equal(sel.addons.external_booking, 1)
+  sel = updateConfiguratorAddon(sel, 'own_booking', 1)
+  assert.equal(sel.addons.external_booking, undefined)
+  assert.equal(sel.addons.own_booking, 1)
+}
+
+{
+  let sel = updateConfiguratorAddon(
+    { packageId: 'start', addons: { shop_integration: 1 } },
+    'new_web_shop',
+    1,
+  )
+  assert.equal(sel.addons.shop_integration, undefined)
+  assert.equal(sel.addons.new_web_shop, 1)
+  const superseded = calculateConfiguratorEstimate(sel)
+  assert.equal(superseded.packageSupersededByEcommerce, true)
+  assert.equal(superseded.fixedTotalEur, 0)
+  assert.equal(superseded.estimateFloorEur, 1500)
+  sel = updateConfiguratorAddon(
+    { packageId: 'start', addons: { new_web_shop: 1 } },
+    'advanced_ecommerce',
+    1,
+  )
+  assert.equal(sel.addons.new_web_shop, undefined)
+  assert.equal(sel.addons.shop_integration, undefined)
+  assert.equal(sel.addons.advanced_ecommerce, 1)
+  sel = updateConfiguratorAddon(sel, 'shop_integration', 1)
+  assert.equal(sel.addons.advanced_ecommerce, undefined)
+  assert.equal(sel.addons.shop_integration, 1)
+}
+
+{
+  const proNews = calculateConfiguratorEstimate({ packageId: 'pro', addons: { newsletter: 1 } })
+  assert.equal(proNews.fixedTotalEur, 580)
+  assert.equal(proNews.estimateFloorEur, 580)
+  const startCombo = calculateConfiguratorEstimate({
+    packageId: 'start',
+    addons: { own_booking: 1, dark_light_mode: 1, ai_content: 1 },
+  })
+  assert.equal(startCombo.fixedTotalEur, 700)
+  assert.equal(startCombo.estimateFloorEur, 780)
 }
 
 // --- Booking exclusion: own wins over external when both requested ---
