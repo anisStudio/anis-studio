@@ -10,6 +10,8 @@ interface WelcomeSectionProps {
 export default function WelcomeSection({ language = 'hr' }: WelcomeSectionProps) {
   const serviceCardVisibility = usePublicDepartmentVisibility()
 
+  const onlyInteriors = serviceCardVisibility.interiors && !serviceCardVisibility.lrc && !serviceCardVisibility.webAtelier
+
   const translations = {
     headline: {
       hr: 'Mjesto gdje ideje postaju stvarnost.',
@@ -38,8 +40,8 @@ export default function WelcomeSection({ language = 'hr' }: WelcomeSectionProps)
       en: 'View our work'
     },
     cardsTitle: {
-      hr: serviceCardVisibility.interiors ? 'Interijeri — tvoj sljedeći korak' : 'Izaberite smjer',
-      en: serviceCardVisibility.interiors ? 'Interiors — your next step' : 'Choose a direction',
+      hr: onlyInteriors ? 'Interijeri — tvoj sljedeći korak' : 'Kako vam možemo pomoći?',
+      en: onlyInteriors ? 'Interiors — your next step' : 'How can we help?',
     },
     cards: {
       lrc: {
@@ -156,9 +158,7 @@ export default function WelcomeSection({ language = 'hr' }: WelcomeSectionProps)
               </span>
             </div>
             <div className="flex flex-col items-center">
-              <div className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300" role="img" aria-label="Gift">
-                🎁
-              </div>
+              <img src="/images/odjeli/poklon.webp" alt="" width="100" height="76" className="mb-4 h-[76px] w-[100px] object-contain" />
               <div>
                 <div className="text-lg font-bold text-plum/90 dark:text-pearl group-hover:text-amethyst dark:group-hover:text-lavender transition-colors">{translations.cards.lrc.title[language]}</div>
                 <div className="mt-1 text-sm font-semibold text-plum/80 dark:text-pearl/70">{translations.cards.lrc.subtitle[language]}</div>
@@ -185,9 +185,7 @@ export default function WelcomeSection({ language = 'hr' }: WelcomeSectionProps)
               </span>
             </div>
             <div className="flex flex-col items-center">
-              <div className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300" role="img" aria-label="House">
-                🏠
-              </div>
+              <img src="/images/odjeli/kuca.webp" alt="" width="100" height="76" className="mb-4 h-[76px] w-[100px] object-contain" />
               <div>
                 <div className="text-lg font-bold text-plum/90 dark:text-pearl group-hover:text-amethyst dark:group-hover:text-lavender transition-colors">{translations.cards.interiors.title[language]}</div>
                 <div className="mt-1 text-sm font-semibold text-plum/80 dark:text-pearl/70">{translations.cards.interiors.subtitle[language]}</div>
@@ -214,9 +212,7 @@ export default function WelcomeSection({ language = 'hr' }: WelcomeSectionProps)
               </span>
             </div>
             <div className="flex flex-col items-center">
-              <div className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300" role="img" aria-label="Laptop">
-                💻
-              </div>
+              <img src="/images/odjeli/racunalo.webp" alt="" width="100" height="76" className="mb-4 h-[76px] w-[100px] object-contain" />
               <div>
                 <div className="text-lg font-bold text-plum/90 dark:text-pearl group-hover:text-amethyst dark:group-hover:text-lavender transition-colors">{translations.cards.webAtelier.title[language]}</div>
                 <div className="mt-1 text-sm font-semibold text-plum/80 dark:text-pearl/70">{translations.cards.webAtelier.subtitle[language]}</div>
