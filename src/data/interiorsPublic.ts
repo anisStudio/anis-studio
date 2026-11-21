@@ -4,3 +4,5 @@ import type { StolarOption } from '../components/InteriorsClientForm'
 export const INTERIORS_STOLAR_OPTIONS: StolarOption[] = [
   { id: 'josip-radat', name: 'Josip Radat' },
 ]
+
+export const INTERIORS_INQUIRY_HASH = '#vrsta-upita'

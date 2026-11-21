@@ -14,6 +14,10 @@ interface InterijeriClientsPageProps {
 export default function InterijeriClientsPage({ language }: InterijeriClientsPageProps) {
   const title = language === 'hr' ? 'Upit za klijente' : 'Client inquiry'
 
+  const introduction = language === 'hr'
+    ? 'Ukratko opišite prostor i što želite vizualizirati. Ako imate mjere ili fotografije prostora, možete ih priložiti.'
+    : 'Briefly describe the space and what you want to visualize. If you have measurements or photos, you can attach them.'
+
   return (
     <AnimatedPage>
       <PageSEO
@@ -23,7 +27,7 @@ export default function InterijeriClientsPage({ language }: InterijeriClientsPag
       />
       <main className="min-w-0">
         <ErrorBoundary name="InterijeriKlijenti">
-          <InteriorsFormPageLayout language={language} title={title}>
+          <InteriorsFormPageLayout language={language} title={title} introduction={introduction}>
             <InteriorsClientForm stolars={INTERIORS_STOLAR_OPTIONS} language={language} />
             <PublicConsultationBooking department="interiors" language={language} />
           </InteriorsFormPageLayout>

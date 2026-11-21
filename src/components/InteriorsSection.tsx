@@ -1,10 +1,12 @@
 import './interiors-panorama.css'
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { trackEvent } from '../lib/analytics'
 import { usePortfolioItems } from '../hooks/usePortfolioItems'
 import { DecorativeSkyBackdrop } from './DecorativeSkyBackdrop'
+
+import { INTERIORS_INQUIRY_HASH } from '../data/interiorsPublic'
 
 interface InteriorsSectionProps {
   language: 'hr' | 'en'
@@ -17,6 +19,16 @@ export default function InteriorsSection({ language }: InteriorsSectionProps) {
   const lightboxItem =
     lightboxIndex !== null ? (previewItems[lightboxIndex] ?? null) : null
   const showPreviewLightboxNav = previewItems.length > 1
+  const { hash } = useLocation()
+  const inquiryHeadingId = INTERIORS_INQUIRY_HASH.slice(1)
+
+  useEffect(() => {
+    if (hash !== INTERIORS_INQUIRY_HASH) return
+    const heading = document.getElementById(inquiryHeadingId)
+    heading?.scrollIntoView({ block: 'start' })
+    heading?.focus({ preventScroll: true })
+  }, [hash, inquiryHeadingId])
+
 
   const previewCopy = {
     title: { hr: 'Primjeri 3D vizualizacija', en: '3D Visualization Examples' },
@@ -109,7 +121,9 @@ export default function InteriorsSection({ language }: InteriorsSectionProps) {
       hr: 'Za stolare i salone kojima treba profesionalan 3D prikaz za lakšu prezentaciju klijentu.',
       en: 'For carpenters and showrooms who need a professional 3D render for easier client presentations.',
     },
-    ctaAction: { hr: 'Zatraži ponudu', en: 'Request quote' },
+    ctaAction: { hr: 'Zatraži ponudu', en: 'Request a quote' },
+    clientAction: { hr: 'Otvori upit za klijente', en: 'Open client inquiry' },
+    carpenterAction: { hr: 'Otvori upit za stolare i studije', en: 'Open carpenter and studio inquiry' },
   }
 
   const reviewCta = {
@@ -235,6 +249,12 @@ export default function InteriorsSection({ language }: InteriorsSectionProps) {
               {translations.bridge[language]}
             </p>
           </div>
+          <Link
+            to={INTERIORS_INQUIRY_HASH}
+            className="mx-auto mt-6 inline-flex min-h-[48px] w-full max-w-xs items-center justify-center rounded-xl bg-[#563078] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#482663] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amethyst dark:focus-visible:outline-lavender sm:w-auto"
+          >
+            {chooser.ctaAction[language]}
+          </Link>
         </div>
 
         {/* Visualization Steps — heading + balanced grid below */}
@@ -399,7 +419,7 @@ export default function InteriorsSection({ language }: InteriorsSectionProps) {
                   {language === 'hr' ? 'Upit' : 'Inquiry'}
                 </p>
               </div>
-              <h3 className="font-heading text-xl font-bold tracking-tight text-balance text-plum/95 dark:text-pearl sm:text-2xl md:text-[1.65rem]">
+              <h3 id={inquiryHeadingId} tabIndex={-1} className="scroll-mt-28 font-heading text-xl font-bold tracking-tight text-balance text-plum/95 dark:text-pearl sm:text-2xl md:text-[1.65rem]">
                 {chooser.sectionTitle[language]}
               </h3>
               <p className="mx-auto mt-4 text-sm leading-relaxed text-plum/78 dark:text-pearl/72 sm:text-[0.95rem] sm:leading-relaxed">
@@ -436,7 +456,7 @@ export default function InteriorsSection({ language }: InteriorsSectionProps) {
                   {chooser.clientsText[language]}
                 </p>
                 <span className="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-[#6E44FF] to-[#8B6FFF] px-4 py-3 text-sm font-semibold text-white shadow-md transition-[transform,box-shadow] duration-300 group-hover:shadow-lg group-hover:brightness-[1.03] dark:from-[#6E44FF] dark:to-[#9D7FFF] sm:w-auto sm:self-start">
-                  {chooser.ctaAction[language]}
+                  {chooser.clientAction[language]}
                   <span className="ml-1.5 transition-transform group-hover:translate-x-0.5" aria-hidden>
                     →
                   </span>
@@ -464,7 +484,7 @@ export default function InteriorsSection({ language }: InteriorsSectionProps) {
                   {chooser.stolariText[language]}
                 </p>
                 <span className="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-[#6E44FF] to-[#8B6FFF] px-4 py-3 text-sm font-semibold text-white shadow-md transition-[transform,box-shadow] duration-300 group-hover:shadow-lg group-hover:brightness-[1.03] dark:from-[#6E44FF] dark:to-[#9D7FFF] sm:w-auto sm:self-start">
-                  {chooser.ctaAction[language]}
+                  {chooser.carpenterAction[language]}
                   <span className="ml-1.5 transition-transform group-hover:translate-x-0.5" aria-hidden>
                     →
                   </span>

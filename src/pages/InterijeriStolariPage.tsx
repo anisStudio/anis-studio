@@ -27,6 +27,10 @@ export default function InterijeriStolariPage({ language }: InterijeriStolariPag
     )
   }
 
+  const introduction = language === 'hr'
+    ? 'Navedite vrstu projekta i podatke osobe za kontakt. Ako već imate nacrte ili datoteke projekta, možete ih priložiti.'
+    : 'Tell us the project type and who to contact. If you already have drawings or project files, you can attach them.'
+
   return (
     <AnimatedPage>
       <PageSEO
@@ -36,7 +40,7 @@ export default function InterijeriStolariPage({ language }: InterijeriStolariPag
       />
       <main className="min-w-0">
         <ErrorBoundary name="InterijeriStolari">
-          <InteriorsFormPageLayout language={language} title={title}>
+          <InteriorsFormPageLayout language={language} title={title} introduction={introduction}>
             <InteriorsCarpenterForm language={language} vrEnabled={vrEnabled} />
           </InteriorsFormPageLayout>
         </ErrorBoundary>
