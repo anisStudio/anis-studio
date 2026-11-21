@@ -10,6 +10,16 @@ interface WelcomeSectionProps {
 export default function WelcomeSection({ language = 'hr' }: WelcomeSectionProps) {
   const serviceCardVisibility = usePublicDepartmentVisibility()
 
+  const visibleDepartments = [
+    { visible: serviceCardVisibility.lrc, path: '/lrc', intent: 'lrc_service_page' },
+    { visible: serviceCardVisibility.interiors, path: '/interijeri', intent: 'interiors_service_page' },
+    { visible: serviceCardVisibility.webAtelier, path: '/web-atelier', intent: 'web_atelier_service_page' },
+  ].filter(department => department.visible)
+  const multipleDepartments = visibleDepartments.length > 1
+  const primary = multipleDepartments
+    ? { path: '#odjeli', intent: 'department_selection' }
+    : visibleDepartments[0] ?? { path: '/kontakt', intent: 'contact_page' }
+
   const onlyInteriors = serviceCardVisibility.interiors && !serviceCardVisibility.lrc && !serviceCardVisibility.webAtelier
 
   const translations = {
@@ -89,12 +99,13 @@ export default function WelcomeSection({ language = 'hr' }: WelcomeSectionProps)
           {/* CTA buttons */}
           <div className="mt-7 sm:mt-8 flex w-full max-w-md flex-col items-stretch justify-center gap-3 sm:max-w-none sm:flex-row sm:items-center sm:gap-4 mx-auto">
             <Link
-              to={serviceCardVisibility.interiors ? '/interijeri' : '/kontakt'}
+              to={primary.path}
+              reloadDocument={multipleDepartments}
               onClick={() =>
                 trackEvent('homepage_line_click', {
                   line: 'welcome_primary_cta',
-                  destination: serviceCardVisibility.interiors ? '/interijeri' : '/kontakt',
-                  intent: serviceCardVisibility.interiors ? 'interiors_service_page' : 'contact_page',
+                  destination: primary.path,
+                  intent: primary.intent,
                 })
               }
               className="inline-flex min-h-[48px] w-full sm:w-auto items-center justify-center rounded-2xl px-6 py-3.5 sm:px-8 sm:py-4 text-sm sm:text-base font-semibold text-white
@@ -136,11 +147,16 @@ export default function WelcomeSection({ language = 'hr' }: WelcomeSectionProps)
       </div>
       <div className="mx-auto max-w-5xl px-4 pb-12 text-center sm:px-6 sm:pb-14">
         {/* Cards Section — only rendered when at least one service is publicly visible */}
-        {(serviceCardVisibility.lrc || serviceCardVisibility.interiors || serviceCardVisibility.webAtelier) && (
+        {visibleDepartments.length > 0 && (
         <>
-        <h2 className="welcome-services-title mt-10 font-heading text-2xl font-bold text-balance text-plum/90 dark:text-pearl sm:mt-14 sm:text-3xl">
+        <h2 id="odjeli" tabIndex={-1} className="scroll-mt-28 welcome-services-title mt-10 font-heading text-2xl font-bold text-balance text-plum/90 dark:text-pearl sm:mt-14 sm:text-3xl">
           {translations.cardsTitle[language]}
         </h2>
+        {multipleDepartments && (
+          <p className="mt-2 text-base text-plum/90 dark:text-pearl/90">
+            {language === 'hr' ? 'Odaberite karticu koja vas zanima.' : 'Choose the card that interests you.'}
+          </p>
+        )}
 
         <div className="welcome-services mt-5 flex flex-wrap justify-center gap-4 sm:mt-6 sm:gap-6">
           {/* LRC Shop Card */}
@@ -185,7 +201,7 @@ export default function WelcomeSection({ language = 'hr' }: WelcomeSectionProps)
               </span>
             </div>
             <div className="flex flex-col items-center">
-              <img src="/images/odjeli/kuca.webp" alt="" width="100" height="76" className="mb-4 h-[76px] w-[100px] object-contain" />
+              <img src="/images/odjeli/dnevni-boravak.webp" alt="" width="168" height="110" className="mb-4 h-auto w-[168px] max-w-full object-contain" />
               <div>
                 <div className="text-lg font-bold text-plum/90 dark:text-pearl group-hover:text-amethyst dark:group-hover:text-lavender transition-colors">{translations.cards.interiors.title[language]}</div>
                 <div className="mt-1 text-sm font-semibold text-plum/80 dark:text-pearl/70">{translations.cards.interiors.subtitle[language]}</div>
