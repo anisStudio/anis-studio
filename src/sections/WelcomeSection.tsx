@@ -71,69 +71,72 @@ export default function WelcomeSection({ language = 'hr' }: WelcomeSectionProps)
 
   return (
     <section id="welcome" className="relative min-h-[min(72svh,720px)] sm:min-h-[78vh] overflow-x-clip [isolation:isolate] section-with-bg">
-      <div aria-hidden="true" className="welcome-atrium" />
-      <div className="welcome-content relative z-10 mx-auto min-w-0 max-w-5xl px-4 pb-12 text-center sm:px-6 sm:pb-14">
-        <div className="welcome-panel welcome-intro mx-auto max-w-[min(100%,34rem)] sm:max-w-2xl">
-          <h1 className="font-heading font-extrabold tracking-tight break-words text-balance">
-            {translations.headline[language]}
-          </h1>
-        {/* Subtitle */}
-        <p className="mt-4 sm:mt-5 text-[0.9375rem] leading-relaxed sm:text-lg md:text-xl text-plum/80 dark:text-pearl/80">
-          {translations.subtitle[language]}
-        </p>
+      <div className="welcome-hero relative">
+        <div aria-hidden="true" className="welcome-atrium" />
+        <div className="welcome-content relative z-10 mx-auto min-w-0 max-w-5xl px-4 text-center sm:px-6">
+          <div className="welcome-panel welcome-intro mx-auto max-w-[min(100%,34rem)] sm:max-w-2xl">
+            <h1 className="font-heading font-extrabold tracking-tight break-words text-balance">
+              {translations.headline[language]}
+            </h1>
+          {/* Subtitle */}
+          <p className="mt-4 sm:mt-5 text-[0.9375rem] leading-relaxed sm:text-lg md:text-xl text-plum/80 dark:text-pearl/80">
+            {translations.subtitle[language]}
+          </p>
+          </div>
+
+          {/* CTA buttons */}
+          <div className="mt-7 sm:mt-8 flex w-full max-w-md flex-col items-stretch justify-center gap-3 sm:max-w-none sm:flex-row sm:items-center sm:gap-4 mx-auto">
+            <Link
+              to={serviceCardVisibility.interiors ? '/interijeri' : '/kontakt'}
+              onClick={() =>
+                trackEvent('homepage_line_click', {
+                  line: 'welcome_primary_cta',
+                  destination: serviceCardVisibility.interiors ? '/interijeri' : '/kontakt',
+                  intent: serviceCardVisibility.interiors ? 'interiors_service_page' : 'contact_page',
+                })
+              }
+              className="inline-flex min-h-[48px] w-full sm:w-auto items-center justify-center rounded-2xl px-6 py-3.5 sm:px-8 sm:py-4 text-sm sm:text-base font-semibold text-white
+                welcome-primary
+                hover:translate-y-[-1px] hover:shadow-[0_24px_70px_rgba(110,68,255,0.45)]
+                active:translate-y-0 transition-transform duration-200 will-change-transform">
+              {translations.ctaPrimary[language]}
+            </Link>
+
+            <a
+              href="#portfolio"
+              className="inline-flex min-h-[48px] w-full sm:w-auto items-center justify-center rounded-2xl px-6 py-3.5 sm:px-8 sm:py-4 text-sm sm:text-base font-semibold
+                text-plum/90 dark:text-pearl border border-amethyst/25 dark:border-lavender/20
+                bg-white/55 dark:bg-white/8 backdrop-blur-2xl
+                shadow-[0_10px_30px_rgba(0,0,0,0.06)]
+                hover:bg-white/70 dark:hover:bg-white/12 transition">
+              {translations.ctaSecondary[language]}
+            </a>
+          </div>
+
+          {/* Bridge — što je Ani's Studio (interiors-first javni fokus) */}
+          <div
+            className="welcome-panel mx-auto mt-10 max-w-[min(100%,34rem)] space-y-4 border-t border-amethyst/10 px-1 pt-10 text-center dark:border-transparent sm:mt-12 sm:max-w-2xl sm:space-y-5 sm:pt-12"
+            aria-labelledby="welcome-bridge-heading"
+          >
+            <h2 id="welcome-bridge-heading" className="sr-only">
+              {language === 'hr' ? 'Što je Ani\'s Studio' : "What is Ani's Studio"}
+            </h2>
+            {translations.bridge[language].map((paragraph, i) => (
+              <p
+                key={i}
+                className="text-[0.9375rem] leading-relaxed text-plum/78 dark:text-pearl/75 sm:text-base sm:leading-relaxed"
+              >
+                {paragraph}
+              </p>
+            ))}
+          </div>
         </div>
-
-        {/* CTA buttons */}
-        <div className="mt-7 sm:mt-8 flex w-full max-w-md flex-col items-stretch justify-center gap-3 sm:max-w-none sm:flex-row sm:items-center sm:gap-4 mx-auto">
-          <Link
-            to={serviceCardVisibility.interiors ? '/interijeri' : '/kontakt'}
-            onClick={() =>
-              trackEvent('homepage_line_click', {
-                line: 'welcome_primary_cta',
-                destination: serviceCardVisibility.interiors ? '/interijeri' : '/kontakt',
-                intent: serviceCardVisibility.interiors ? 'interiors_service_page' : 'contact_page',
-              })
-            }
-            className="inline-flex min-h-[48px] w-full sm:w-auto items-center justify-center rounded-2xl px-6 py-3.5 sm:px-8 sm:py-4 text-sm sm:text-base font-semibold text-white
-              welcome-primary
-              hover:translate-y-[-1px] hover:shadow-[0_24px_70px_rgba(110,68,255,0.45)]
-              active:translate-y-0 transition-transform duration-200 will-change-transform">
-            {translations.ctaPrimary[language]}
-          </Link>
-
-          <a
-            href="#portfolio"
-            className="inline-flex min-h-[48px] w-full sm:w-auto items-center justify-center rounded-2xl px-6 py-3.5 sm:px-8 sm:py-4 text-sm sm:text-base font-semibold
-              text-plum/90 dark:text-pearl border border-amethyst/25 dark:border-lavender/20
-              bg-white/55 dark:bg-white/8 backdrop-blur-2xl
-              shadow-[0_10px_30px_rgba(0,0,0,0.06)]
-              hover:bg-white/70 dark:hover:bg-white/12 transition">
-            {translations.ctaSecondary[language]}
-          </a>
-        </div>
-
-        {/* Bridge — što je Ani's Studio (interiors-first javni fokus) */}
-        <div
-          className="welcome-panel mx-auto mt-10 max-w-[min(100%,34rem)] space-y-4 border-t border-amethyst/10 px-1 pt-10 text-center dark:border-transparent sm:mt-12 sm:max-w-2xl sm:space-y-5 sm:pt-12"
-          aria-labelledby="welcome-bridge-heading"
-        >
-          <h2 id="welcome-bridge-heading" className="sr-only">
-            {language === 'hr' ? 'Što je Ani\'s Studio' : "What is Ani's Studio"}
-          </h2>
-          {translations.bridge[language].map((paragraph, i) => (
-            <p
-              key={i}
-              className="text-[0.9375rem] leading-relaxed text-plum/78 dark:text-pearl/75 sm:text-base sm:leading-relaxed"
-            >
-              {paragraph}
-            </p>
-          ))}
-        </div>
-
+      </div>
+      <div className="mx-auto max-w-5xl px-4 pb-12 text-center sm:px-6 sm:pb-14">
         {/* Cards Section — only rendered when at least one service is publicly visible */}
         {(serviceCardVisibility.lrc || serviceCardVisibility.interiors || serviceCardVisibility.webAtelier) && (
         <>
-        <h2 className="mt-10 font-heading text-2xl font-bold text-balance text-plum/90 dark:text-pearl sm:mt-14 sm:text-3xl">
+        <h2 className="welcome-services-title mt-10 font-heading text-2xl font-bold text-balance text-plum/90 dark:text-pearl sm:mt-14 sm:text-3xl">
           {translations.cardsTitle[language]}
         </h2>
 
