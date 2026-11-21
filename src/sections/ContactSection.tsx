@@ -48,13 +48,6 @@ export default function ContactSection({ language = 'hr' }: ContactSectionProps)
 
   return (
     <section id="kontakt" className="Section fade-in relative section-with-bg py-14 sm:py-16 md:py-20">
-      {/* Animated glow pulse keyframes */}
-      <style>{`
-        @keyframes glowPulse {
-          0%, 100% { box-shadow: 0 0 20px rgba(110,68,255,0.4), 0 18px 50px rgba(110,68,255,0.35); }
-          50% { box-shadow: 0 0 35px rgba(110,68,255,0.6), 0 22px 60px rgba(110,68,255,0.45); }
-        }
-      `}</style>
       {/* I8E-3C: samo homepage — bez sekcijskog wash wrappera; globalni body::before platno. */}
 
       <div className="relative z-10 mx-auto min-w-0 max-w-5xl px-4 sm:px-6">
@@ -182,9 +175,6 @@ export default function ContactSection({ language = 'hr' }: ContactSectionProps)
               hover:translate-y-[-2px]
               active:translate-y-0 
               transition-transform duration-200"
-            style={{
-              animation: 'glowPulse 3s ease-in-out infinite'
-            }}
           >
             {translations.ctaButton[language]}
           </Link>

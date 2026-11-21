@@ -17,7 +17,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
   onCartClick,
 }) => {
   return (
-    <>
+    <div className="public-site">
       <ErrorBoundary name="Header">
         <Header
           language={language}
@@ -32,7 +32,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
       <ErrorBoundary name="Footer">
         <Footer language={language} />
       </ErrorBoundary>
-    </>
+    </div>
   )
 }
 

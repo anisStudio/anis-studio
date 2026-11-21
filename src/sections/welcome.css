@@ -1,0 +1,63 @@
+.public-site main :is(h1, h2, h3, .font-heading) {
+  font-family: Poppins, sans-serif;
+  background-image: none;
+  -webkit-text-fill-color: currentColor;
+  text-shadow: none;
+  filter: none;
+}
+
+#welcome {
+  --welcome-paper: 248, 245, 252;
+  --welcome-ink: #241a32;
+  --welcome-image: url('/images/atrij/maslina-dan.webp');
+  color: var(--welcome-ink);
+  background: rgb(var(--welcome-paper));
+}
+
+.dark #welcome {
+  --welcome-paper: 26, 17, 43;
+  --welcome-ink: #faf4ff;
+  --welcome-image: url('/images/atrij/maslina-sumrak.webp');
+}
+
+.welcome-atrium {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(transparent 42%, rgb(var(--welcome-paper))),
+    var(--welcome-image) center top / 100% auto no-repeat;
+}
+
+.welcome-content { padding-top: clamp(2rem, 7vw, 6rem); }
+.welcome-panel {
+  padding: clamp(1.1rem, 3vw, 2.3rem);
+  border-radius: 1.4rem;
+  background: rgba(var(--welcome-paper), .93);
+}
+#welcome h1 {
+  margin: 0;
+  font-size: clamp(2.5rem, 5vw, 5rem);
+  letter-spacing: -.045em;
+  line-height: 1.07;
+  color: var(--welcome-ink);
+}
+#welcome .welcome-panel p { color: var(--welcome-ink); }
+#welcome .welcome-primary { background: #563078; color: white; }
+#welcome a[href="#portfolio"] { background: rgb(var(--welcome-paper)); color: var(--welcome-ink); }
+.welcome-services > a {
+  flex: 1 1 16rem;
+  max-width: 32rem;
+  background: rgb(var(--welcome-paper));
+}
+html:not(.dark) #portfolio button.border-amethyst,
+html:not(.dark) #kontakt a.px-10 { background: #563078; color: white; }
+html:not(.dark) section[aria-labelledby="starlink-home-card-heading"] p.uppercase { color: #5c4766; }
+
+@media (max-width: 680px) {
+  .welcome-atrium {
+    height: 13rem;
+    background: var(--welcome-image) 66% top / auto 13rem no-repeat;
+  }
+  .welcome-content { padding-top: 12rem; }
+  .welcome-intro { text-align: left; }
+}

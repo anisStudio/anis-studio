@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { DecorativeSkyBackdrop } from '../components/DecorativeSkyBackdrop'
+import './welcome.css'
 import { usePublicDepartmentVisibility } from '../hooks/usePublicDepartmentVisibility'
 import { trackEvent } from '../lib/analytics'
 
@@ -8,7 +8,6 @@ interface WelcomeSectionProps {
 }
 
 export default function WelcomeSection({ language = 'hr' }: WelcomeSectionProps) {
-  const USE_IMAGE_BG = true
   const serviceCardVisibility = usePublicDepartmentVisibility()
 
   const translations = {
@@ -72,97 +71,12 @@ export default function WelcomeSection({ language = 'hr' }: WelcomeSectionProps)
 
   return (
     <section id="welcome" className="relative min-h-[min(72svh,720px)] sm:min-h-[78vh] overflow-x-clip [isolation:isolate] section-with-bg">
-      {/* CTA pulse + scroll cue arrow */}
-      <style>{`
-        @keyframes ctaPulse {
-          0%, 100% { box-shadow: 0 18px 50px rgba(110,68,255,0.35); }
-          50% { box-shadow: 0 18px 60px rgba(110,68,255,0.5), 0 0 20px rgba(110,68,255,0.3); }
-        }
-        @keyframes scrollCueArrow {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(5px); }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .scroll-cue-arrow { animation: none !important; }
-        }
-      `}</style>
-      {/* CLIP WRAPPER - contains only visual background layers */}
-      <div className="absolute inset-0 overflow-hidden">
-        {USE_IMAGE_BG ? (
-          <>
-            <div className="pointer-events-none absolute inset-0 z-[1]">
-              <DecorativeSkyBackdrop priority="high" />
-            </div>
-          </>
-        ) : (
-          <>
-            {/* Placeholder gradient (light) */}
-            <div
-              className="pointer-events-none absolute inset-0 z-[1] dark:hidden"
-              style={{
-                background:
-                  "radial-gradient(circle at 50% 20%, rgba(189,166,255,0.55), transparent 60%), radial-gradient(circle at 20% 60%, rgba(110,68,255,0.18), transparent 55%), radial-gradient(circle at 80% 65%, rgba(120,220,255,0.14), transparent 55%), linear-gradient(180deg, rgba(255,255,255,0.96), rgba(249,247,251,0.9))",
-              }}
-            />
-            {/* Placeholder gradient (dark) */}
-            <div
-              className="pointer-events-none absolute inset-0 z-[1] hidden dark:block"
-              style={{
-                background:
-                  "radial-gradient(circle at 50% 20%, rgba(110,68,255,0.35), transparent 60%), radial-gradient(circle at 80% 65%, rgba(120,220,255,0.18), transparent 55%), linear-gradient(180deg, rgba(7,8,18,0.65), rgba(7,8,18,0.95))",
-              }}
-            />
-          </>
-        )}
-
-        {/* Noise overlay */}
-        <div
-          className="pointer-events-none absolute inset-0 z-[3] opacity-[0.06] mix-blend-overlay dark:opacity-[0.08] dark:mix-blend-soft-light"
-          style={{ backgroundImage: "url(/noise.svg)", backgroundSize: "260px 260px" }}
-        />
-
-        {/* I8E-3E: SparklesCanvas uklonjen — animirani krugovi uzlazno izgledali su kao mjehurići vode. */}
-        <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 z-[5] h-36 dark:hidden sm:h-44"
-          style={{
-            background:
-              'linear-gradient(to bottom, rgba(245,243,250,0) 0%, rgba(189,166,255,0.028) 42%, rgba(245,243,250,0.038) 72%, rgba(245,243,250,0.055) 100%)',
-          }}
-        />
-        <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 z-[5] h-32 hidden dark:block sm:h-40"
-          style={{
-            background:
-              'linear-gradient(to bottom, rgba(7,8,18,0) 0%, rgba(110,68,255,0.04) 38%, rgba(7,8,18,0.045) 100%)',
-          }}
-        />
-      </div>
-
-      {/* Content wrapper */}
-      <div className="relative z-10 mx-auto min-w-0 max-w-5xl px-4 pb-12 pt-20 text-center sm:px-6 sm:pb-14 sm:pt-24">
-        {/* Subtle glow behind heading */}
-        <div 
-          className="pointer-events-none absolute left-1/2 top-24 -translate-x-1/2 z-[9] h-40 w-[min(520px,calc(100vw-2rem))] max-w-full rounded-full blur-2xl dark:hidden"
-          style={{
-            background: 'radial-gradient(circle, rgba(110,68,255,0.22), transparent 60%)'
-          }}
-        />
-        <div 
-          className="pointer-events-none absolute left-1/2 top-24 -translate-x-1/2 z-[9] h-40 w-[min(520px,calc(100vw-2rem))] max-w-full rounded-full blur-2xl hidden dark:block"
-          style={{
-            background: 'radial-gradient(circle, rgba(189,166,255,0.14), transparent 60%)'
-          }}
-        />
-
-        {/* Hero text block — constrained width for readability */}
-        <div className="mx-auto max-w-[min(100%,34rem)] sm:max-w-2xl">
-        {/* Headline */}
-        <h1 className="font-heading text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight break-words text-balance
-          text-plum/90 dark:text-pearl drop-shadow-[0_14px_40px_rgba(110,68,255,0.18)]">
-          {translations.headline[language]}
-          <span className="ml-1.5 sm:ml-3 inline-block align-middle">✨</span>
-        </h1>
-
+      <div aria-hidden="true" className="welcome-atrium" />
+      <div className="welcome-content relative z-10 mx-auto min-w-0 max-w-5xl px-4 pb-12 text-center sm:px-6 sm:pb-14">
+        <div className="welcome-panel welcome-intro mx-auto max-w-[min(100%,34rem)] sm:max-w-2xl">
+          <h1 className="font-heading font-extrabold tracking-tight break-words text-balance">
+            {translations.headline[language]}
+          </h1>
         {/* Subtitle */}
         <p className="mt-4 sm:mt-5 text-[0.9375rem] leading-relaxed sm:text-lg md:text-xl text-plum/80 dark:text-pearl/80">
           {translations.subtitle[language]}
@@ -181,10 +95,9 @@ export default function WelcomeSection({ language = 'hr' }: WelcomeSectionProps)
               })
             }
             className="inline-flex min-h-[48px] w-full sm:w-auto items-center justify-center rounded-2xl px-6 py-3.5 sm:px-8 sm:py-4 text-sm sm:text-base font-semibold text-white
-              bg-amethyst
+              welcome-primary
               hover:translate-y-[-1px] hover:shadow-[0_24px_70px_rgba(110,68,255,0.45)]
-              active:translate-y-0 transition-transform duration-200 will-change-transform"
-            style={{ animation: 'ctaPulse 3s ease-in-out infinite' }}>
+              active:translate-y-0 transition-transform duration-200 will-change-transform">
             {translations.ctaPrimary[language]}
           </Link>
 
@@ -199,42 +112,9 @@ export default function WelcomeSection({ language = 'hr' }: WelcomeSectionProps)
           </a>
         </div>
 
-        {/* Scroll indicator — text-first SCROLL cue */}
-        <div className="mt-10 flex justify-center">
-          <a
-            href="#portfolio"
-            className="group inline-flex min-h-[48px] flex-col items-center justify-center gap-2.5 rounded-2xl px-6 py-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amethyst/40 dark:focus-visible:outline-lavender/40"
-            aria-label={language === 'hr' ? 'Scroll do istaknutih radova' : 'Scroll to featured work'}
-          >
-            <span className="text-[0.6875rem] sm:text-xs font-semibold tracking-[0.38em] text-plum/50 dark:text-pearl/55 group-hover:text-amethyst/85 dark:group-hover:text-lavender/80 transition-colors">
-              SCROLL
-            </span>
-            <span
-              className="scroll-cue-arrow flex flex-col items-center text-amethyst dark:text-lavender"
-              aria-hidden="true"
-              style={{ animation: 'scrollCueArrow 2.8s ease-in-out infinite' }}
-            >
-              <svg
-                className="h-5 w-5 shrink-0 opacity-95 drop-shadow-[0_1px_2px_rgba(110,68,255,0.4)] dark:drop-shadow-[0_1px_3px_rgba(189,166,255,0.5)]"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M6 9l6 6 6-6"
-                  stroke="currentColor"
-                  strokeWidth="2.25"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </span>
-          </a>
-        </div>
-
         {/* Bridge — što je Ani's Studio (interiors-first javni fokus) */}
         <div
-          className="mx-auto mt-10 max-w-[min(100%,34rem)] space-y-4 border-t border-amethyst/10 px-1 pt-10 text-center dark:border-transparent sm:mt-12 sm:max-w-2xl sm:space-y-5 sm:pt-12"
+          className="welcome-panel mx-auto mt-10 max-w-[min(100%,34rem)] space-y-4 border-t border-amethyst/10 px-1 pt-10 text-center dark:border-transparent sm:mt-12 sm:max-w-2xl sm:space-y-5 sm:pt-12"
           aria-labelledby="welcome-bridge-heading"
         >
           <h2 id="welcome-bridge-heading" className="sr-only">
@@ -257,7 +137,7 @@ export default function WelcomeSection({ language = 'hr' }: WelcomeSectionProps)
           {translations.cardsTitle[language]}
         </h2>
 
-        <div className="mt-5 grid grid-cols-1 gap-4 sm:mt-6 sm:gap-6 md:grid-cols-3">
+        <div className="welcome-services mt-5 flex flex-wrap justify-center gap-4 sm:mt-6 sm:gap-6">
           {/* LRC Shop Card */}
           {serviceCardVisibility.lrc ? (
           <Link
@@ -285,12 +165,7 @@ export default function WelcomeSection({ language = 'hr' }: WelcomeSectionProps)
               </div>
             </div>
           </Link>
-          ) : (
-            <div
-              className="pointer-events-none hidden min-h-0 select-none md:block"
-              aria-hidden="true"
-            />
-          )}
+          ) : null}
 
           {/* Interijeri Card */}
           {serviceCardVisibility.interiors ? (
@@ -319,12 +194,7 @@ export default function WelcomeSection({ language = 'hr' }: WelcomeSectionProps)
               </div>
             </div>
           </Link>
-          ) : (
-            <div
-              className="pointer-events-none hidden min-h-0 select-none md:block"
-              aria-hidden="true"
-            />
-          )}
+          ) : null}
 
           {/* Web Atelier Card */}
           {serviceCardVisibility.webAtelier ? (
@@ -353,12 +223,7 @@ export default function WelcomeSection({ language = 'hr' }: WelcomeSectionProps)
               </div>
             </div>
           </Link>
-          ) : (
-            <div
-              className="pointer-events-none hidden min-h-0 select-none md:block"
-              aria-hidden="true"
-            />
-          )}
+          ) : null}
         </div>
         </>
         )}
