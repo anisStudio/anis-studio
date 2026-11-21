@@ -12,6 +12,8 @@ import LoginModal from './components/LoginModal'
 import RegisterModal from './components/RegisterModal'
 import { useGlobalScrollAnimations } from './hooks/useGlobalScrollAnimations'
 import { useThemeStore } from './lib/theme.store'
+import { AllDepartmentsPreviewContext } from './hooks/usePublicDepartmentVisibility'
+import { AdminDepartmentPreviewContext } from './providers/AdminDepartmentPreviewContext'
 import MainLayout from './layouts/MainLayout'
 import AdminLayout from './layouts/AdminLayout'
 import HomePage from './pages/HomePage'
@@ -112,20 +114,16 @@ function AnimatedRoutes({
     }
   }, [location])
 
+  const publicLayout = (
+    <MainLayout language={language} onLanguageChange={onLanguageChange}
+      cartItemCount={cartCount} onCartClick={onCartClick} />
+  )
+
   return (
     <AnimatePresence mode="wait">
       <Suspense fallback={<RouteFallback />}>
         <Routes location={location} key={routeKey}>
-          <Route
-            element={
-              <MainLayout
-                language={language}
-                onLanguageChange={onLanguageChange}
-                cartItemCount={cartCount}
-                onCartClick={onCartClick}
-              />
-            }
-          >
+          <Route element={publicLayout}>
             <Route path="/" element={<HomePage language={language} />} />
             <Route
               path="/lrc"
@@ -221,6 +219,18 @@ function AnimatedRoutes({
                 element={<WebAtelierDevPreviewPage language={language} />}
               />
             ) : null}
+          </Route>
+
+          <Route element={
+            <AdminRoute publicLayout>
+              <AllDepartmentsPreviewContext.Provider value={true}>
+                <AdminDepartmentPreviewContext.Provider value={true}>
+                  {publicLayout}
+                </AdminDepartmentPreviewContext.Provider>
+              </AllDepartmentsPreviewContext.Provider>
+            </AdminRoute>
+          }>
+            <Route path="/pregled/naslovnica" element={<HomePage language={language} />} />
           </Route>
 
           {/* Admin routes - no public header/footer; login/recovery outside AdminRoute */}

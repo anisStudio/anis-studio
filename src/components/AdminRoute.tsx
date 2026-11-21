@@ -5,9 +5,10 @@ import { useAdminAuth } from '../providers/AdminAuthProvider'
 
 interface AdminRouteProps {
   children: ReactNode
+  publicLayout?: boolean
 }
 
-const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
+const AdminRoute: React.FC<AdminRouteProps> = ({ children, publicLayout }) => {
   const { isAdmin, loading } = useAdminAuth()
   const location = useLocation()
 
@@ -25,6 +26,8 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
   if (!isAdmin) {
     return <Navigate to="/admin/login" replace state={{ from: location }} />
   }
+
+  if (publicLayout) return <>{children}</>
 
   return (
     <div className="admin-scope min-w-0">{children}</div>

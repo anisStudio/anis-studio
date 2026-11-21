@@ -42,6 +42,10 @@ export default function AdminSitePreviewPage() {
           <code className="rounded bg-slate-100 px-1 text-xs">is_admin</code>
           ). Ovo nije zamjena za Vercel Preview deployment razvojnih izmjena.
         </p>
+        <Link to="/pregled/naslovnica" target="_blank" rel="noopener noreferrer"
+          className="inline-flex min-h-[44px] items-center rounded-lg bg-violet-800 px-4 py-2 font-semibold text-white hover:bg-violet-900 hover:text-white">
+          Naslovnica sa svim odjelima
+        </Link>
       </header>
 
       <section className="mb-8 rounded-xl border border-amber-200 bg-amber-50/80 px-4 py-3 text-sm text-amber-950">
