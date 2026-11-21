@@ -900,6 +900,12 @@ html.dark body::before {
     color: #F9F7FB !important;
   }
   
+  /* Filled actions retain white labels inside light sections with background imagery. */
+  html:not(.dark) .public-site .section-with-bg :is(a, button):is(.welcome-primary, .btn-primary, .bg-amethyst.text-white),
+  html:not(.dark) .public-site .section-with-bg :is(a, button):is(.welcome-primary, .btn-primary, .bg-amethyst.text-white) span {
+    color: #fff !important;
+  }
+
   /* Text shadows for readability on backgrounds */
   .text-shadow-strong {
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 20px rgba(0, 0, 0, 0.2);
