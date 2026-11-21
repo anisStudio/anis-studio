@@ -11,7 +11,9 @@
   --welcome-ink: #241a32;
   --welcome-image: url('/images/atrij/maslina-dan.webp');
   color: var(--welcome-ink);
-  background: rgb(var(--welcome-paper));
+  background: linear-gradient(to bottom,
+    rgb(var(--welcome-paper)) calc(100% - clamp(8rem, 18vw, 16rem)),
+    rgba(var(--welcome-paper), 0));
 }
 
 .dark #welcome {
