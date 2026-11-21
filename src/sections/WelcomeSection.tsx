@@ -153,7 +153,7 @@ export default function WelcomeSection({ language = 'hr' }: WelcomeSectionProps)
           {translations.cardsTitle[language]}
         </h2>
         {multipleDepartments && (
-          <p className="mt-2 text-base text-plum/90 dark:text-pearl/90">
+          <p className="mx-auto mt-2 text-center text-base text-plum/90 dark:text-pearl/90">
             {language === 'hr' ? 'Odaberite karticu koja vas zanima.' : 'Choose the card that interests you.'}
           </p>
         )}
