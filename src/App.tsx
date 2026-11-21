@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense } from 'react'
+import { useState, useEffect, useLayoutEffect, lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Outlet, useLocation } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 import { Toaster } from 'react-hot-toast'
@@ -87,6 +87,11 @@ function AnimatedRoutes({
   onCartClick: () => void
 }) {
   const location = useLocation()
+  const adminRoute = /^\/admin(?:\/|$)/.test(location.pathname)
+  const publicTheme = useThemeStore(state => state.theme)
+  useLayoutEffect(() => {
+    document.documentElement.classList.toggle('dark', !adminRoute && publicTheme === 'dark')
+  }, [adminRoute, publicTheme])
   // Avoid remounting the whole route tree between admin URLs (better dashboard UX).
   // Public URLs still key by pathname so AnimatePresence + page exits behave as before.
   const routeKey = location.pathname.startsWith('/admin') ? '/admin' : location.pathname

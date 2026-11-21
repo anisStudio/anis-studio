@@ -7,9 +7,9 @@ import AdminNav from '../components/AdminNav'
  */
 export default function AdminLayout() {
   return (
-    <div className="flex min-h-screen min-w-0 flex-col">
+    <div className="studio-admin-layout">
       <AdminNav />
-      <div className="min-w-0 flex-1">
+      <div className="min-w-0">
         <Outlet />
       </div>
     </div>

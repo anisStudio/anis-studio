@@ -1,13 +1,25 @@
-import React, { useState } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { useState } from 'react'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { PanelsTopLeft, Images, MessageSquare, Armchair, Inbox, Mail, FileText, Folders, CalendarDays, Settings, Menu, X, LogOut } from 'lucide-react'
 import { useAdminAuth } from '../providers/AdminAuthProvider'
 
-const AdminNav: React.FC = () => {
+const groups = [
+  { title: 'Studio', items: [['Pregled stranice', '/admin/preview', PanelsTopLeft], ['Portfolio', '/admin/portfolio', Images], ['Recenzije', '/admin/reviews', MessageSquare]] },
+  { title: 'Interijeri', items: [['Interijer projekti', '/admin/interiors-projects', Armchair]] },
+  { title: 'LRC', items: [['LRC upiti', '/admin/lrc-inquiries', Inbox]] },
+  { title: 'Web Atelier', items: [['WA upiti', '/admin/web-atelier-inquiries', Mail], ['WA ponude', '/admin/web-atelier-offers', FileText], ['WA projekti', '/admin/web-atelier-projects', Folders]] },
+  { title: 'Upravljanje', items: [['Kapacitet', '/admin/availability', CalendarDays], ['Postavke', '/admin/settings', Settings]] },
+] as const
+
+export default function AdminNav() {
   const { logout } = useAdminAuth()
   const navigate = useNavigate()
+  const { pathname } = useLocation()
+  const [openedAt, setOpenedAt] = useState<string | null>(null)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const open = openedAt === pathname
 
-  const handleLogout = async () => {
+  async function handleLogout() {
     if (isLoggingOut) return
     setIsLoggingOut(true)
     try {
@@ -19,148 +31,30 @@ const AdminNav: React.FC = () => {
   }
 
   return (
-    <div className="bg-slate-50 border-b border-slate-200">
-      <div className="mx-auto max-w-4xl px-4 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <h2 className="text-lg font-semibold text-slate-900">Admin panel</h2>
-
-            <nav className="flex flex-wrap items-center gap-4">
-              <NavLink
-                to="/admin/preview"
-                className={({ isActive }) =>
-                  `text-sm font-medium transition-colors duration-200 px-3 py-1.5 rounded-lg ${
-                    isActive
-                      ? 'text-violet-700 bg-violet-50 font-semibold'
-                      : 'text-slate-700 hover:text-violet-700 hover:bg-slate-100'
-                  }`
-                }
-              >
-                Pregled stranice
-              </NavLink>
-              <NavLink
-                to="/admin/settings"
-                className={({ isActive }) =>
-                  `text-sm font-medium transition-colors duration-200 px-3 py-1.5 rounded-lg ${
-                    isActive
-                      ? 'text-violet-700 bg-violet-50 font-semibold'
-                      : 'text-slate-700 hover:text-violet-700 hover:bg-slate-100'
-                  }`
-                }
-              >
-                Postavke
-              </NavLink>
-              <NavLink
-                to="/admin/lrc-inquiries"
-                className={({ isActive }) =>
-                  `text-sm font-medium transition-colors duration-200 px-3 py-1.5 rounded-lg ${
-                    isActive
-                      ? 'text-violet-700 bg-violet-50 font-semibold'
-                      : 'text-slate-700 hover:text-violet-700 hover:bg-slate-100'
-                  }`
-                }
-              >
-                LRC upiti
-              </NavLink>
-              <NavLink
-                to="/admin/interiors-projects"
-                className={({ isActive }) =>
-                  `text-sm font-medium transition-colors duration-200 px-3 py-1.5 rounded-lg ${
-                    isActive
-                      ? 'text-violet-700 bg-violet-50 font-semibold'
-                      : 'text-slate-700 hover:text-violet-700 hover:bg-slate-100'
-                  }`
-                }
-              >
-                Interijer projekti
-              </NavLink>
-              <NavLink
-                to="/admin/portfolio"
-                className={({ isActive }) =>
-                  `text-sm font-medium transition-colors duration-200 px-3 py-1.5 rounded-lg ${
-                    isActive
-                      ? 'text-violet-700 bg-violet-50 font-semibold'
-                      : 'text-slate-700 hover:text-violet-700 hover:bg-slate-100'
-                  }`
-                }
-              >
-                Portfolio
-              </NavLink>
-              <NavLink
-                to="/admin/reviews"
-                className={({ isActive }) =>
-                  `text-sm font-medium transition-colors duration-200 px-3 py-1.5 rounded-lg ${
-                    isActive
-                      ? 'text-violet-700 bg-violet-50 font-semibold'
-                      : 'text-slate-700 hover:text-violet-700 hover:bg-slate-100'
-                  }`
-                }
-              >
-                Recenzije
-              </NavLink>
-              <NavLink
-                to="/admin/web-atelier-inquiries"
-                className={({ isActive }) =>
-                  `text-sm font-medium transition-colors duration-200 px-3 py-1.5 rounded-lg ${
-                    isActive
-                      ? 'text-violet-700 bg-violet-50 font-semibold'
-                      : 'text-slate-700 hover:text-violet-700 hover:bg-slate-100'
-                  }`
-                }
-              >
-                Web Atelier
-              </NavLink>
-              <NavLink
-                to="/admin/web-atelier-offers"
-                className={({ isActive }) =>
-                  `text-sm font-medium transition-colors duration-200 px-3 py-1.5 rounded-lg ${
-                    isActive
-                      ? 'text-violet-700 bg-violet-50 font-semibold'
-                      : 'text-slate-700 hover:text-violet-700 hover:bg-slate-100'
-                  }`
-                }
-              >
-                WA ponude
-              </NavLink>
-              <NavLink
-                to="/admin/web-atelier-projects"
-                className={({ isActive }) =>
-                  `text-sm font-medium transition-colors duration-200 px-3 py-1.5 rounded-lg ${
-                    isActive
-                      ? 'text-violet-700 bg-violet-50 font-semibold'
-                      : 'text-slate-700 hover:text-violet-700 hover:bg-slate-100'
-                  }`
-                }
-              >
-                WA projekti
-              </NavLink>
-              <NavLink
-                to="/admin/availability"
-                className={({ isActive }) =>
-                  `text-sm font-medium transition-colors duration-200 px-3 py-1.5 rounded-lg ${
-                    isActive
-                      ? 'text-violet-700 bg-violet-50 font-semibold'
-                      : 'text-slate-700 hover:text-violet-700 hover:bg-slate-100'
-                  }`
-                }
-              >
-                Kapacitet
-              </NavLink>
-            </nav>
-          </div>
-
-          <button
-            type="button"
-            onClick={handleLogout}
-            disabled={isLoggingOut}
-            className="px-4 py-2 text-sm font-medium text-slate-800 bg-white border border-slate-200 rounded-lg shadow-sm hover:bg-slate-50 hover:text-violet-700 hover:border-violet-200 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isLoggingOut ? 'Odjava…' : 'Odjava'}
-          </button>
-        </div>
+    <aside className="studio-admin-sidebar">
+      <div className="studio-admin-brand">
+        <div><strong>Ani’s Studio</strong><small>Admin panel</small></div>
+        <button type="button" className="studio-admin-menu" aria-expanded={open} aria-controls="admin-links" onClick={() => setOpenedAt(open ? null : pathname)}>
+          {open ? <X size={18} /> : <Menu size={18} />} Izbornik
+        </button>
       </div>
-    </div>
+      <div id="admin-links" className="studio-admin-links" data-open={open}>
+        <nav aria-label="Administracija">
+          {groups.map(group => (
+            <div className="studio-admin-group" key={group.title}>
+              <span>{group.title}</span>
+              {group.items.map(([label, path, Icon]) => (
+                <NavLink key={path} to={path} onClick={() => setOpenedAt(null)}>
+                  <Icon size={17} aria-hidden="true" />{label}
+                </NavLink>
+              ))}
+            </div>
+          ))}
+        </nav>
+        <button type="button" className="studio-admin-logout" onClick={handleLogout} disabled={isLoggingOut}>
+          <LogOut size={17} aria-hidden="true" />{isLoggingOut ? 'Odjava…' : 'Odjava'}
+        </button>
+      </div>
+    </aside>
   )
 }
-
-export default AdminNav

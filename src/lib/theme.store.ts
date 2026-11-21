@@ -11,7 +11,7 @@ interface ThemeState {
 
 const applyThemeToDOM = (theme: Theme) => {
   if (typeof document === 'undefined') return
-  document.documentElement.classList.toggle('dark', theme === 'dark')
+  document.documentElement.classList.toggle('dark', theme === 'dark' && !/^\/admin(?:\/|$)/.test(window.location.pathname))
 }
 
 export const useThemeStore = create<ThemeState>((set, get) => ({
