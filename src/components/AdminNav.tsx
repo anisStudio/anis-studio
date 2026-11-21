@@ -5,8 +5,8 @@ import { useAdminAuth } from '../providers/AdminAuthProvider'
 
 const groups = [
   { title: 'Studio', items: [['Pregled stranice', '/admin/preview', PanelsTopLeft], ['Portfolio', '/admin/portfolio', Images], ['Recenzije', '/admin/reviews', MessageSquare]] },
-  { title: 'Interijeri', items: [['Interijer projekti', '/admin/interiors-projects', Armchair]] },
   { title: 'LRC', items: [['LRC upiti', '/admin/lrc-inquiries', Inbox]] },
+  { title: 'Interijeri', items: [['Interijer projekti', '/admin/interiors-projects', Armchair]] },
   { title: 'Web Atelier', items: [['WA upiti', '/admin/web-atelier-inquiries', Mail], ['WA ponude', '/admin/web-atelier-offers', FileText], ['WA projekti', '/admin/web-atelier-projects', Folders]] },
   { title: 'Upravljanje', items: [['Kapacitet', '/admin/availability', CalendarDays], ['Postavke', '/admin/settings', Settings]] },
 ] as const
