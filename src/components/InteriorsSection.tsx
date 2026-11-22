@@ -8,6 +8,8 @@ import { DecorativeSkyBackdrop } from './DecorativeSkyBackdrop'
 
 import { INTERIORS_INQUIRY_HASH } from '../data/interiorsPublic'
 
+const livingRoomImage = '/images/odjeli/dnevni-boravak.webp'
+
 interface InteriorsSectionProps {
   language: 'hr' | 'en'
 }
@@ -187,37 +189,37 @@ export default function InteriorsSection({ language }: InteriorsSectionProps) {
   const visualizationSteps = [
     {
       number: 1,
-      icon: '📏',
+      image: '/images/koraci-interijeri/metar.webp',
       title: translations.step1.title,
       desc: translations.step1.desc
     },
     {
       number: 2,
-      icon: '✏️',
+      image: '/images/koraci-interijeri/tlocrt.webp',
       title: translations.step2.title,
       desc: translations.step2.desc
     },
     {
       number: 3,
-      icon: '📸',
+      image: '/images/koraci-interijeri/reference.webp',
       title: translations.step3.title,
       desc: translations.step3.desc
     },
     {
       number: 4,
-      icon: '📝',
+      image: '/images/koraci-interijeri/detalji.webp',
       title: translations.step4.title,
       desc: translations.step4.desc
     },
     {
       number: 5,
-      icon: '📤',
+      image: '/images/koraci-interijeri/upit.webp',
       title: translations.step5.title,
       desc: translations.step5.desc
     },
     {
       number: 6,
-      icon: '🛋️',
+      image: livingRoomImage,
       title: translations.step6.title,
       desc: translations.step6.desc
     }
@@ -268,23 +270,28 @@ export default function InteriorsSection({ language }: InteriorsSectionProps) {
           {visualizationSteps.map((step) => (
             <div 
               key={step.number} 
-              className="relative flex min-h-[148px] w-full max-w-md flex-col items-center rounded-xl border border-[rgba(110,68,255,0.15)] bg-[rgba(248,246,255,0.72)] p-4 pt-9 text-center shadow-sm backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-md dark:border-lavender/15 dark:bg-white/8 dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)] dark:hover:shadow-[0_20px_50px_rgba(189,166,255,0.12)] sm:max-w-none sm:hover:scale-[1.02] fade-in"
+              className="relative flex w-full flex-col items-center rounded-2xl border border-[rgba(110,68,255,0.15)] bg-[rgba(248,246,255,0.72)] p-5 text-center shadow-sm backdrop-blur-sm dark:border-lavender/15 dark:bg-white/8 dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)] fade-in"
             >
-              {/* Step Number Badge — centered on card top */}
-              <div className="absolute left-1/2 top-3 z-10 flex h-8 w-8 -translate-x-1/2 items-center justify-center rounded-full bg-gradient-to-br from-[#6E44FF] to-[#BDA6FF] text-sm font-bold text-white shadow-md">
+              <div className="absolute left-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-[#563078] dark:bg-[#6d4491] text-sm font-bold text-white shadow-md">
                 {step.number}
               </div>
 
-              {/* Icon */}
-              <div className="mb-2 mt-1 text-3xl">{step.icon}</div>
+              <img
+                src={step.image}
+                alt=""
+                width={144}
+                height={96}
+                loading="lazy"
+                className="mb-3 h-24 w-36 max-w-[68%] object-contain"
+              />
               
               {/* Title */}
-              <h4 className="mb-1.5 max-w-[14rem] text-xs font-bold leading-tight text-[--color-primary] sm:max-w-none">
+              <h4 className="mb-2 text-base font-bold leading-tight text-plum/95 dark:text-pearl">
                 {step.title[language]}
               </h4>
               
               {/* Description */}
-              <p className="mt-auto max-w-none text-[11px] leading-relaxed text-plum/75 dark:text-pearl/65 sm:text-xs">
+              <p className="max-w-none text-sm leading-relaxed text-plum/80 dark:text-pearl/80">
                 {step.desc[language]}
               </p>
             </div>
@@ -441,14 +448,14 @@ export default function InteriorsSection({ language }: InteriorsSectionProps) {
                 className="group relative flex min-h-0 flex-col overflow-hidden rounded-2xl border border-[rgba(110,68,255,0.16)] bg-[rgba(248,246,255,0.80)] p-6 text-center shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-[--color-primary]/35 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[--color-primary] dark:border-lavender/18 dark:bg-white/[0.06] dark:hover:shadow-[0_20px_50px_rgba(189,166,255,0.14)] sm:p-7 sm:text-left"
               >
                 <span className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[rgba(110,68,255,0.25)] to-transparent opacity-0 transition-opacity group-hover:opacity-100 dark:via-lavender/30" aria-hidden />
-                <div className="mb-4 flex justify-center sm:mb-5 sm:justify-start">
-                  <span
-                    className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#6E44FF]/12 to-[#BDA6FF]/10 text-xl shadow-inner dark:from-[#6E44FF]/22 dark:to-[#BDA6FF]/12"
-                    aria-hidden
-                  >
-                    🏠
-                  </span>
-                </div>
+                <img
+                  src={livingRoomImage}
+                  alt=""
+                  width={192}
+                  height={120}
+                  loading="lazy"
+                  className="mx-auto mb-4 h-[120px] w-48 max-w-full object-contain sm:mx-0 sm:mb-5"
+                />
                 <h4 className="font-heading text-lg font-bold leading-snug text-plum/95 dark:text-pearl sm:text-xl">
                   {chooser.clientsTitle[language]}
                 </h4>
@@ -469,14 +476,14 @@ export default function InteriorsSection({ language }: InteriorsSectionProps) {
                 className="group relative flex min-h-0 flex-col overflow-hidden rounded-2xl border border-[rgba(110,68,255,0.16)] bg-[rgba(248,246,255,0.80)] p-6 text-center shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-[--color-primary]/35 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[--color-primary] dark:border-lavender/18 dark:bg-white/[0.06] dark:hover:shadow-[0_20px_50px_rgba(189,166,255,0.14)] sm:p-7 sm:text-left"
               >
                 <span className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[rgba(110,68,255,0.25)] to-transparent opacity-0 transition-opacity group-hover:opacity-100 dark:via-lavender/30" aria-hidden />
-                <div className="mb-4 flex justify-center sm:mb-5 sm:justify-start">
-                  <span
-                    className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#6E44FF]/12 to-[#BDA6FF]/10 text-xl shadow-inner dark:from-[#6E44FF]/22 dark:to-[#BDA6FF]/12"
-                    aria-hidden
-                  >
-                    🪚
-                  </span>
-                </div>
+                <img
+                  src={'/images/koraci-interijeri/stolari.webp'}
+                  alt=""
+                  width={192}
+                  height={120}
+                  loading="lazy"
+                  className="mx-auto mb-4 h-[120px] w-48 max-w-full object-contain sm:mx-0 sm:mb-5"
+                />
                 <h4 className="font-heading text-lg font-bold leading-snug text-plum/95 dark:text-pearl sm:text-xl">
                   {chooser.stolariTitle[language]}
                 </h4>
