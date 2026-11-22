@@ -8,7 +8,7 @@ import {
 } from '../lib/publicServiceAccess'
 import { PageSEO } from '../components/PageSEO'
 
-const DEPARTMENTS: PublicService[] = ['interiors', 'lrc', 'webAtelier']
+const DEPARTMENTS: PublicService[] = ['lrc', 'interiors', 'webAtelier']
 
 function visibilityLabel(visible: boolean): { text: string; className: string } {
   if (visible) {

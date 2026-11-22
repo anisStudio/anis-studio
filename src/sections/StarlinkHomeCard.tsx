@@ -35,13 +35,22 @@ export default function StarlinkHomeCard({ language }: StarlinkHomeCardProps) {
     >
       <div className="mx-auto max-w-5xl">
         <div className="flex flex-col gap-4 rounded-2xl border border-[rgba(110,68,255,0.1)] bg-white/35 px-5 py-5 backdrop-blur-sm dark:border-lavender/10 dark:bg-white/[0.03] sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:px-6 sm:py-4">
-          <div className="min-w-0">
+          <img
+            src="/images/starlink-preporuka.webp"
+            alt=""
+            width={120}
+            height={120}
+            className="mx-auto h-24 w-24 shrink-0 object-contain sm:mx-0 sm:h-28 sm:w-28"
+            loading="lazy"
+            decoding="async"
+          />
+          <div className="min-w-0 text-center sm:text-left">
             <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-plum/50 dark:text-pearl/55">
               {copy.label[language]}
             </p>
             <h2
               id="starlink-home-card-heading"
-              className="mt-1 font-heading text-lg font-bold tracking-tight text-plum/90 dark:text-pearl sm:text-xl"
+              className="mt-1 font-heading text-lg font-bold tracking-tight text-balance text-plum/90 dark:text-pearl max-sm:text-center sm:text-xl"
             >
               {copy.title[language]}
             </h2>

@@ -2,6 +2,10 @@
 // Never logs tokens, secrets, or PII.
 
 import {
+  readBookingOwnerEmailEnv,
+  sendBookingOwnerEmail,
+} from './bookingOwnerEmail.ts'
+import {
   resolveDevHostAccess,
   type TurnstileHostPolicy,
 } from './webAtelierGatewayPolicy.ts'
@@ -23,6 +27,10 @@ export interface BookingGatewayEnv {
   turnstileSecret: string
   allowWww: boolean
   allowDevHosts: boolean
+  bookingOwnerEmail?: string
+  bookingEmailFrom?: string
+  bookingEmailProvider?: string
+  resendApiKey?: string
 }
 
 export interface BookingGatewayDeps {
@@ -269,5 +277,52 @@ export async function handleBookingRequest(
   }
   const success = successFromRpc(booked.data)
   if (!success) return jsonResponse(origin, 503, { error: 'unavailable' }, openDev)
+
+  if (!success.replay) {
+    const mailEnv = readBookingOwnerEmailEnv({
+      BOOKING_OWNER_EMAIL: env.bookingOwnerEmail,
+      BOOKING_EMAIL_FROM: env.bookingEmailFrom,
+      BOOKING_EMAIL_PROVIDER: env.bookingEmailProvider,
+      RESEND_API_KEY: env.resendApiKey,
+    })
+    if (mailEnv) {
+      try {
+        const mailResult = await sendBookingOwnerEmail(
+          {
+            reservationId: success.reservationId,
+            department: success.department,
+            startsAt: success.startsAt,
+            endsAt: success.endsAt,
+            submission: {
+              contactName: submission.contactName,
+              contactEmail: submission.contactEmail,
+              contactPhone: submission.contactPhone,
+              description: submission.description,
+            },
+          },
+          mailEnv,
+          deps.fetchImpl,
+        )
+        if (!mailResult.ok) {
+          console.error(
+            JSON.stringify({
+              event: 'booking_owner_email_failed',
+              reservation_id: success.reservationId,
+              error: mailResult.error,
+            }),
+          )
+        }
+      } catch {
+        console.error(
+          JSON.stringify({
+            event: 'booking_owner_email_failed',
+            reservation_id: success.reservationId,
+            error: 'unexpected',
+          }),
+        )
+      }
+    }
+  }
+
   return jsonResponse(origin, 200, success, openDev)
 }

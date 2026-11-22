@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
+import { PortfolioImageLightbox } from '../components/PortfolioImageLightbox'
 import { usePortfolioItems, type PortfolioGridItem } from '../hooks/usePortfolioItems'
 import { usePublicDepartmentVisibility } from '../hooks/usePublicDepartmentVisibility'
 
@@ -81,16 +82,6 @@ export default function PortfolioSection({ language }: PortfolioSectionProps) {
     }
   }, [visibleFilterCategories, selectedCategory])
 
-  useEffect(() => {
-    if (typeof document === 'undefined') return
-    if (!lightboxItem) return
-    const prev = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => {
-      document.body.style.overflow = prev
-    }
-  }, [lightboxItem])
-
   // Category icons
   const categoryIcons: Record<string, string> = {
     'lrc': '🎁',
@@ -126,37 +117,6 @@ export default function PortfolioSection({ language }: PortfolioSectionProps) {
     if (!stillInFilter) setLightboxItem(null)
   }, [lightboxNavItems, lightboxItem])
 
-  useEffect(() => {
-    if (typeof document === 'undefined') return
-    if (!lightboxItem) return
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.preventDefault()
-        setLightboxItem(null)
-        return
-      }
-      if (lightboxNavItems.length < 2) return
-      if (e.key === 'ArrowLeft') {
-        e.preventDefault()
-        const i = lightboxNavItems.findIndex((x) => x.key === lightboxItem.key)
-        const idx =
-          i < 0 ? lightboxNavItems.length - 1 : (i - 1 + lightboxNavItems.length) % lightboxNavItems.length
-        setLightboxItem(lightboxNavItems[idx])
-        return
-      }
-      if (e.key === 'ArrowRight') {
-        e.preventDefault()
-        const i = lightboxNavItems.findIndex((x) => x.key === lightboxItem.key)
-        const idx = i < 0 ? 0 : (i + 1) % lightboxNavItems.length
-        setLightboxItem(lightboxNavItems[idx])
-      }
-    }
-
-    document.addEventListener('keydown', handleKeyDown, true)
-    return () => document.removeEventListener('keydown', handleKeyDown, true)
-  }, [lightboxItem, lightboxNavItems])
-
   const gridClasses =
     'grid w-full grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 sm:gap-5 transition-opacity duration-300'
 
@@ -176,9 +136,6 @@ export default function PortfolioSection({ language }: PortfolioSectionProps) {
     const idx = i < 0 ? 0 : (i + 1) % lightboxNavItems.length
     setLightboxItem(lightboxNavItems[idx])
   }
-
-  const navBtnClass =
-    'inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/25 bg-violet-600 text-white shadow-lg touch-manipulation hover:bg-violet-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#111018]'
 
   // If no service category is publicly visible, skip the entire section.
   if (enabledCategorySet.size === 0) return null
@@ -341,129 +298,25 @@ export default function PortfolioSection({ language }: PortfolioSectionProps) {
         </div>
       </div>
 
-      {lightboxItem && typeof document !== 'undefined'
+      {lightboxItem?.imageUrl && typeof document !== 'undefined'
         ? createPortal(
-            <div
-              className="fixed inset-0 z-[9999] flex items-center justify-center overflow-y-auto overscroll-contain bg-black/80 px-4 py-6"
-              role="presentation"
-              onClick={(e) => {
-                if (e.target === e.currentTarget) setLightboxItem(null)
-              }}
-            >
-              <div
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby="portfolio-lightbox-title"
-                className="portfolio-lightbox-panel relative z-[9999] flex max-h-[calc(100vh-2rem)] w-full max-w-6xl flex-col overflow-y-auto overflow-x-hidden rounded-3xl border border-white/10 bg-[#111018] shadow-[0_24px_60px_rgba(0,0,0,0.5)]"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <button
-                  type="button"
-                  onClick={() => setLightboxItem(null)}
-                  className="absolute right-3 top-3 z-30 flex items-center gap-2 rounded-full border border-white/20 bg-violet-600 px-3 py-2 text-sm font-semibold text-white shadow-lg touch-manipulation hover:bg-violet-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#111018] sm:right-4 sm:top-4 sm:px-4 sm:py-2.5"
-                  aria-label={language === 'hr' ? 'Zatvori prikaz' : 'Close preview'}
-                >
-                  <span>{language === 'hr' ? 'Zatvori' : 'Close'}</span>
-                  <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-
-                <div className="flex min-h-0 flex-col gap-5 px-4 pb-8 pt-6 sm:px-6 sm:pb-10 sm:pt-8">
-                  <div className="relative shrink-0">
-                    {showLightboxNav ? (
-                      <>
-                        <button
-                          type="button"
-                          onClick={goLightboxPrev}
-                          className={`${navBtnClass} absolute left-1 top-1/2 z-10 hidden -translate-y-1/2 md:flex`}
-                          aria-label={language === 'hr' ? 'Prethodna portfolio stavka' : 'Previous portfolio item'}
-                        >
-                          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                          </svg>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={goLightboxNext}
-                          className={`${navBtnClass} absolute right-1 top-1/2 z-10 hidden -translate-y-1/2 md:flex`}
-                          aria-label={language === 'hr' ? 'Sljedeća portfolio stavka' : 'Next portfolio item'}
-                        >
-                          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
-                        </button>
-                      </>
-                    ) : null}
-                    {lightboxItem.imageUrl ? (
-                      <div className="flex w-full min-h-0 min-w-0 shrink-0 justify-center rounded-xl bg-black/25 p-2 sm:p-4">
-                        <img
-                          src={lightboxItem.imageUrl}
-                          alt={lightboxItem.imageAlt ?? ''}
-                          decoding="async"
-                          className="h-auto w-full max-h-[55vh] max-w-full object-contain"
-                        />
-                      </div>
-                    ) : (
-                      <div className="relative flex aspect-[4/3] w-full max-h-[55vh] shrink-0 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-slate-900/80">
-                        <div className="absolute inset-0 bg-gradient-to-br from-amethyst/25 via-[#111018] to-plum/40" />
-                        <div className="relative flex flex-col items-center">
-                          <span className="mb-2 text-5xl opacity-70" aria-hidden>
-                            {categoryIcons[lightboxItem.category]}
-                          </span>
-                          <p className="portfolio-lightbox-placeholder-caption text-sm font-medium text-zinc-400">
-                            {translations.placeholder[language]}
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {showLightboxNav ? (
-                    <div className="flex shrink-0 items-center justify-center gap-10 md:hidden">
-                      <button
-                        type="button"
-                        onClick={goLightboxPrev}
-                        className={navBtnClass}
-                        aria-label={language === 'hr' ? 'Prethodna portfolio stavka' : 'Previous portfolio item'}
-                      >
-                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                        </svg>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={goLightboxNext}
-                        className={navBtnClass}
-                        aria-label={language === 'hr' ? 'Sljedeća portfolio stavka' : 'Next portfolio item'}
-                      >
-                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </button>
-                    </div>
-                  ) : null}
-
-                  <div className="mx-auto flex w-full max-w-3xl min-h-0 flex-col items-center space-y-3 text-center sm:max-w-4xl">
-                    <h2
-                      id="portfolio-lightbox-title"
-                      className="w-full text-balance font-heading text-xl font-bold leading-snug text-white sm:text-2xl"
-                    >
-                      {lightboxItem.title}
-                    </h2>
-                    {lightboxItem.description ? (
-                      <p className="portfolio-lightbox-description w-full text-balance text-sm leading-relaxed text-zinc-200 sm:text-base sm:leading-relaxed">
-                        {lightboxItem.description}
-                      </p>
-                    ) : null}
-                    <span className="portfolio-lightbox-badge inline-flex max-w-full shrink-0 items-center justify-center gap-1.5 rounded-full border border-lavender/40 bg-lavender/15 px-3 py-1.5 text-xs font-semibold sm:text-sm">
-                      <span className="shrink-0">{categoryIcons[lightboxItem.category]}</span>
-                      <span>{categoryLabelFor(lightboxItem.category)}</span>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>,
+            <PortfolioImageLightbox
+              language={language}
+              imageUrl={lightboxItem.imageUrl}
+              imageAlt={lightboxItem.imageAlt ?? lightboxItem.title}
+              title={lightboxItem.title}
+              description={lightboxItem.description}
+              showNav={showLightboxNav}
+              onClose={() => setLightboxItem(null)}
+              onPrev={goLightboxPrev}
+              onNext={goLightboxNext}
+              badge={
+                <span className="portfolio-lightbox-badge inline-flex max-w-full shrink-0 items-center justify-center gap-1.5 rounded-full border border-lavender/40 bg-lavender/15 px-3 py-1.5 text-xs font-semibold text-white sm:text-sm">
+                  <span className="shrink-0">{categoryIcons[lightboxItem.category]}</span>
+                  <span>{categoryLabelFor(lightboxItem.category)}</span>
+                </span>
+              }
+            />,
             document.body
           )
         : null}

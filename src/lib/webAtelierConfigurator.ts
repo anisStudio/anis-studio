@@ -9,6 +9,7 @@ import {
 } from './webAtelierOffers.ts'
 
 export const WEB_ATELIER_CONFIGURATOR_STORAGE_KEY = 'web-atelier-configurator-v1'
+export const WEB_ATELIER_CONFIGURATOR_STEP_KEY = 'web-atelier-configurator-step-v1'
 export const WEB_ATELIER_CONFIG_MARKER_START = '--- F2.5 CONFIGURATOR (INDICATIVE, NONBINDING) ---'
 export const WEB_ATELIER_CONFIG_MARKER_END = '--- END F2.5 CONFIGURATOR ---'
 
@@ -749,6 +750,25 @@ export function writeStoredConfiguratorSelection(
     return
   }
   storage.setItem(WEB_ATELIER_CONFIGURATOR_STORAGE_KEY, serializeConfiguratorSelection(selection))
+}
+
+export function readStoredConfiguratorStep(
+  storage: Pick<Storage, 'getItem'> | null | undefined,
+): number | null {
+  if (!storage) return null
+  const raw = storage.getItem(WEB_ATELIER_CONFIGURATOR_STEP_KEY)
+  if (!raw) return null
+  const step = Number.parseInt(raw, 10)
+  if (!Number.isFinite(step) || step < 0 || step > 3) return null
+  return step
+}
+
+export function writeStoredConfiguratorStep(
+  storage: Pick<Storage, 'setItem'> | null | undefined,
+  step: number,
+): void {
+  if (!storage) return
+  storage.setItem(WEB_ATELIER_CONFIGURATOR_STEP_KEY, String(step))
 }
 
 /**

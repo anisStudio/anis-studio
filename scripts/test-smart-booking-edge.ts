@@ -159,6 +159,42 @@ assert.match(success.calls[1].url, /public_book_consultation_slot/)
 assert.match(success.calls[0].body, /response=turnstile-token-ok/)
 assert.doesNotMatch(success.calls[0].body, /ana@example\.com/)
 
+const successWithMockMail = mockFetch([
+  siteverify({ success: true, hostname: 'anislrc.hr', 'error-codes': [] }),
+  rpcOk({
+    reservation_id: RESERVATION_ID,
+    department: 'interiors',
+    starts_at: '2027-01-15T09:00:00+00:00',
+    ends_at: '2027-01-15T11:00:00+00:00',
+    replay: false,
+  }),
+])
+const mailEnv = env({
+  bookingOwnerEmail: 'owner@example.com',
+  bookingEmailProvider: 'mock',
+})
+const mockMailResult = await book({ env: mailEnv, fetchImpl: successWithMockMail.fetchImpl })
+assert.equal(mockMailResult.status, 200)
+assert.equal(successWithMockMail.calls.length, 2)
+
+const replayOk = mockFetch([
+  siteverify({ success: true, hostname: 'anislrc.hr', 'error-codes': [] }),
+  rpcOk({
+    reservation_id: RESERVATION_ID,
+    department: 'interiors',
+    starts_at: '2027-01-15T09:00:00+00:00',
+    ends_at: '2027-01-15T11:00:00+00:00',
+    replay: true,
+  }),
+])
+const replayResult = await book({
+  env: env({ bookingOwnerEmail: 'owner@example.com', bookingEmailProvider: 'mock' }),
+  fetchImpl: replayOk.fetchImpl,
+})
+assert.equal(replayResult.status, 200)
+assert.equal(replayResult.json.replay, true)
+assert.equal(replayOk.calls.length, 2)
+
 const missingToken = await book(
   { env: env(), fetchImpl: mockFetch([]).fetchImpl },
   validBody({ turnstileToken: '' }),

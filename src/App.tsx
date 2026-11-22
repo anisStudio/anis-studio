@@ -1,5 +1,5 @@
 import { useState, useEffect, useLayoutEffect, lazy, Suspense } from 'react'
-import { BrowserRouter, Routes, Route, Outlet, useLocation } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Outlet, useLocation, Navigate } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 import { Toaster } from 'react-hot-toast'
 import CartDrawer from './components/CartDrawer'
@@ -245,6 +245,7 @@ function AnimatedRoutes({
               </AdminRoute>
             }
           >
+            <Route index element={<Navigate to="preview" replace />} />
             <Route path="settings" element={<AdminSettingsPage />} />
             <Route path="preview" element={<AdminSitePreviewPage />} />
             <Route path="lrc-inquiries" element={<AdminLrcInquiriesPage />} />

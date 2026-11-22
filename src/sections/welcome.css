@@ -58,7 +58,8 @@ html:not(.dark) section[aria-labelledby="starlink-home-card-heading"] p.uppercas
     background: var(--welcome-image) 66% top / auto 13rem no-repeat;
   }
   .welcome-content { padding-top: 12rem; }
-  .welcome-intro { text-align: left; }
+  .welcome-intro { text-align: center; }
+  #welcome h1 { text-align: center; }
 }
 
 @media (min-width: 681px) {

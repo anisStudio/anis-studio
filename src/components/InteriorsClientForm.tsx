@@ -15,11 +15,6 @@ import {
 } from '../lib/interiorsInspirationFiles'
 import { UploadProgress } from './UploadProgress'
 
-export interface StolarOption {
-  id: string
-  name: string // npr. "Josip Radat"
-}
-
 export interface ClientProjectFormValues {
   clientName: string
   email: string
@@ -68,7 +63,6 @@ export interface ClientProjectFormValues {
 }
 
 interface InteriorsClientFormProps {
-  stolars: StolarOption[]
   onSubmit?: (values: ClientProjectFormValues) => void
   language?: 'hr' | 'en'
 }
@@ -127,8 +121,7 @@ const BUDGET_RANGE_LABELS_HR: Record<string, string> = {
   unknown: 'Ne znam, trebam okvirnu procjenu',
 }
 
-export function InteriorsClientForm({ stolars: _stolarsUnused, onSubmit, language = 'hr' }: InteriorsClientFormProps) {
-  void _stolarsUnused
+export function InteriorsClientForm({ onSubmit, language = 'hr' }: InteriorsClientFormProps) {
   const inputClass =
     "w-full rounded-xl border border-slate-200 dark:border-lavender/20 bg-white/80 dark:bg-white/10 px-3 py-2 text-sm shadow-inner focus:outline-none focus:ring-2 focus:ring-violet-100 dark:focus:ring-violet-900/30 focus:border-violet-400 dark:focus:border-violet-500 text-plum/90 dark:text-pearl placeholder:text-plum/60 dark:placeholder:text-pearl/50";
 

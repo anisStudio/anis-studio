@@ -29,7 +29,7 @@ export default function AdminLoginPage() {
     if (loading || !isAdmin) return
 
     const from = location.state?.from?.pathname
-    navigate(from || '/admin/settings', { replace: true })
+    navigate(from || '/admin/preview', { replace: true })
   }, [isAdmin, loading, navigate, location.state])
 
   const handleSubmit = async (e: React.FormEvent) => {

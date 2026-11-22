@@ -3,7 +3,6 @@ import { AnimatedPage } from '../components/AnimatedPage'
 import { InteriorsFormPageLayout } from '../components/InteriorsFormPageLayout'
 import { InteriorsClientForm } from '../components/InteriorsClientForm'
 import { PublicConsultationBooking } from '../components/PublicConsultationBooking'
-import { INTERIORS_STOLAR_OPTIONS } from '../data/interiorsPublic'
 import { PageSEO } from '../components/PageSEO'
 
 interface InterijeriClientsPageProps {
@@ -33,7 +32,7 @@ export default function InterijeriClientsPage({ language }: InterijeriClientsPag
             introduction={introduction}
             panoramaSrc="/images/interijeri-upiti/klijenti.webp"
           >
-            <InteriorsClientForm stolars={INTERIORS_STOLAR_OPTIONS} language={language} />
+            <InteriorsClientForm language={language} />
             <PublicConsultationBooking department="interiors" language={language} />
           </InteriorsFormPageLayout>
         </ErrorBoundary>

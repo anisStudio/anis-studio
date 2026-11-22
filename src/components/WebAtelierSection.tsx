@@ -35,6 +35,7 @@ export default function WebAtelierSection({
     },
     ctaPrimary: { hr: 'Pošalji upit', en: 'Send inquiry' },
     ctaSecondary: { hr: 'Procijeni projekt', en: 'Estimate your project' },
+    openConfigurator: { hr: 'Otvori konfigurator', en: 'Open configurator' },
     ctaDemos: { hr: 'Pogledaj primjere', en: 'Explore demos' },
     panelTitle: {
       hr: 'Što dobivate u suradnji',
@@ -268,6 +269,20 @@ export default function WebAtelierSection({
           </ol>
         </section>
 
+        <div className="wa-prem-section flex justify-center px-2">
+          <a
+            href="#web-atelier-configurator"
+            className="btn btn-primary min-h-[48px] w-full max-w-md items-center justify-center sm:w-auto"
+            onClick={() => trackEvent('inquiry_cta_click', { source: 'web-atelier-open-configurator' })}
+          >
+            {copy.openConfigurator[language]}
+          </a>
+        </div>
+
+        <div id="web-atelier-pricing" className="wa-prem-section mx-auto w-full max-w-6xl">
+          <WebAtelierConfigurator language={language} enableInquiryCta={enableInquiryLinks} />
+        </div>
+
         <section className="wa-prem-section" aria-labelledby="wa-journey-title">
           <div className="wa-prem-section-head">
             <h2 id="wa-journey-title">{copy.journeyTitle[language]}</h2>
@@ -286,10 +301,6 @@ export default function WebAtelierSection({
             ))}
           </div>
         </section>
-
-        <div id="web-atelier-pricing" className="wa-prem-section mx-auto w-full max-w-6xl">
-          <WebAtelierConfigurator language={language} enableInquiryCta={enableInquiryLinks} />
-        </div>
 
         <div className="wa-prem-section wa-prem-closing fade-in">
           <h2>{copy.closingTitle[language]}</h2>

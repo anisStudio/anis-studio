@@ -912,6 +912,24 @@ html.dark body::before {
     color: #fff !important;
   }
 
+  /* Review avatar initials sit on purple gradients inside .section-with-bg. */
+  html:not(.dark) .section-with-bg .testimonial-avatar-initials,
+  html.dark .section-with-bg .testimonial-avatar-initials {
+    color: #fff !important;
+    -webkit-text-fill-color: #fff !important;
+  }
+
+  /* O nama: desktop-only ~13% wider portrait frame; mobile unchanged */
+  @media (min-width: 1024px) {
+    #about .about-studio-photo-col {
+      width: 48%;
+    }
+
+    #about .about-studio-photo-frame {
+      max-width: 31.5rem;
+    }
+  }
+
   .section-with-bg :is(.interiors-upload-action, .interiors-form-submit) {
     color: #fff !important;
   }

@@ -2,6 +2,7 @@ import './interiors-panorama.css'
 import { DepartmentStepCard } from './DepartmentStepCard'
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { PortfolioImageLightbox } from './PortfolioImageLightbox'
 import { Link, useLocation } from 'react-router-dom'
 import { trackEvent } from '../lib/analytics'
 import { usePortfolioItems } from '../hooks/usePortfolioItems'
@@ -66,16 +67,6 @@ export default function InteriorsSection({ language }: InteriorsSectionProps) {
   useEffect(() => {
     if (typeof document === 'undefined') return
     if (lightboxIndex === null) return
-    const prev = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => {
-      document.body.style.overflow = prev
-    }
-  }, [lightboxIndex])
-
-  useEffect(() => {
-    if (typeof document === 'undefined') return
-    if (lightboxIndex === null) return
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -104,9 +95,6 @@ export default function InteriorsSection({ language }: InteriorsSectionProps) {
     document.addEventListener('keydown', handleKeyDown, true)
     return () => document.removeEventListener('keydown', handleKeyDown, true)
   }, [lightboxIndex, previewItems.length])
-
-  const previewNavBtnClass =
-    'inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/25 bg-violet-600 text-white shadow-lg touch-manipulation hover:bg-violet-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#111018]'
 
   const chooser = {
     sectionTitle: { hr: 'Odaberite vrstu upita', en: 'Choose the type of inquiry' },
@@ -143,8 +131,8 @@ export default function InteriorsSection({ language }: InteriorsSectionProps) {
 
   const translations = {
     title: {
-      hr: "🏠 Ani's Interijeri — 3D vizualizacija prostora",
-      en: "🏠 Ani's Interijeri — 3D space visualization",
+      hr: "Ani's Interijeri — 3D vizualizacija prostora",
+      en: "Ani's Interijeri — 3D space visualization",
     },
     subtitle: {
       hr: 'Vidiš svoj prostor prije nego ga napraviš — realistični 3D prikazi na temelju tvojih mjera, ideja i željenog stila.',
@@ -229,7 +217,7 @@ export default function InteriorsSection({ language }: InteriorsSectionProps) {
   return (
     <section
       id="interiors"
-      className="Section fade-in relative section-with-bg !pt-[clamp(1.5rem,2.5vw,2.75rem)] !pb-[clamp(2rem,3.5vw,3.5rem)] sm:!pb-[clamp(2.25rem,3.5vw,3.75rem)]"
+      className="Section fade-in relative section-with-bg !pt-[clamp(0.85rem,2vw,2.75rem)] !pb-[clamp(2rem,3.5vw,3.5rem)] sm:!pb-[clamp(2.25rem,3.5vw,3.75rem)]"
     >
       {/* Background wrapper */}
       <div className="absolute inset-0 overflow-hidden -z-10">
@@ -240,21 +228,21 @@ export default function InteriorsSection({ language }: InteriorsSectionProps) {
       
       <div className="relative z-10 mx-auto flex min-w-0 w-full max-w-6xl flex-col px-0">
         {/* Section Header — single centered column */}
-        <div className="mx-auto mb-10 w-full text-center sm:mb-12">
-          <header className="department-panorama interiors-panorama mb-4">
+        <div className="mx-auto mb-10 w-full text-center sm:mb-12 max-sm:mb-5 max-sm:max-w-2xl max-sm:px-4">
+          <header className="department-panorama interiors-panorama interiors-panorama--compact mb-4 max-sm:mb-3">
             <h1 className="font-heading font-bold tracking-tight">{translations.title[language]}</h1>
           </header>
-          <p className="mx-auto mb-2 max-w-2xl text-lg font-semibold italic leading-snug text-amethyst dark:text-lavender sm:text-xl">
+          <p className="mx-auto mb-2 max-w-2xl text-base font-semibold italic leading-snug text-amethyst dark:text-lavender max-sm:mb-1 sm:text-lg sm:text-xl">
             {translations.subtitle[language]}
           </p>
-          <div className="mx-auto mt-6 max-w-2xl border-t border-amethyst/10 px-2 pt-6 text-center dark:border-lavender/15 sm:mt-7 sm:px-3 sm:pt-7">
-            <p className="text-sm leading-relaxed text-plum/78 dark:text-pearl/75 sm:text-[0.9375rem] sm:leading-relaxed">
+          <div className="mx-auto mt-6 max-w-2xl border-t border-amethyst/10 px-2 pt-6 text-center dark:border-lavender/15 max-sm:mt-3 max-sm:pt-3 sm:mt-7 sm:px-3 sm:pt-7">
+            <p className="text-sm leading-relaxed text-plum/78 dark:text-pearl/75 max-sm:text-[0.8125rem] max-sm:leading-snug sm:text-[0.9375rem] sm:leading-relaxed">
               {translations.bridge[language]}
             </p>
           </div>
           <Link
             to={INTERIORS_INQUIRY_HASH}
-            className="public-action mx-auto mt-6 inline-flex min-h-[48px] w-full max-w-xs items-center justify-center rounded-xl px-6 py-3 text-sm font-semibold sm:w-auto"
+            className="public-action mx-auto mt-6 inline-flex min-h-[48px] w-full max-w-xs items-center justify-center rounded-xl px-6 py-3 text-sm font-semibold max-sm:mt-3 sm:w-auto"
           >
             {chooser.ctaAction[language]}
           </Link>
@@ -507,145 +495,24 @@ export default function InteriorsSection({ language }: InteriorsSectionProps) {
         </div>
       </div>
 
-      {lightboxItem && typeof document !== 'undefined'
+      {lightboxItem?.imageUrl && typeof document !== 'undefined'
         ? createPortal(
-            <div
-              className="fixed inset-0 z-[9999] flex items-center justify-center overflow-y-auto overscroll-contain bg-black/80 px-4 py-6"
-              role="presentation"
-              style={{ WebkitOverflowScrolling: 'touch' }}
-              onClick={(e) => {
-                if (e.target === e.currentTarget) setLightboxIndex(null)
-              }}
-            >
-              <div
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby="interiors-preview-lightbox-title"
-                className="relative z-[9999] flex max-h-[calc(100vh-2rem)] w-full max-w-6xl flex-col overflow-y-auto overflow-x-hidden rounded-3xl border border-white/10 bg-[#111018] shadow-[0_24px_60px_rgba(0,0,0,0.5)]"
-                style={{ touchAction: 'pan-y' }}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <button
-                  type="button"
-                  onClick={() => setLightboxIndex(null)}
-                  className="absolute right-3 top-3 z-30 flex items-center gap-2 rounded-full border border-white/20 bg-violet-600 px-3 py-2 text-sm font-semibold text-white shadow-lg touch-manipulation hover:bg-violet-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#111018] sm:right-4 sm:top-4 sm:px-4 sm:py-2.5"
-                  aria-label={language === 'hr' ? 'Zatvori prikaz' : 'Close preview'}
-                >
-                  <span>{language === 'hr' ? 'Zatvori' : 'Close'}</span>
-                  <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-
-                <div className="flex min-h-0 flex-col gap-5 px-4 pb-8 pt-6 sm:px-6 sm:pb-10 sm:pt-8">
-                  <div className="relative shrink-0">
-                    {showPreviewLightboxNav ? (
-                      <>
-                        <button
-                          type="button"
-                          onClick={goPreviewLightboxPrev}
-                          className={`${previewNavBtnClass} absolute left-1 top-1/2 z-10 hidden -translate-y-1/2 md:flex`}
-                          aria-label={language === 'hr' ? 'Prethodna stavka' : 'Previous item'}
-                        >
-                          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                          </svg>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={goPreviewLightboxNext}
-                          className={`${previewNavBtnClass} absolute right-1 top-1/2 z-10 hidden -translate-y-1/2 md:flex`}
-                          aria-label={language === 'hr' ? 'Sljedeća stavka' : 'Next item'}
-                        >
-                          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
-                        </button>
-                      </>
-                    ) : null}
-                    {lightboxItem.imageUrl ? (
-                      <div className="flex w-full min-h-0 min-w-0 shrink-0 justify-center rounded-xl bg-black/25 p-2 sm:p-4">
-                        <img
-                          src={lightboxItem.imageUrl}
-                          alt={lightboxItem.imageAlt ?? ''}
-                          decoding="async"
-                          className="h-auto w-full max-h-[55vh] max-w-full object-contain"
-                        />
-                      </div>
-                    ) : (
-                      <div className="relative flex aspect-[4/3] w-full max-h-[55vh] shrink-0 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-slate-900/80">
-                        <div className="absolute inset-0 bg-gradient-to-br from-amethyst/25 via-[#111018] to-plum/40" />
-                        <div className="relative flex flex-col items-center">
-                          <span className="mb-2 text-5xl opacity-70" aria-hidden>
-                            🏠
-                          </span>
-                          <p className="text-sm font-medium text-zinc-400">
-                            {previewCopy.placeholder[language]}
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {showPreviewLightboxNav ? (
-                    <div className="flex shrink-0 items-center justify-center gap-10 md:hidden">
-                      <button
-                        type="button"
-                        onClick={goPreviewLightboxPrev}
-                        className={previewNavBtnClass}
-                        aria-label={language === 'hr' ? 'Prethodna stavka' : 'Previous item'}
-                      >
-                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                        </svg>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={goPreviewLightboxNext}
-                        className={previewNavBtnClass}
-                        aria-label={language === 'hr' ? 'Sljedeća stavka' : 'Next item'}
-                      >
-                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </button>
-                    </div>
-                  ) : null}
-
-                  <div className="mx-auto flex w-full max-w-3xl min-h-0 flex-col items-center space-y-3 text-center sm:max-w-4xl">
-                    <h2
-                      id="interiors-preview-lightbox-title"
-                      className="w-full text-balance font-heading text-xl font-bold leading-snug text-white sm:text-2xl"
-                    >
-                      {lightboxItem.title}
-                    </h2>
-                    {lightboxItem.description ? (
-                      <p className="w-full text-balance text-sm leading-relaxed text-zinc-200 sm:text-base sm:leading-relaxed">
-                        {lightboxItem.description}
-                      </p>
-                    ) : null}
-                    {lightboxItem.tags.length > 0 ? (
-                      <div className="flex w-full flex-wrap justify-center gap-1.5">
-                        {lightboxItem.tags.map((tag, ti) => (
-                          <span
-                            key={`${tag}-${ti}`}
-                            className="inline-flex max-w-full truncate rounded-md border border-lavender/35 bg-white/10 px-2 py-1 text-xs font-medium text-zinc-100"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    ) : null}
-                    <span className="inline-flex max-w-full shrink-0 items-center justify-center gap-1.5 rounded-full border border-lavender/40 bg-lavender/15 px-3 py-1.5 text-xs font-semibold sm:text-sm">
-                      <span className="shrink-0" aria-hidden>
-                        🏠
-                      </span>
-                      <span className="text-white">{previewCopy.badge[language]}</span>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>,
+            <PortfolioImageLightbox
+              language={language}
+              imageUrl={lightboxItem.imageUrl}
+              imageAlt={lightboxItem.imageAlt ?? lightboxItem.title}
+              title={lightboxItem.title}
+              description={lightboxItem.description}
+              showNav={showPreviewLightboxNav}
+              onClose={() => setLightboxIndex(null)}
+              onPrev={goPreviewLightboxPrev}
+              onNext={goPreviewLightboxNext}
+              badge={
+                <span className="inline-flex max-w-full shrink-0 items-center justify-center gap-1.5 rounded-full border border-lavender/40 bg-lavender/15 px-3 py-1.5 text-xs font-semibold text-white sm:text-sm">
+                  {previewCopy.badge[language]}
+                </span>
+              }
+            />,
             document.body
           )
         : null}

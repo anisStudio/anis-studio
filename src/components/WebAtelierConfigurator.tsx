@@ -1,4 +1,4 @@
-import { useId, useMemo, useState } from 'react'
+import { useEffect, useId, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { trackEvent } from '../lib/analytics'
 import {
@@ -7,12 +7,15 @@ import {
   addonLabel,
   calculateConfiguratorEstimate,
   emptyConfiguratorSelection,
+  readStoredConfiguratorSelection,
+  readStoredConfiguratorStep,
   formatEur,
+  writeStoredConfiguratorSelection,
+  writeStoredConfiguratorStep,
   packageLabel,
   packageScopeHeadline,
   sharedPackageIncludesCopy,
   updateConfiguratorAddon,
-  writeStoredConfiguratorSelection,
   type ConfiguratorAddonId,
   type ConfiguratorPackageId,
   type ConfiguratorSelection,
@@ -35,8 +38,25 @@ export function WebAtelierConfigurator({
   enableInquiryCta = true,
 }: WebAtelierConfiguratorProps) {
   const baseId = useId()
-  const [selection, setSelection] = useState<ConfiguratorSelection>(() => emptyConfiguratorSelection())
-  const [step, setStep] = useState<ConfigStep>(0)
+  const [selection, setSelection] = useState<ConfiguratorSelection>(() => {
+    if (typeof window === 'undefined') return emptyConfiguratorSelection()
+    return readStoredConfiguratorSelection(window.sessionStorage) ?? emptyConfiguratorSelection()
+  })
+  const [step, setStep] = useState<ConfigStep>(() => {
+    if (typeof window === 'undefined') return 0
+    const stored = readStoredConfiguratorStep(window.sessionStorage)
+    return stored == null ? 0 : (stored as ConfigStep)
+  })
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    writeStoredConfiguratorStep(window.sessionStorage, step)
+  }, [step])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    writeStoredConfiguratorSelection(window.sessionStorage, selection)
+  }, [selection])
 
   const estimate = useMemo(() => calculateConfiguratorEstimate(selection), [selection])
 

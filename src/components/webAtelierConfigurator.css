@@ -113,6 +113,22 @@ html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-progress-list {
   gap: 0.4rem;
 }
 
+@media (max-width: 639px) {
+  html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-progress-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-progress-list > li {
+    display: flex;
+  }
+
+  html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-progress-btn {
+    flex: 1;
+    min-height: 3.15rem;
+    height: 100%;
+  }
+}
+
 html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-progress-btn {
   width: 100%;
   min-height: 44px;

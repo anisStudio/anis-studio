@@ -35,6 +35,7 @@ interface TestimonialMarqueeProps {
 }
 
 const MARQUEE_DURATION_SEC = 36
+const MARQUEE_DURATION_COARSE_SEC = 50
 
 function usePrefersReducedMotion() {
   const [reduce, setReduce] = useState(false)
@@ -61,12 +62,13 @@ function useCoarsePointer() {
   return coarse
 }
 
+/** Purple-forward gradients so white initials stay readable in light and dark UI. */
 const avatarGradients = [
   'from-amethyst to-plum',
-  'from-lavender to-amethyst',
-  'from-amethyst to-lavender',
-  'from-plum/90 to-amethyst',
-  'from-lavender to-plum',
+  'from-violet-700 to-amethyst',
+  'from-plum to-violet-800',
+  'from-amethyst to-violet-900',
+  'from-violet-800 to-plum',
 ]
 
 function getInitials(name: string) {
@@ -89,6 +91,7 @@ function MarqueeLane({
   renderStars,
   rowTone,
   direction,
+  autoPaused,
 }: {
   items: Testimonial[]
   language: 'hr' | 'en'
@@ -96,13 +99,14 @@ function MarqueeLane({
   renderStars: (rating: number) => ReactNode
   rowTone: TestimonialRowTone
   direction: TestimonialMarqueeDirection
+  autoPaused: boolean
 }) {
   const isCoarse = useCoarsePointer()
   const rowRef = useRef<HTMLDivElement>(null)
   const [activeKey, setActiveKey] = useState<string | null>(null)
+  const [touchHold, setTouchHold] = useState(false)
 
-  // On touch devices, render single set; on desktop, duplicate for seamless loop
-  const displayItems = isCoarse ? items : [...items, ...items]
+  const displayItems = items.length > 1 ? [...items, ...items] : items
 
   useEffect(() => {
     if (activeKey === null) return
@@ -128,8 +132,7 @@ function MarqueeLane({
     setActiveKey(null)
   }
 
-  /** Touch / coarse pointers: do not pause the track on tap-expand (avoids half-card “stuck” state). */
-  const paused = activeKey !== null && !isCoarse
+  const paused = autoPaused || touchHold || (activeKey !== null && !isCoarse)
 
   return (
     <div
@@ -139,7 +142,7 @@ function MarqueeLane({
       onBlur={handleRowFocusOut}
       className={clsx(
         'testimonial-marquee-row group/marquee relative py-2',
-        isCoarse
+        isCoarse && paused
           ? 'overflow-x-auto overflow-y-visible scrollbar-thin scrollbar-thumb-amethyst/20 scrollbar-track-transparent snap-x snap-mandatory'
           : 'overflow-x-hidden overflow-y-visible',
         direction === 'right' && 'marquee-dir-right'
@@ -148,9 +151,13 @@ function MarqueeLane({
       <div
         className={clsx(
           'isolate flex gap-3 sm:gap-4',
-          isCoarse ? 'w-full' : 'testimonial-marquee-track w-max'
+          displayItems.length > items.length ? 'testimonial-marquee-track w-max' : 'w-full'
         )}
-        style={!isCoarse ? { animationDuration: `${MARQUEE_DURATION_SEC}s` } : undefined}
+        style={
+          displayItems.length > items.length
+            ? { animationDuration: `${isCoarse ? MARQUEE_DURATION_COARSE_SEC : MARQUEE_DURATION_SEC}s` }
+            : undefined
+        }
       >
         {displayItems.map((testimonial, index) => {
           const cardKey = `${testimonial.id}-${index}`
@@ -169,6 +176,7 @@ function MarqueeLane({
               onCoarseToggle={() =>
                 setActiveKey((prev) => (prev === cardKey ? null : cardKey))
               }
+              onCoarseTouchHold={(hold) => setTouchHold(hold)}
             />
           )
         })}
@@ -307,6 +315,7 @@ function TestimonialCard({
   isCoarse,
   expandedTap,
   onCoarseToggle,
+  onCoarseTouchHold,
 }: {
   testimonial: Testimonial
   language: 'hr' | 'en'
@@ -318,6 +327,7 @@ function TestimonialCard({
   isCoarse?: boolean
   expandedTap?: boolean
   onCoarseToggle?: () => void
+  onCoarseTouchHold?: (hold: boolean) => void
 }) {
   const widthClass =
     layout === 'marquee'
@@ -389,11 +399,26 @@ function TestimonialCard({
       aria-expanded={coarse ? tapOpen : undefined}
       onClick={isMarquee ? handleMarqueeClick : undefined}
       onKeyDown={isMarquee ? handleMarqueeKeyDown : undefined}
+      onPointerDown={
+        isMarquee && coarse
+          ? () => onCoarseTouchHold?.(true)
+          : undefined
+      }
+      onPointerUp={
+        isMarquee && coarse
+          ? () => onCoarseTouchHold?.(false)
+          : undefined
+      }
+      onPointerCancel={
+        isMarquee && coarse
+          ? () => onCoarseTouchHold?.(false)
+          : undefined
+      }
       className={articleClass}
     >
       <div className="flex items-start gap-3 sm:gap-3.5">
         <div
-          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-[0.6875rem] font-bold tracking-wide text-white shadow-[0_2px_12px_rgba(110,68,255,0.28)] ring-1 ring-white/25 dark:ring-white/10 sm:h-11 sm:w-11 sm:text-sm ${avatarGradients[cardIndex % avatarGradients.length]}`}
+          className={`testimonial-avatar-initials flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-[0.6875rem] font-bold tracking-wide text-white shadow-[0_2px_12px_rgba(110,68,255,0.28)] [text-shadow:0_1px_2px_rgba(26,17,43,0.35)] ring-1 ring-white/30 dark:ring-white/15 sm:h-11 sm:w-11 sm:text-sm ${avatarGradients[cardIndex % avatarGradients.length]}`}
           aria-hidden={true}
         >
           {getInitials(testimonial.name)}
@@ -453,6 +478,7 @@ function GroupMarqueeBlock({
   prefersReducedMotion,
   emptyPreview,
   marqueeDirection = 'left',
+  autoPaused,
 }: {
   groupKey: TestimonialRowGroupKey
   items: Testimonial[]
@@ -461,6 +487,7 @@ function GroupMarqueeBlock({
   prefersReducedMotion: boolean
   emptyPreview?: boolean
   marqueeDirection?: TestimonialMarqueeDirection
+  autoPaused: boolean
 }) {
   const verifiedLabel = language === 'hr' ? 'Verificirano' : 'Verified'
   const renderStars = (rating: number) =>
@@ -520,6 +547,7 @@ function GroupMarqueeBlock({
         renderStars={renderStars}
         rowTone={rowTone}
         direction={marqueeDirection}
+        autoPaused={autoPaused}
       />
     </div>
   )
@@ -554,6 +582,26 @@ function WebAtelierEmptyPreview({
 
 export default function TestimonialMarquee({ language, rowBlocks }: TestimonialMarqueeProps) {
   const prefersReducedMotion = usePrefersReducedMotion()
+  const isCoarse = useCoarsePointer()
+  const [autoPaused, setAutoPaused] = useState(false)
+
+  const pauseToggleLabel =
+    language === 'hr'
+      ? autoPaused
+        ? 'Nastavi'
+        : 'Pauziraj'
+      : autoPaused
+        ? 'Resume'
+        : 'Pause'
+
+  const pauseToggleAriaLabel =
+    language === 'hr'
+      ? autoPaused
+        ? 'Nastavi automatsko pomicanje recenzija'
+        : 'Pauziraj automatsko pomicanje recenzija'
+      : autoPaused
+        ? 'Resume automatic review scrolling'
+        : 'Pause automatic review scrolling'
 
   return (
     <>
@@ -586,6 +634,9 @@ export default function TestimonialMarquee({ language, rowBlocks }: TestimonialM
         .testimonial-marquee-row[data-paused="true"] .testimonial-marquee-track {
           animation-play-state: paused;
         }
+        .testimonial-marquee-row[data-coarse-pointer="true"]:not([data-paused="true"]) .testimonial-marquee-track {
+          animation-play-state: running;
+        }
         @media (prefers-reduced-motion: reduce) {
           .testimonial-marquee-track {
             animation: none !important;
@@ -593,6 +644,29 @@ export default function TestimonialMarquee({ language, rowBlocks }: TestimonialM
           }
         }
       `}</style>
+
+      {!prefersReducedMotion && isCoarse ? (
+        <div className="mb-4 flex justify-center sm:mb-5">
+          <button
+            type="button"
+            className="inline-flex min-h-[40px] min-w-[6.5rem] items-center justify-center rounded-full border border-amethyst/25 bg-white/75 px-4 py-2 text-xs font-semibold tracking-wide text-plum/90 shadow-sm backdrop-blur-sm transition hover:border-amethyst/40 dark:border-lavender/22 dark:bg-white/[0.09] dark:text-pearl/92 dark:hover:border-lavender/35"
+            aria-pressed={autoPaused}
+            aria-label={pauseToggleAriaLabel}
+            onClick={() => setAutoPaused((v) => !v)}
+          >
+            {pauseToggleLabel}
+          </button>
+        </div>
+      ) : !prefersReducedMotion ? (
+        <button
+          type="button"
+          className="sr-only"
+          aria-pressed={autoPaused}
+          onClick={() => setAutoPaused((v) => !v)}
+        >
+          {pauseToggleAriaLabel}
+        </button>
+      ) : null}
 
       <div className="flex flex-col gap-8 sm:gap-10">
         {rowBlocks.map((block) => (
@@ -609,6 +683,7 @@ export default function TestimonialMarquee({ language, rowBlocks }: TestimonialM
             prefersReducedMotion={prefersReducedMotion}
             emptyPreview={block.emptyPreview}
             marqueeDirection={block.marqueeDirection}
+            autoPaused={autoPaused}
           />
         ))}
       </div>

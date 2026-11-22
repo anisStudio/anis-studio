@@ -21,6 +21,10 @@ function readEnv(): BookingGatewayEnv | null {
     turnstileSecret,
     allowWww: envFlag('TURNSTILE_ALLOW_WWW'),
     allowDevHosts: resolveDevHostAccess(supabaseUrl, envFlag('TURNSTILE_ALLOW_DEV_HOSTS')),
+    bookingOwnerEmail: Deno.env.get('BOOKING_OWNER_EMAIL') ?? undefined,
+    bookingEmailFrom: Deno.env.get('BOOKING_EMAIL_FROM') ?? undefined,
+    bookingEmailProvider: Deno.env.get('BOOKING_EMAIL_PROVIDER') ?? undefined,
+    resendApiKey: Deno.env.get('RESEND_API_KEY') ?? undefined,
   }
 }
 
