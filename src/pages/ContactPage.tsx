@@ -217,7 +217,7 @@ export default function ContactPage({ language }: ContactPageProps) {
                 <Link
                   key={item.to}
                   to={item.to}
-                  className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-[rgba(110,68,255,0.2)] bg-white/80 px-4 py-2.5 text-sm font-semibold text-[--color-primary] shadow-sm transition-all duration-200 hover:border-[--color-primary]/40 hover:bg-amethyst/5 dark:border-lavender/25 dark:bg-white/[0.06] dark:text-lavender dark:hover:bg-white/10"
+                  className="public-action inline-flex min-h-[44px] items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold"
                 >
                   {item.label}
                 </Link>

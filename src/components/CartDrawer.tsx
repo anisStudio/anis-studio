@@ -318,13 +318,10 @@ export default function CartDrawer({
 
                 {/* Checkout Button */}
                 <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                  className="public-action"
                   onClick={() => alert('Checkout functionality coming soon!')}
                   style={{
                     width: '100%',
-                    background: 'var(--gradient-primary)',
-                    color: 'white',
                     border: 'none',
                     borderRadius: 'var(--radius-lg)',
                     padding: 'var(--space-lg)',

@@ -229,7 +229,7 @@ export default function RegisterModal({ language }: RegisterModalProps) {
           <button
             type="submit"
             disabled={isSubmitting || isLoading}
-            className="btn btn-primary min-h-[48px] w-full py-3 text-base disabled:cursor-not-allowed disabled:opacity-50"
+            className="public-action btn btn-primary min-h-[48px] w-full py-3 text-base disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isSubmitting || isLoading 
               ? (language === 'hr' ? 'Registriranje...' : 'Signing up...')

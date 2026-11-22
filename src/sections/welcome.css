@@ -44,15 +44,12 @@
   color: var(--welcome-ink);
 }
 #welcome .welcome-panel p { color: var(--welcome-ink); }
-#welcome .welcome-primary { background: #563078; color: white; }
-#welcome a[href="#portfolio"] { background: rgb(var(--welcome-paper)); color: var(--welcome-ink); }
 .welcome-services > a {
   flex: 1 1 16rem;
   max-width: 32rem;
   background: rgb(var(--welcome-paper));
 }
-html:not(.dark) #portfolio button.border-amethyst,
-html:not(.dark) #kontakt a.px-10 { background: #563078; color: white; }
+html:not(.dark) #portfolio button.border-amethyst { background: var(--public-action-bg); color: white; }
 html:not(.dark) section[aria-labelledby="starlink-home-card-heading"] p.uppercase { color: #5c4766; }
 
 @media (max-width: 680px) {

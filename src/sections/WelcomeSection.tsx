@@ -109,19 +109,14 @@ export default function WelcomeSection({ language = 'hr' }: WelcomeSectionProps)
                 })
               }
               className="inline-flex min-h-[48px] w-full sm:w-auto items-center justify-center rounded-2xl px-6 py-3.5 sm:px-8 sm:py-4 text-sm sm:text-base font-semibold text-white
-                welcome-primary
-                hover:translate-y-[-1px] hover:shadow-[0_24px_70px_rgba(110,68,255,0.45)]
-                active:translate-y-0 transition-transform duration-200 will-change-transform">
+                public-action">
               {translations.ctaPrimary[language]}
             </Link>
 
             <a
               href="#portfolio"
               className="inline-flex min-h-[48px] w-full sm:w-auto items-center justify-center rounded-2xl px-6 py-3.5 sm:px-8 sm:py-4 text-sm sm:text-base font-semibold
-                text-plum/90 dark:text-pearl border border-amethyst/25 dark:border-lavender/20
-                bg-white/55 dark:bg-white/8 backdrop-blur-2xl
-                shadow-[0_10px_30px_rgba(0,0,0,0.06)]
-                hover:bg-white/70 dark:hover:bg-white/12 transition">
+                public-action">
               {translations.ctaSecondary[language]}
             </a>
           </div>

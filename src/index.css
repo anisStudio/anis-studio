@@ -12,6 +12,8 @@
 :root {
   --color-primary: #6E44FF;
   --color-primary-600: #5A2FE6;
+  --public-action-bg: #563078;
+  --public-action-hover: #482663;
   --color-ink: #2E2447;
   --color-ink-muted: #5c4d70;
   --pearl-0: 245 243 250;
@@ -901,12 +903,12 @@ html.dark body::before {
   }
   
   /* Filled actions retain white labels inside light sections with background imagery. */
-  html:not(.dark) .public-site .section-with-bg :is(a, button):is(.welcome-primary, .btn-primary, .bg-amethyst.text-white),
-  html:not(.dark) .public-site .section-with-bg :is(a, button):is(.welcome-primary, .btn-primary, .bg-amethyst.text-white) span {
+  html:not(.dark) .public-site .section-with-bg :is(a, button):is(.btn-primary, .bg-amethyst.text-white),
+  html:not(.dark) .public-site .section-with-bg :is(a, button):is(.btn-primary, .bg-amethyst.text-white) span {
     color: #fff !important;
   }
 
-  html:not(.dark) #interiors :is(.interiors-quote-action, .interiors-step-number) {
+  html:not(.dark) #interiors .interiors-step-number {
     color: #fff !important;
   }
 
@@ -1060,4 +1062,51 @@ html.dark .admin-scope p {
 
 @media (max-width: 767px) {
   .admin-scope article a { flex-wrap: wrap; gap: .25rem .5rem; overflow-wrap: anywhere; }
+}
+
+/* Public action buttons share the Interiors quote palette across both themes. */
+:is(.public-action, :root .public-site :is(
+  .btn-primary, .btn-secondary, .wa-prem-cta-secondary, .wa-cfg-btn,
+  .wa-cfg-nav-btn, .wa-submit, .wa-demo-card-link,
+  .interiors-form-submit, .interiors-upload-action
+)) {
+  background: var(--public-action-bg);
+  border-color: transparent;
+  color: #fff !important;
+  box-shadow: none;
+  filter: none;
+  transform: none;
+  transition: background-color 180ms ease;
+}
+
+:is(.public-action, :root .public-site :is(
+  .btn-primary, .btn-secondary, .wa-prem-cta-secondary, .wa-cfg-btn,
+  .wa-cfg-nav-btn, .wa-submit, .wa-demo-card-link,
+  .interiors-form-submit, .interiors-upload-action
+)) :is(span, svg) {
+  color: #fff !important;
+}
+
+@media (hover: hover) {
+  .public-action:hover:not(:disabled, [aria-disabled="true"]),
+  a:hover > .public-action,
+  :root .public-site :is(
+    .btn-primary, .btn-secondary, .wa-prem-cta-secondary, .wa-cfg-btn,
+    .wa-cfg-nav-btn, .wa-submit, .wa-demo-card-link,
+    .interiors-form-submit, .interiors-upload-action
+  ):hover:not(:disabled, [aria-disabled="true"], :has(input:disabled)) {
+    background: var(--public-action-hover);
+    filter: none;
+    transform: none;
+  }
+}
+
+.public-action:focus-visible,
+:root .public-site :is(
+  .btn-primary, .btn-secondary, .wa-prem-cta-secondary, .wa-cfg-btn,
+  .wa-cfg-nav-btn, .wa-submit, .wa-demo-card-link,
+  .interiors-form-submit, .interiors-upload-action
+):focus-visible {
+  outline: 2px solid #9875cc;
+  outline-offset: 3px;
 }

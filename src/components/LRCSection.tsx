@@ -360,7 +360,7 @@ export default function LRCSection({ language = 'hr', isFormEnabled = true }: LR
                   source: 'lrc-section',
                 })
               }
-              className="mt-4 inline-flex min-h-[42px] w-full max-w-[14rem] items-center justify-center rounded-xl border border-amethyst/30 bg-white/65 px-4 py-2 text-xs font-semibold text-plum/88 shadow-[0_4px_16px_rgba(46,36,71,0.06)] backdrop-blur-sm transition hover:border-[--color-primary]/45 hover:bg-white/85 dark:border-lavender/28 dark:bg-white/[0.08] dark:text-pearl dark:hover:bg-white/[0.12] sm:inline-flex sm:w-auto sm:text-sm"
+              className="public-action mt-4 inline-flex min-h-[42px] w-full max-w-[14rem] items-center justify-center rounded-xl px-4 py-2 text-xs font-semibold sm:inline-flex sm:w-auto sm:text-sm"
             >
               {translations.reviewCtaButton[language]}
             </Link>

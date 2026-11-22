@@ -522,7 +522,7 @@ export default function OstaviRecenzijuPage({ language }: OstaviRecenzijuPagePro
                         <button
                           type="submit"
                           disabled={isSubmitting}
-                          className="inline-flex min-h-[48px] w-full items-center justify-center rounded-xl bg-gradient-to-r from-[#6E44FF] to-[#8B6FFF] px-8 py-3 text-sm font-semibold text-white shadow-md transition-[filter,box-shadow] hover:brightness-[1.04] hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60 dark:from-[#6E44FF] dark:to-[#9D7FFF]"
+                          className="inline-flex min-h-[48px] w-full items-center justify-center public-action rounded-xl px-8 py-3 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60"
                         >
                           {isSubmitting ? t('submittingBtn') : t('submitBtn')}
                         </button>

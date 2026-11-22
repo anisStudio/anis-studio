@@ -157,15 +157,9 @@ html body .wa-form.wa-form.wa-form .wa-banner-ok * {
   color: #064e3b !important;
 }
 
-/* Submit button: white on amethyst (5.3:1) in every context */
 html body .wa-form.wa-form.wa-form .wa-submit {
-  background-color: var(--wa-accent) !important;
-  color: #ffffff !important;
+  color: #fff !important;
   border: 0;
-}
-
-html body .wa-form.wa-form.wa-form .wa-submit:hover:not(:disabled) {
-  background-color: #5a2fe6 !important;
 }
 
 html body .wa-form.wa-form.wa-form .wa-submit:focus-visible {

@@ -87,7 +87,7 @@ html body .wa-cfg.wa-cfg.wa-cfg input[type='number'] {
 }
 
 html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-btn {
-  background: linear-gradient(135deg, #bda6ff 0%, #6e44ff 100%) !important;
+  background: var(--public-action-bg);
   color: #ffffff !important;
   border: none;
   border-radius: 0.75rem;
@@ -193,8 +193,7 @@ html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-nav-btn {
   padding: 0.55rem 1rem;
   border-radius: 0.7rem;
   border: 1px solid var(--wa-cfg-border);
-  background: #ffffff !important;
-  color: var(--wa-cfg-ink) !important;
+  color: #fff !important;
   font-weight: 600;
   font-size: 0.875rem;
   cursor: pointer;
@@ -206,7 +205,7 @@ html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-nav-btn:disabled {
 }
 
 html body .wa-cfg.wa-cfg.wa-cfg .wa-cfg-nav-btn-primary {
-  background: linear-gradient(135deg, #bda6ff 0%, #6e44ff 100%) !important;
+  background: var(--public-action-bg);
   color: #ffffff !important;
   border: none;
 }

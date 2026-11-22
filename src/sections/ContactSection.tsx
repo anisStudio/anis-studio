@@ -171,11 +171,7 @@ export default function ContactSection({ language = 'hr' }: ContactSectionProps)
         <div className="mt-12 flex justify-center">
           <Link
             to="/kontakt"
-            className="inline-flex items-center justify-center rounded-2xl px-10 py-5 font-semibold text-white text-lg
-              bg-amethyst
-              hover:translate-y-[-2px]
-              active:translate-y-0 
-              transition-transform duration-200"
+            className="inline-flex items-center justify-center public-action rounded-2xl px-10 py-5 font-semibold text-lg"
           >
             {translations.ctaButton[language]}
           </Link>

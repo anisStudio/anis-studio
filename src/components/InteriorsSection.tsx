@@ -253,7 +253,7 @@ export default function InteriorsSection({ language }: InteriorsSectionProps) {
           </div>
           <Link
             to={INTERIORS_INQUIRY_HASH}
-            className="interiors-quote-action mx-auto mt-6 inline-flex min-h-[48px] w-full max-w-xs items-center justify-center rounded-xl bg-[#563078] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#482663] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amethyst dark:focus-visible:outline-lavender sm:w-auto"
+            className="public-action mx-auto mt-6 inline-flex min-h-[48px] w-full max-w-xs items-center justify-center rounded-xl px-6 py-3 text-sm font-semibold sm:w-auto"
           >
             {chooser.ctaAction[language]}
           </Link>
@@ -410,7 +410,7 @@ export default function InteriorsSection({ language }: InteriorsSectionProps) {
               onClick={() =>
                 trackEvent('interiors_portfolio_preview_click', { destination: '/#portfolio' })
               }
-              className="inline-flex min-h-[48px] w-full max-w-xs items-center justify-center rounded-xl border border-amethyst/25 bg-white/70 px-8 py-3.5 text-sm font-semibold text-plum/90 shadow-[0_8px_24px_rgba(46,36,71,0.08)] backdrop-blur-sm transition hover:border-[--color-primary]/40 hover:bg-white/90 hover:shadow-[0_12px_32px_rgba(110,68,255,0.12)] dark:border-lavender/25 dark:bg-white/10 dark:text-pearl dark:hover:bg-white/[0.14] dark:hover:shadow-[0_12px_40px_rgba(0,0,0,0.35)] sm:w-auto sm:min-w-[200px]"
+              className="public-action inline-flex min-h-[48px] w-full max-w-xs items-center justify-center rounded-xl px-8 py-3.5 text-sm font-semibold sm:w-auto sm:min-w-[200px]"
             >
               {previewCopy.allWork[language]}
             </a>
@@ -462,7 +462,7 @@ export default function InteriorsSection({ language }: InteriorsSectionProps) {
                 <p className="mx-auto mt-3 flex-1 text-sm leading-relaxed text-plum/76 dark:text-pearl/70 sm:text-[0.9375rem]">
                   {chooser.clientsText[language]}
                 </p>
-                <span className="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-[#6E44FF] to-[#8B6FFF] px-4 py-3 text-sm font-semibold text-white shadow-md transition-[transform,box-shadow] duration-300 group-hover:shadow-lg group-hover:brightness-[1.03] dark:from-[#6E44FF] dark:to-[#9D7FFF] sm:w-auto sm:self-center">
+                <span className="public-action mt-6 inline-flex w-full items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold sm:w-auto sm:self-center">
                   {chooser.clientAction[language]}
                   <span className="ml-1.5 transition-transform group-hover:translate-x-0.5" aria-hidden>
                     →
@@ -490,7 +490,7 @@ export default function InteriorsSection({ language }: InteriorsSectionProps) {
                 <p className="mx-auto mt-3 flex-1 text-sm leading-relaxed text-plum/76 dark:text-pearl/70 sm:text-[0.9375rem]">
                   {chooser.stolariText[language]}
                 </p>
-                <span className="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-[#6E44FF] to-[#8B6FFF] px-4 py-3 text-sm font-semibold text-white shadow-md transition-[transform,box-shadow] duration-300 group-hover:shadow-lg group-hover:brightness-[1.03] dark:from-[#6E44FF] dark:to-[#9D7FFF] sm:w-auto sm:self-center">
+                <span className="public-action mt-6 inline-flex w-full items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold sm:w-auto sm:self-center">
                   {chooser.carpenterAction[language]}
                   <span className="ml-1.5 transition-transform group-hover:translate-x-0.5" aria-hidden>
                     →
@@ -518,7 +518,7 @@ export default function InteriorsSection({ language }: InteriorsSectionProps) {
                   source: 'interiors-section',
                 })
               }
-              className="mt-4 inline-flex min-h-[42px] w-full max-w-[14rem] items-center justify-center rounded-xl border border-amethyst/30 bg-white/65 px-4 py-2 text-xs font-semibold text-plum/88 shadow-[0_4px_16px_rgba(46,36,71,0.06)] backdrop-blur-sm transition hover:border-[--color-primary]/45 hover:bg-white/85 dark:border-lavender/28 dark:bg-white/[0.08] dark:text-pearl dark:hover:bg-white/[0.12] sm:inline-flex sm:w-auto sm:text-sm"
+              className="public-action mt-4 inline-flex min-h-[42px] w-full max-w-[14rem] items-center justify-center rounded-xl px-4 py-2 text-xs font-semibold sm:inline-flex sm:w-auto sm:text-sm"
             >
               {reviewCta.button[language]}
             </Link>
