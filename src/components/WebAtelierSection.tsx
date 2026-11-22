@@ -7,6 +7,7 @@ import {
   packagePositioningLine,
 } from '../lib/webAtelierConfigurator'
 import { DecorativeSkyBackdrop } from './DecorativeSkyBackdrop'
+import { DepartmentStepCard } from './DepartmentStepCard'
 import { WebAtelierConfigurator } from './WebAtelierConfigurator'
 import { WebAtelierDemoPortfolio } from './webAtelierDemos/WebAtelierDemoPortfolio'
 import './interiors-panorama.css'
@@ -108,30 +109,33 @@ export default function WebAtelierSection({
       },
     ],
     journeyTitle: {
-      hr: 'Tri različita koraka — ne miješaju se',
-      en: 'Three distinct steps — not the same thing',
+      hr: 'Od upita do projekta',
+      en: 'From inquiry to project',
     },
     journeyIntro: {
-      hr: 'Upit, konzultacija i prihvat ponude nisu isto. Možete poslati upit i bez rezervacije termina.',
-      en: 'Inquiry, consultation, and offer acceptance are different. You can inquire without booking a slot.',
+      hr: 'Upit možete poslati i bez rezervacije termina. Projekt počinje nakon što prihvatite ponudu.',
+      en: 'You can send an inquiry without booking a consultation. The project starts after you accept the quote.',
     },
     journey: [
       {
-        title: { hr: '1. Upit za projekt', en: '1. Project inquiry' },
+        image: '/images/koraci-interijeri/upit.webp',
+        title: { hr: 'Upit za projekt', en: 'Project inquiry' },
         desc: {
           hr: 'Opis potrebe i preferirani paket. Dostupan u svakom trenutku.',
           en: 'Describe the need and preferred package. Available anytime.',
         },
       },
       {
-        title: { hr: '2. Konzultacija (opcionalno)', en: '2. Consultation (optional)' },
+        image: '/images/koraci-web-atelier/konzultacija.webp',
+        title: { hr: 'Konzultacija (opcionalno)', en: 'Consultation (optional)' },
         desc: {
-          hr: 'Termin za početak suradnje ako je potreban razgovor. Nije prihvat ponude.',
-          en: 'A start-of-cooperation slot when a call helps. Not offer acceptance.',
+          hr: 'Ako vam treba razgovor o projektu, možete rezervirati termin.',
+          en: 'If you would like to discuss your project, you can book a consultation.',
         },
       },
       {
-        title: { hr: '3. Ponuda i projekt', en: '3. Offer and project' },
+        image: '/images/koraci-web-atelier/ponuda.webp',
+        title: { hr: 'Ponuda i projekt', en: 'Offer and project' },
         desc: {
           hr: 'Konačna ponuda dolazi nakon pregleda. Projekt kreće tek nakon eksplicitnog prihvata.',
           en: 'A final quote follows review. A project starts only after explicit acceptance.',
@@ -269,12 +273,16 @@ export default function WebAtelierSection({
             <h2 id="wa-journey-title">{copy.journeyTitle[language]}</h2>
             <p>{copy.journeyIntro[language]}</p>
           </div>
-          <div className="wa-prem-journey">
-            {copy.journey.map((item) => (
-              <article key={item.title.hr}>
-                <h3>{item.title[language]}</h3>
-                <p>{item.desc[language]}</p>
-              </article>
+          <div className="mx-auto grid w-full max-w-5xl grid-cols-1 gap-4 sm:gap-5 md:grid-cols-3">
+            {copy.journey.map((item, index) => (
+              <DepartmentStepCard
+                key={item.image}
+                number={index + 1}
+                image={item.image}
+                title={item.title[language]}
+                description={item.desc[language]}
+                heading="h3"
+              />
             ))}
           </div>
         </section>

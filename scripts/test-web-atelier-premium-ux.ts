@@ -21,7 +21,7 @@ const robots = readFileSync(join(root, 'public/robots.txt'), 'utf8')
 assert.match(section, /wa-prem-hero/)
 assert.match(section, /Pošalji upit|Send inquiry/)
 assert.match(section, /#web-atelier-configurator/)
-assert.match(section, /Tri različita koraka|Three distinct steps/)
+assert.match(section, /Od upita do projekta|From inquiry to project/)
 assert.doesNotMatch(section, /garancija rangiranja|unlimited revisions|besplatno hosting/i)
 
 assert.match(configurator, /wa-cfg-progress/)

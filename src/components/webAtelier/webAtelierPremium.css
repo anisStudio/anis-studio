@@ -268,38 +268,6 @@
   color: var(--wa-ink-soft);
 }
 
-.wa-prem-journey {
-  display: grid;
-  gap: 0.75rem;
-}
-
-@media (min-width: 768px) {
-  .wa-prem-journey {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-.wa-prem-journey article {
-  border-radius: 1rem;
-  border: 1px solid var(--wa-line);
-  background: var(--wa-surface-strong);
-  padding: 1.1rem 1.15rem 1.2rem;
-}
-
-.wa-prem-journey h3 {
-  margin: 0;
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--wa-ink);
-}
-
-.wa-prem-journey p {
-  margin: 0.5rem 0 0;
-  font-size: 0.8125rem;
-  line-height: 1.55;
-  color: var(--wa-ink-soft);
-}
-
 .wa-prem-closing {
   border-radius: 1.25rem;
   border: 1px solid var(--wa-line);
