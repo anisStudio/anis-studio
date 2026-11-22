@@ -214,7 +214,7 @@ export function InteriorsCarpenterForm({ language = 'hr', vrEnabled = false }: I
     setExportFiles((prev) => prev.filter((_, i) => i !== index))
   }
 
-  function validate(v: CarpenterProjectFormValues): { isValid: boolean; errors: Record<string, string>; firstErrorField: string | null } {
+  function validate(v: CarpenterProjectFormValues, form: HTMLFormElement): { isValid: boolean; errors: Record<string, string>; firstErrorField: string | null } {
     const newErrors: Record<string, string> = {}
 
     if (!v.companyName.trim()) {
@@ -237,6 +237,12 @@ export function InteriorsCarpenterForm({ language = 'hr', vrEnabled = false }: I
     if (!v.location.trim()) {
       newErrors.location = language === 'hr' ? 'Grad / lokacija je obavezna' : 'City / location is required'
     }
+    const website = form.querySelector<HTMLInputElement>('#website')
+    if (website?.validity.typeMismatch) {
+      newErrors.website = language === 'hr'
+        ? 'Unesite cijelu web adresu, npr. https://example.com.'
+        : 'Enter the full website address, e.g. https://example.com.'
+    }
     if (!v.projectType) {
       newErrors.projectType = language === 'hr' ? 'Molimo odaberite tip projekta' : 'Please select project type'
     }
@@ -244,14 +250,21 @@ export function InteriorsCarpenterForm({ language = 'hr', vrEnabled = false }: I
       newErrors.contactPreference = language === 'hr' ? 'Molim te odaberi način kontaktiranja.' : 'Please select contact preference.'
     }
 
+    const vrClientCount = form.querySelector<HTMLInputElement>('#vrForClientsPerYear')
+    if (vrClientCount && !vrClientCount.validity.valid) {
+      newErrors.vrForClientsPerYear = language === 'hr'
+        ? 'Unesite cijeli broj veći od nule.'
+        : 'Enter a whole number greater than zero.'
+    }
+
     const firstErrorField = Object.keys(newErrors)[0] || null
     return { isValid: Object.keys(newErrors).length === 0, errors: newErrors, firstErrorField }
   }
 
-  async function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
 
-    const validation = validate(values)
+    const validation = validate(values, e.currentTarget)
     setErrors(validation.errors)
 
     if (!validation.isValid) {
@@ -264,8 +277,8 @@ export function InteriorsCarpenterForm({ language = 'hr', vrEnabled = false }: I
               `input[name="${validation.firstErrorField}"], select[name="${validation.firstErrorField}"], textarea[name="${validation.firstErrorField}"]`
             )
           if (field) {
-            (field as HTMLElement).focus()
-            field.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            (field as HTMLElement).focus({ preventScroll: true })
+            field.scrollIntoView({ block: 'center' })
           }
         }, 100)
       }
@@ -443,7 +456,7 @@ export function InteriorsCarpenterForm({ language = 'hr', vrEnabled = false }: I
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mx-auto max-w-3xl space-y-8 pb-1">
+    <form noValidate onSubmit={handleSubmit} className="mx-auto max-w-3xl space-y-8 pb-1">
       {/* Naslov */}
       <div className="space-y-2 text-center mb-6">
         <h2 className="text-xl font-semibold text-slate-900">
@@ -455,6 +468,10 @@ export function InteriorsCarpenterForm({ language = 'hr', vrEnabled = false }: I
             : 'Fill in the short form and we will get back to you with information as soon as possible.'}
         </p>
       </div>
+
+      <p className="text-sm text-plum/80 dark:text-pearl/80">
+        {language === 'hr' ? 'Polja označena zvjezdicom (*) obavezna su.' : 'Fields marked with an asterisk (*) are required.'}
+      </p>
 
       {/* 1. Podaci o firmi */}
       <fieldset className="space-y-4 rounded-2xl bg-white/70 dark:bg-white/8 p-5 sm:p-6 md:p-7 shadow-sm ring-1 ring-slate-100 dark:ring-slate-700/50">
@@ -470,12 +487,16 @@ export function InteriorsCarpenterForm({ language = 'hr', vrEnabled = false }: I
               type="text"
               id="companyName"
               name="companyName"
+              aria-required="true"
+              aria-invalid={Boolean(errors.companyName)}
+              aria-describedby={errors.companyName ? "carpenter-companyName-error" : undefined}
+              autoComplete="organization"
               className={`${inputClass} ${errors.companyName ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''}`}
               value={values.companyName}
               onChange={e => handleChange('companyName', e.target.value)}
             />
           </label>
-          {errors.companyName && <p className="text-xs text-red-500 mt-1">{errors.companyName}</p>}
+          {errors.companyName && <p id="carpenter-companyName-error" className="interiors-field-error mt-1 text-sm">{errors.companyName}</p>}
         </div>
 
         <div>
@@ -485,12 +506,16 @@ export function InteriorsCarpenterForm({ language = 'hr', vrEnabled = false }: I
               type="text"
               id="contactName"
               name="contactName"
+              aria-required="true"
+              aria-invalid={Boolean(errors.contactName)}
+              aria-describedby={errors.contactName ? "carpenter-contactName-error" : undefined}
+              autoComplete="name"
               className={`${inputClass} ${errors.contactName ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''}`}
               value={values.contactName}
               onChange={e => handleChange('contactName', e.target.value)}
             />
           </label>
-          {errors.contactName && <p className="text-xs text-red-500 mt-1">{errors.contactName}</p>}
+          {errors.contactName && <p id="carpenter-contactName-error" className="interiors-field-error mt-1 text-sm">{errors.contactName}</p>}
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -501,12 +526,16 @@ export function InteriorsCarpenterForm({ language = 'hr', vrEnabled = false }: I
                 type="email"
                 id="email"
                 name="email"
+                aria-required="true"
+                aria-invalid={Boolean(errors.email)}
+                aria-describedby={errors.email ? "carpenter-email-error" : undefined}
+                autoComplete="email"
                 className={`${inputClass} ${errors.email ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''}`}
                 value={values.email}
                 onChange={e => handleChange('email', e.target.value)}
               />
             </label>
-            {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
+            {errors.email && <p id="carpenter-email-error" className="interiors-field-error mt-1 text-sm">{errors.email}</p>}
           </div>
 
           <div>
@@ -516,12 +545,16 @@ export function InteriorsCarpenterForm({ language = 'hr', vrEnabled = false }: I
                 type="tel"
                 id="phone"
                 name="phone"
+                aria-required="true"
+                aria-invalid={Boolean(errors.phone)}
+                aria-describedby={errors.phone ? "carpenter-phone-error" : undefined}
+                autoComplete="tel"
                 className={`${inputClass} ${errors.phone ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''}`}
                 value={values.phone}
                 onChange={e => handleChange('phone', e.target.value)}
               />
             </label>
-            {errors.phone && <p className="text-xs text-red-500 mt-1">{errors.phone}</p>}
+            {errors.phone && <p id="carpenter-phone-error" className="interiors-field-error mt-1 text-sm">{errors.phone}</p>}
           </div>
         </div>
 
@@ -533,13 +566,16 @@ export function InteriorsCarpenterForm({ language = 'hr', vrEnabled = false }: I
                 type="text"
                 id="location"
                 name="location"
+                aria-required="true"
+                aria-invalid={Boolean(errors.location)}
+                aria-describedby={errors.location ? "carpenter-location-error" : undefined}
                 className={`${inputClass} ${errors.location ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''}`}
                 value={values.location}
                 onChange={e => handleChange('location', e.target.value)}
                 placeholder={language === 'hr' ? 'npr. Rijeka' : 'e.g. Rijeka'}
               />
             </label>
-            {errors.location && <p className="text-xs text-red-500 mt-1">{errors.location}</p>}
+            {errors.location && <p id="carpenter-location-error" className="interiors-field-error mt-1 text-sm">{errors.location}</p>}
           </div>
 
           <div>
@@ -549,12 +585,16 @@ export function InteriorsCarpenterForm({ language = 'hr', vrEnabled = false }: I
                 type="url"
                 id="website"
                 name="website"
+                aria-invalid={Boolean(errors.website)}
+                aria-describedby={errors.website ? "carpenter-website-error" : undefined}
+                autoComplete="url"
                 className={inputClass}
                 value={values.website}
                 onChange={e => handleChange('website', e.target.value)}
                 placeholder={language === 'hr' ? 'npr. https://example.com' : 'e.g. https://example.com'}
               />
             </label>
+            {errors.website && <p id="carpenter-website-error" className="interiors-field-error mt-1 text-sm">{errors.website}</p>}
           </div>
         </div>
       </fieldset>
@@ -572,6 +612,9 @@ export function InteriorsCarpenterForm({ language = 'hr', vrEnabled = false }: I
             <select
               id="projectType"
               name="projectType"
+              aria-required="true"
+              aria-invalid={Boolean(errors.projectType)}
+              aria-describedby={errors.projectType ? "carpenter-projectType-error" : undefined}
               value={values.projectType}
               onChange={e => handleChange('projectType', e.target.value)}
               className={`${selectClass} ${errors.projectType ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''}`}
@@ -587,7 +630,7 @@ export function InteriorsCarpenterForm({ language = 'hr', vrEnabled = false }: I
               <option value="drugo">Drugo</option>
             </select>
           </label>
-          {errors.projectType && <p className="text-xs text-red-500 mt-1">{errors.projectType}</p>}
+          {errors.projectType && <p id="carpenter-projectType-error" className="interiors-field-error mt-1 text-sm">{errors.projectType}</p>}
         </div>
 
         <div>
@@ -698,16 +741,16 @@ export function InteriorsCarpenterForm({ language = 'hr', vrEnabled = false }: I
         </p>
 
         <div>
-          <label className="block space-y-1 text-sm sm:text-base text-plum/90 dark:text-pearl">
+          <div className="space-y-1 text-sm sm:text-base text-plum/90 dark:text-pearl">
             <span>Skice / tlocrti / fotografije (PDF, slika...)</span>
             <div className="flex items-center gap-3 mt-2">
-              <label className="inline-flex cursor-pointer items-center rounded-full bg-violet-500 px-4 py-2 text-xs font-medium text-white shadow-sm hover:bg-violet-600">
+              <label className="interiors-upload-action inline-flex min-h-[44px] cursor-pointer items-center rounded-full bg-violet-700 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-violet-800">
                 Odaberi datoteke
                 <input
                   type="file"
                   accept=".pdf,image/*"
                   multiple
-                  className="hidden"
+                  className="sr-only"
                   onChange={handleKitchenSketchFilesChange}
                 />
               </label>
@@ -723,7 +766,7 @@ export function InteriorsCarpenterForm({ language = 'hr', vrEnabled = false }: I
                   <li key={`${file.name}-${file.size}-${index}`} className="flex items-center justify-between gap-2">
                     <span className="flex items-center gap-2">
                       <span className="inline-block h-1.5 w-1.5 rounded-full bg-violet-500" />
-                      <span className="font-medium">{file.name}</span>
+                      <span className="min-w-0 break-all font-medium">{file.name}</span>
                     </span>
                     <button
                       type="button"
@@ -737,20 +780,20 @@ export function InteriorsCarpenterForm({ language = 'hr', vrEnabled = false }: I
                 ))}
               </ul>
             )}
-          </label>
+          </div>
         </div>
 
         <div>
-          <label className="block space-y-1 text-sm sm:text-base text-plum/90 dark:text-pearl">
-            <span>3D export (npr. .fbx, .obj, .zip)</span>
+          <div className="space-y-1 text-sm sm:text-base text-plum/90 dark:text-pearl">
+            <span>3D datoteke (.fbx, .obj, .zip, .3ds, .skp)</span>
             <div className="flex items-center gap-3 mt-2">
-              <label className="inline-flex cursor-pointer items-center rounded-full bg-violet-500 px-4 py-2 text-xs font-medium text-white shadow-sm hover:bg-violet-600">
+              <label className="interiors-upload-action inline-flex min-h-[44px] cursor-pointer items-center rounded-full bg-violet-700 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-violet-800">
                 Odaberi datoteke
                 <input
                   type="file"
                   accept=".fbx,.obj,.zip,.3ds,.skp"
                   multiple
-                  className="hidden"
+                  className="sr-only"
                   onChange={handleCarpenterExportFilesChange}
                 />
               </label>
@@ -766,7 +809,7 @@ export function InteriorsCarpenterForm({ language = 'hr', vrEnabled = false }: I
                   <li key={`${file.name}-${file.size}-${index}`} className="flex items-center justify-between gap-2">
                     <span className="flex items-center gap-2">
                       <span className="inline-block h-1.5 w-1.5 rounded-full bg-violet-500" />
-                      <span className="font-medium">{file.name}</span>
+                      <span className="min-w-0 break-all font-medium">{file.name}</span>
                     </span>
                     <button
                       type="button"
@@ -780,7 +823,7 @@ export function InteriorsCarpenterForm({ language = 'hr', vrEnabled = false }: I
                 ))}
               </ul>
             )}
-          </label>
+          </div>
         </div>
       </fieldset>
 
@@ -797,6 +840,9 @@ export function InteriorsCarpenterForm({ language = 'hr', vrEnabled = false }: I
             <select
               id="contactPreference"
               name="contactPreference"
+              aria-required="true"
+              aria-invalid={Boolean(errors.contactPreference)}
+              aria-describedby={errors.contactPreference ? "carpenter-contactPreference-error" : undefined}
               className={`${selectClass} ${errors.contactPreference ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''}`}
               value={values.contactPreference}
               onChange={e => handleChange('contactPreference', e.target.value)}
@@ -808,7 +854,7 @@ export function InteriorsCarpenterForm({ language = 'hr', vrEnabled = false }: I
               <option value="viber">Viber</option>
             </select>
           </label>
-          {errors.contactPreference && <p className="text-xs text-red-500 mt-1">{errors.contactPreference}</p>}
+          {errors.contactPreference && <p id="carpenter-contactPreference-error" className="interiors-field-error mt-1 text-sm">{errors.contactPreference}</p>}
         </div>
 
         <div>
@@ -852,6 +898,9 @@ export function InteriorsCarpenterForm({ language = 'hr', vrEnabled = false }: I
                   <span>{language === 'hr' ? 'Za koliko klijenata godišnje bi ti otprilike trebao VR?' : 'For how many clients per year would you approximately need VR?'}</span>
                   <input
                     type="number"
+                    id="vrForClientsPerYear"
+                    aria-invalid={Boolean(errors.vrForClientsPerYear)}
+                    aria-describedby={errors.vrForClientsPerYear ? 'carpenter-vrForClientsPerYear-error' : undefined}
                     className={inputClass}
                     value={values.vrForClientsPerYear}
                     onChange={e => handleChange('vrForClientsPerYear', e.target.value)}
@@ -859,6 +908,11 @@ export function InteriorsCarpenterForm({ language = 'hr', vrEnabled = false }: I
                     min="1"
                   />
                 </label>
+                {errors.vrForClientsPerYear && (
+                  <p id="carpenter-vrForClientsPerYear-error" className="interiors-field-error mt-1 text-sm">
+                    {errors.vrForClientsPerYear}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -899,7 +953,7 @@ export function InteriorsCarpenterForm({ language = 'hr', vrEnabled = false }: I
         <button
           type="submit"
           disabled={isSubmitting}
-          className="inline-flex items-center justify-center rounded-full bg-violet-500 px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-violet-600 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-violet-300 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="interiors-form-submit inline-flex min-h-[44px] w-full items-center justify-center rounded-full bg-violet-700 sm:w-auto px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-violet-800 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-violet-300 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSubmitting
             ? (language === 'hr' ? 'Šaljem...' : 'Sending...')

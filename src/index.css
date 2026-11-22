@@ -910,6 +910,23 @@ html.dark body::before {
     color: #fff !important;
   }
 
+  .section-with-bg :is(.interiors-upload-action, .interiors-form-submit) {
+    color: #fff !important;
+  }
+
+  .interiors-upload-action:focus-within {
+    outline: 2px solid #8b5cf6;
+    outline-offset: 3px;
+  }
+
+  .section-with-bg .interiors-field-error {
+    color: #a31535 !important;
+  }
+
+  html.dark .section-with-bg .interiors-field-error {
+    color: #fda4af !important;
+  }
+
   /* Text shadows for readability on backgrounds */
   .text-shadow-strong {
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 20px rgba(0, 0, 0, 0.2);

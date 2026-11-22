@@ -567,8 +567,8 @@ export function InteriorsClientForm({ stolars: _stolarsUnused, onSubmit, languag
                        document.querySelector(`[name="${validation.firstErrorField}"]`) ||
                        document.querySelector(`input[name="${validation.firstErrorField}"], select[name="${validation.firstErrorField}"], textarea[name="${validation.firstErrorField}"]`)
           if (field) {
-            field.focus()
-            field.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            field.focus({ preventScroll: true })
+            field.scrollIntoView({ block: 'center' })
           }
         }, 100)
       }
@@ -776,7 +776,7 @@ export function InteriorsClientForm({ stolars: _stolarsUnused, onSubmit, languag
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mx-auto max-w-3xl space-y-8 pb-1">
+    <form noValidate onSubmit={handleSubmit} className="mx-auto max-w-3xl space-y-8 pb-1">
       {/* Naslov i podnaslov */}
       <div className="space-y-2 text-center mb-6">
         <h2 className="text-xl font-semibold text-plum/90 dark:text-pearl">
@@ -786,6 +786,10 @@ export function InteriorsClientForm({ stolars: _stolarsUnused, onSubmit, languag
           Ispunite formu s približnim dimenzijama u centimetrima, potrebama i opisom. Javit ćemo vam se u najkraćem mogućem roku.
         </p>
       </div>
+
+      <p className="text-sm text-plum/80 dark:text-pearl/80">
+        {language === 'hr' ? 'Polja označena zvjezdicom (*) obavezna su.' : 'Fields marked with an asterisk (*) are required.'}
+      </p>
 
       {/* Legenda za checkboxe i radio gumbe */}
       <p className="mb-4 text-xs text-slate-500 dark:text-slate-400">
@@ -807,13 +811,16 @@ export function InteriorsClientForm({ stolars: _stolarsUnused, onSubmit, languag
               type="text"
               id="clientName"
               name="clientName"
+              aria-required="true"
+              aria-invalid={Boolean(errors.clientName)}
+              aria-describedby={errors.clientName ? "client-clientName-error" : undefined}
               className={`${inputClass} ${errors.clientName ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''}`}
               value={values.clientName}
               onChange={e => handleChange('clientName', e.target.value)}
             />
           </label>
           {errors.clientName && (
-            <p className="text-xs text-red-500 mt-1">{errors.clientName}</p>
+            <p id="client-clientName-error" className="interiors-field-error mt-1 text-sm">{errors.clientName}</p>
           )}
         </div>
 
@@ -824,13 +831,17 @@ export function InteriorsClientForm({ stolars: _stolarsUnused, onSubmit, languag
               type="email"
               id="email"
               name="email"
+              aria-required="true"
+              aria-invalid={Boolean(errors.email)}
+              aria-describedby={errors.email ? "client-email-error" : undefined}
+              autoComplete="email"
               className={`${inputClass} ${errors.email ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''}`}
               value={values.email}
               onChange={e => handleChange('email', e.target.value)}
             />
           </label>
           {errors.email && (
-            <p className="text-xs text-red-500 mt-1">{errors.email}</p>
+            <p id="client-email-error" className="interiors-field-error mt-1 text-sm">{errors.email}</p>
           )}
         </div>
 
@@ -841,6 +852,10 @@ export function InteriorsClientForm({ stolars: _stolarsUnused, onSubmit, languag
               type="tel"
               id="phone"
               name="phone"
+              aria-required="true"
+              aria-invalid={Boolean(errors.phone)}
+              aria-describedby={errors.phone ? "client-phone-error" : undefined}
+              autoComplete="tel"
               className={`${inputClass} ${errors.phone ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''}`}
               value={values.phone}
               onChange={e => handleChange('phone', e.target.value)}
@@ -848,7 +863,7 @@ export function InteriorsClientForm({ stolars: _stolarsUnused, onSubmit, languag
             />
           </label>
           {errors.phone && (
-            <p className="text-xs text-red-500 mt-1">{errors.phone}</p>
+            <p id="client-phone-error" className="interiors-field-error mt-1 text-sm">{errors.phone}</p>
           )}
         </div>
 
@@ -902,6 +917,9 @@ export function InteriorsClientForm({ stolars: _stolarsUnused, onSubmit, languag
               <select
                 id="projectType"
                 name="projectType"
+                aria-required="true"
+                aria-invalid={Boolean(errors.projectType)}
+                aria-describedby={errors.projectType ? "client-projectType-error" : undefined}
                 value={values.projectType}
                 onChange={e => handleChange('projectType', e.target.value)}
                 className={`${selectClass} ${errors.projectType ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''}`}
@@ -918,7 +936,7 @@ export function InteriorsClientForm({ stolars: _stolarsUnused, onSubmit, languag
               </select>
             </label>
             {errors.projectType && (
-              <p className="text-xs text-red-500 mt-1">{errors.projectType}</p>
+              <p id="client-projectType-error" className="interiors-field-error mt-1 text-sm">{errors.projectType}</p>
             )}
           </div>
 
@@ -929,13 +947,16 @@ export function InteriorsClientForm({ stolars: _stolarsUnused, onSubmit, languag
                 type="text"
                 id="location"
                 name="location"
+                aria-required="true"
+                aria-invalid={Boolean(errors.location)}
+                aria-describedby={errors.location ? "client-location-error" : undefined}
                 value={values.location}
                 onChange={e => handleChange('location', e.target.value)}
                 className={`${inputClass} ${errors.location ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''}`}
               />
             </label>
             {errors.location && (
-              <p className="text-xs text-red-500 mt-1">{errors.location}</p>
+              <p id="client-location-error" className="interiors-field-error mt-1 text-sm">{errors.location}</p>
             )}
           </div>
 
@@ -1007,22 +1028,22 @@ export function InteriorsClientForm({ stolars: _stolarsUnused, onSubmit, languag
         {values.hasPlan === 'plan' && (
           <div className="space-y-2">
             <p className="block text-sm font-medium text-plum/90 dark:text-pearl">
-              Tlocrt prostora (PDF ili slika)
+              Tlocrt prostora (opcionalno)
             </p>
             <p className="text-xs text-slate-500">
-              Možeš učitati više datoteka (preporučeno 3–5, PDF ili slike).
+              {language === 'hr' ? 'Možete priložiti više PDF datoteka ili slika.' : 'You can attach multiple PDFs or images.'}
             </p>
 
             <div className="flex items-center gap-3 mt-2">
               {/* Gumb za tlocrt – isti stil kao inspiracije */}
-              <label className="inline-flex cursor-pointer items-center rounded-full bg-violet-500 px-4 py-2 text-xs font-medium text-white shadow-sm hover:bg-violet-600">
+              <label className="interiors-upload-action inline-flex min-h-[44px] cursor-pointer items-center rounded-full bg-violet-700 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-violet-800">
                 Odaberi datoteke
                 <input
                   id="plan-file-input"
                   type="file"
                   accept=".pdf,image/*"
                   multiple
-                  className="hidden"
+                  className="sr-only"
                   onChange={(e) => handleFileChange(e, 'planFile')}
                 />
               </label>
@@ -1034,7 +1055,7 @@ export function InteriorsClientForm({ stolars: _stolarsUnused, onSubmit, languag
                   <li key={`${name}-${i}`} className="flex items-center justify-between gap-2">
                     <span className="flex items-center gap-2">
                       <span className="inline-block h-1.5 w-1.5 rounded-full bg-violet-500" />
-                      <span className="font-medium">{name}</span>
+                      <span className="min-w-0 break-all font-medium">{name}</span>
                     </span>
                     <button
                       type="button"
@@ -1054,25 +1075,25 @@ export function InteriorsClientForm({ stolars: _stolarsUnused, onSubmit, languag
         {(values.hasPlan === 'photos' || values.hasPlan === 'none') && (
           <div className="space-y-2">
             <p className="block text-sm sm:text-base font-medium text-plum/90 dark:text-pearl">
-              Učitaj fotografije prostora
+              Fotografije prostora (opcionalno)
             </p>
             <div className="flex flex-wrap items-center gap-3">
               <label
                 htmlFor="interiors-space-photo-input"
-                className="inline-flex cursor-pointer items-center rounded-full bg-violet-500 px-4 py-2 text-xs font-medium text-white shadow-sm hover:bg-violet-600"
+                className="interiors-upload-action inline-flex min-h-[44px] cursor-pointer items-center rounded-full bg-violet-700 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-violet-800"
               >
                 Odaberi datoteke
+                <input
+                  id="interiors-space-photo-input"
+                  type="file"
+                  accept="image/jpeg,image/png,image/jpg,.jpg,.jpeg,.png"
+                  className="sr-only"
+                  multiple
+                  onChange={(e) => handleFileChange(e, 'photoFiles')}
+                />
               </label>
-              <input
-                id="interiors-space-photo-input"
-                type="file"
-                accept="image/jpeg,image/png,image/jpg,.jpg,.jpeg,.png"
-                className="hidden"
-                multiple
-                onChange={(e) => handleFileChange(e, 'photoFiles')}
-              />
               <span className="text-xs text-slate-500">
-                Možeš u jednom koraku odabrati više slika ili više puta pritisnuti gumb — sve se zbraja na listu ispod.
+                {language === 'hr' ? 'JPG, JPEG ili PNG. Možete ih dodati odjednom ili u više odabira.' : 'JPG, JPEG or PNG. You can add them all at once or in several selections.'}
               </span>
             </div>
             <div className="text-xs text-slate-600 dark:text-slate-400">
@@ -1208,10 +1229,10 @@ export function InteriorsClientForm({ stolars: _stolarsUnused, onSubmit, languag
             <p>Učitaj slike inspiracije (npr. Pinterest, Instagram)</p>
             <div className="flex flex-wrap items-center gap-3">
               <label
-                className={`inline-flex items-center rounded-full px-4 py-2 text-xs font-medium text-white shadow-sm ${
+                className={`interiors-upload-action inline-flex min-h-[44px] items-center rounded-full px-4 py-2 text-sm font-medium text-white shadow-sm ${
                   inspirationLimitReached
                     ? 'cursor-not-allowed bg-violet-300 opacity-70 dark:bg-violet-800'
-                    : 'cursor-pointer bg-violet-500 hover:bg-violet-600'
+                    : 'cursor-pointer bg-violet-700 hover:bg-violet-800'
                 }`}
               >
                 {inspirationLimitReached ? 'Limit dosegnut' : 'Odaberi datoteke'}
@@ -1219,7 +1240,7 @@ export function InteriorsClientForm({ stolars: _stolarsUnused, onSubmit, languag
                   id="inspiration-file-input"
                   type="file"
                   accept="image/jpeg,image/png,.jpg,.jpeg,.png"
-                  className="hidden"
+                  className="sr-only"
                   multiple
                   disabled={inspirationLimitReached}
                   onChange={e => handleFileChange(e, 'inspirationFiles')}
@@ -1269,17 +1290,20 @@ export function InteriorsClientForm({ stolars: _stolarsUnused, onSubmit, languag
               </div>
             )}
             {errors.inspirationFiles ? (
-              <p className="mt-1 text-xs text-red-500">{errors.inspirationFiles}</p>
+              <p role="alert" className="interiors-field-error mt-1 text-sm">{errors.inspirationFiles}</p>
             ) : null}
           </div>
         </div>
 
         <div>
           <label className="block space-y-1 text-sm sm:text-base text-plum/90 dark:text-pearl">
-            <span>Opiši svojim riječima što ti je najvažnije u ovom prostoru</span>
+            <span>{language === 'hr' ? 'Opišite što vam je najvažnije u ovom prostoru *' : 'Describe what matters most to you in this space *'}</span>
             <textarea
               id="projectNote"
               name="projectNote"
+              aria-required="true"
+              aria-invalid={Boolean(errors.projectNote)}
+              aria-describedby={errors.projectNote ? "client-projectNote-error" : undefined}
               value={values.projectNote}
               className={`${textareaClass} ${errors.projectNote ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''}`}
               onChange={e => handleChange('projectNote', e.target.value)}
@@ -1289,7 +1313,7 @@ export function InteriorsClientForm({ stolars: _stolarsUnused, onSubmit, languag
             <span className="text-xs text-slate-500">Najmanje 10 znakova. Opišite detaljno što želite postići u ovom prostoru.</span>
           </label>
           {errors.projectNote && (
-            <p className="text-xs text-red-500 mt-1">{errors.projectNote}</p>
+            <p id="client-projectNote-error" className="interiors-field-error mt-1 text-sm">{errors.projectNote}</p>
           )}
         </div>
 
@@ -1346,7 +1370,7 @@ export function InteriorsClientForm({ stolars: _stolarsUnused, onSubmit, languag
         <button
           type="submit"
           disabled={isSubmitting}
-          className="inline-flex items-center justify-center rounded-full bg-violet-500 px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-violet-600 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-violet-300 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="interiors-form-submit inline-flex min-h-[44px] w-full items-center justify-center rounded-full bg-violet-700 sm:w-auto px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-violet-800 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-violet-300 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSubmitting ? (language === 'hr' ? 'Šaljem...' : 'Sending...') : (language === 'hr' ? 'Pošalji upit za projekt' : 'Send project inquiry')}
         </button>
