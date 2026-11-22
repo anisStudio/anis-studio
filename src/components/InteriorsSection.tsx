@@ -240,7 +240,7 @@ export default function InteriorsSection({ language }: InteriorsSectionProps) {
       <div className="relative z-10 mx-auto flex min-w-0 w-full max-w-6xl flex-col px-0">
         {/* Section Header — single centered column */}
         <div className="mx-auto mb-10 w-full text-center sm:mb-12">
-          <header className="interiors-panorama mb-4">
+          <header className="department-panorama interiors-panorama mb-4">
             <h1 className="font-heading font-bold tracking-tight">{translations.title[language]}</h1>
           </header>
           <p className="mx-auto mb-2 max-w-2xl text-lg font-semibold italic leading-snug text-amethyst dark:text-lavender sm:text-xl">

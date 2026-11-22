@@ -21,24 +21,21 @@
   --atrium-image: url('/images/atrij/wa-sumrak.webp');
 }
 
-.interiors-panorama,
 .department-panorama {
   --atrium-panel: rgba(248, 245, 252, .95);
   padding: clamp(2rem, 4vw, 4rem) 1rem;
   background: var(--atrium-image) center 48% / cover no-repeat;
   border-radius: 1.25rem;
-}
-.dark :is(.interiors-panorama, .department-panorama) {
-  --atrium-panel: rgba(26, 17, 43, .95);
-}
-
-.department-panorama {
   display: grid;
   align-content: center;
   min-height: clamp(13rem, 33vw, 25rem);
 }
 
-:is(.interiors-panorama, .department-panorama) h1 {
+.dark .department-panorama {
+  --atrium-panel: rgba(26, 17, 43, .95);
+}
+
+.department-panorama h1 {
   width: fit-content;
   margin: 0 auto;
   padding: .8em 1em;
@@ -46,14 +43,6 @@
   background: var(--atrium-panel);
   font-size: clamp(1.5rem, 3vw, 2.5rem);
   text-wrap: balance;
-}
-@media (max-width: 680px) {
-  .interiors-panorama {
-    padding: 8rem 0 0;
-    background-position: center top;
-    background-size: 100% auto;
-  }
-  .interiors-panorama h1 { width: 100%; }
 }
 
 @media (max-width: 680px) {
