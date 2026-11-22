@@ -8,11 +8,10 @@ interface InteriorsFormPageLayoutProps {
   title: string
   introduction: string
   panoramaSrc: string
-  fullPanoramaOnMobile?: boolean
   children: ReactNode
 }
 
-export function InteriorsFormPageLayout({ language, title, introduction, panoramaSrc, fullPanoramaOnMobile = false, children }: InteriorsFormPageLayoutProps) {
+export function InteriorsFormPageLayout({ language, title, introduction, panoramaSrc, children }: InteriorsFormPageLayoutProps) {
   const backLabel = language === 'hr' ? 'Natrag na odabir vrste upita' : 'Back to inquiry types'
 
   return (
@@ -37,9 +36,7 @@ export function InteriorsFormPageLayout({ language, title, introduction, panoram
             width={764}
             height={578}
             decoding="async"
-            className={`mt-2 block w-full rounded-2xl object-cover dark:brightness-90 sm:aspect-[8/5] sm:h-auto sm:object-center ${
-              fullPanoramaOnMobile ? 'h-auto' : 'h-28 object-[center_62%]'
-            }`}
+            className="mt-2 block h-28 w-full rounded-2xl object-cover object-[center_62%] dark:brightness-90 sm:aspect-[3/1] sm:h-auto"
           />
           <h1 className="mt-5 font-heading text-2xl font-bold tracking-tight text-balance text-plum/90 dark:text-pearl sm:text-3xl">
             {title}
