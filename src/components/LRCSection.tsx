@@ -41,31 +41,12 @@ export default function LRCSection({ language = 'hr', isFormEnabled = true }: LR
   })
 
   const translations = {
-    title: {
-      hr: "Ani's LRC — Personalizirani ručni radovi",
-      en: "Ani's LRC — Personalized handmade work",
-    },
+    title: { hr: 'Pokloni s osobnim potpisom', en: 'Gifts with a personal touch' },
     browse: { hr: 'Pogledaj ponudu', en: 'Browse the catalog' },
     noResults: { hr: 'Nema proizvoda za odabranu pretragu.', en: 'No products match your search.' },
-    lrcBadge: {
-      hr: {
-        line1: 'LRC = Laser Resin Crafting',
-        line2: '(lasersko graviranje + epoksidna smola)',
-      },
-      en: {
-        line1: 'LRC = Laser Resin Crafting',
-        line2: '(laser engraving + epoxy resin)',
-      },
-    },
-    bridge: {
-      hr: [
-        "Ani's LRC je radionica personaliziranih ručnih radova — od poklona i dekoracija do funkcionalnih predmeta za posebne prilike i svakodnevnu upotrebu.",
-        'Možeš odabrati proizvod iz ponude i prilagoditi ga gravurom, bojama, materijalima ili detaljima, a možeš i poslati svoju ideju za potpuno unikatan komad.',
-      ],
-      en: [
-        "Ani's LRC is a workshop for personalized handmade pieces — from gifts and decorations to functional items for special occasions and everyday use.",
-        'You can pick a product from the catalog and tailor it with engraving, colors, materials, or details — or send your own idea for a completely unique piece.',
-      ],
+    lead: {
+      hr: 'Personalizirajte poklon gravurom, bojom ili materijalom. U radionici spajamo lasersko graviranje i epoksidnu smolu, a možemo izraditi i komad prema vašoj ideji.',
+      en: 'Personalize a gift with engraving, color, or material. We combine laser engraving and epoxy resin in our workshop and can make a piece based on your idea.',
     },
     offerTitle: {
       hr: 'Ponuda proizvoda',
@@ -176,37 +157,33 @@ export default function LRCSection({ language = 'hr', isFormEnabled = true }: LR
       </div>
 
       <div className="relative z-10 mx-auto min-w-0 max-w-6xl">
-        <header className="relative isolate mb-10 overflow-hidden rounded-3xl border border-amethyst/15 bg-white/60 px-5 py-8 text-center dark:border-lavender/20 dark:bg-[#1c1530] sm:mb-14 sm:px-8 sm:py-12">
-          <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 hidden bg-contain bg-top bg-no-repeat sm:block sm:bg-[url('/lrc_image/bg-lrc-hero-light.webp')] dark:sm:bg-[url('/lrc_image/bg-lrc-hero-dark.webp')]" />
-          <div className="mx-auto max-w-2xl sm:rounded-2xl sm:bg-white/85 sm:px-6 sm:py-5 sm:dark:bg-[#1c1530]/90">
-            <img
-              src="/images/odjeli/poklon.webp"
-              alt=""
-              className="mx-auto mb-3 h-20 w-24 object-contain sm:h-24 sm:w-28"
-            />
-            <p className="mb-2 text-sm font-semibold text-amethyst dark:text-lavender">
-              {translations.lrcBadge[language].line1}
-            </p>
-            <h1 className="font-heading text-2xl font-bold tracking-tight text-balance text-plum dark:text-pearl sm:text-4xl">
+        <header className="mb-10 grid overflow-hidden rounded-3xl border border-amethyst/15 bg-[#eee6f7] dark:border-lavender/20 dark:bg-[#1c1530] sm:mb-14 md:grid-cols-[1fr_1.12fr]">
+          <div className="flex min-w-0 flex-col justify-center px-5 py-7 sm:px-8 md:py-10 lg:px-12">
+            <p className="mb-3 text-sm font-bold text-plum dark:text-pearl">Ani’s LRC</p>
+            <h1 className="font-heading text-[clamp(1.75rem,4.5vw,3rem)] font-bold leading-tight tracking-tight text-plum dark:text-pearl">
               {translations.title[language]}
             </h1>
-            <div className="mt-4 space-y-2">
-              {translations.bridge[language].map((paragraph) => (
-                <p key={paragraph} className="text-base leading-relaxed text-plum dark:text-pearl">
-                  {paragraph}
-                </p>
-              ))}
-            </div>
-            <div className="mt-5 flex flex-wrap justify-center gap-3">
-              <a href="#lrc-ponuda" className="btn btn-primary min-h-11">
+            <p className="mt-4 max-w-xl text-base leading-relaxed text-plum dark:text-pearl">
+              {translations.lead[language]}
+            </p>
+            <div className="mt-5 flex flex-col flex-wrap gap-3 sm:flex-row">
+              <a href="#lrc-ponuda" className="btn btn-primary min-h-12 justify-center">
                 {translations.browse[language]}
               </a>
               {isFormEnabled && (
-                <Link to="/lrc/upit" className="btn btn-secondary min-h-11">
+                <Link to="/lrc/upit" className="btn btn-secondary min-h-12 justify-center">
                   {translations.formCtaButton[language]}
                 </Link>
               )}
             </div>
+          </div>
+          <div className="relative -order-1 aspect-[16/9] md:order-none md:aspect-auto">
+            <img
+              src="/images/zaglavlja/lrc-radionica.webp"
+              alt=""
+              fetchPriority="high"
+              className="absolute inset-0 h-full w-full object-cover dark:brightness-90"
+            />
           </div>
         </header>
 

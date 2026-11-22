@@ -24,12 +24,12 @@ export default function WebAtelierSection({
   const copy = {
     kicker: { hr: "Ani's Web Atelier", en: "Ani's Web Atelier" },
     h1: {
-      hr: 'Web stranice koje jasno predstavljaju vaš obrt i pozivaju na kontakt',
-      en: 'Websites that clearly present your craft and invite contact',
+      hr: 'Web stranice za male obrte',
+      en: 'Websites for small businesses',
     },
     lead: {
-      hr: 'Za male obrte, poduzetnike i brendove kojima treba uredna, profesionalna web prisutnost — bez tehničkog kaosa i bez pretjeranih obećanja.',
-      en: 'For small businesses, entrepreneurs, and brands that need a tidy, professional web presence — without technical chaos or overstated promises.',
+      hr: 'Predstavite svoju ponudu na računalu i mobitelu. Pogledajte primjere dizajna i procijenite opseg projekta u konfiguratoru.',
+      en: 'Present your services on desktop and mobile. Explore design examples and estimate your project scope in the configurator.',
     },
     ctaPrimary: { hr: 'Pošalji upit', en: 'Send inquiry' },
     ctaSecondary: { hr: 'Procijeni projekt', en: 'Estimate your project' },
@@ -168,8 +168,8 @@ export default function WebAtelierSection({
       </div>
 
       <div className="relative z-10 mx-auto w-full min-w-0 max-w-6xl px-1 sm:px-0">
-        <div className="wa-prem-hero">
-          <div>
+        <header className="wa-prem-hero">
+          <div className="flex min-w-0 flex-col justify-center px-5 py-7 sm:px-8 md:py-10 lg:px-12">
             <p className="wa-prem-kicker">{copy.kicker[language]}</p>
             <h1 className="font-heading font-bold">{copy.h1[language]}</h1>
             <p className="wa-prem-lead">{copy.lead[language]}</p>
@@ -204,27 +204,31 @@ export default function WebAtelierSection({
             </div>
           </div>
 
-          <aside className="wa-prem-hero-panel" aria-labelledby="wa-hero-panel-title">
+          <div className="relative -order-1 aspect-[16/9] md:order-none md:aspect-auto">
             <img
-              src="/images/odjeli/racunalo.webp"
+              src="/images/zaglavlja/web-atelier.webp"
               alt=""
-              className="mx-auto mb-4 h-24 w-40 object-contain sm:h-32 sm:w-52"
+              fetchPriority="high"
+              className="absolute inset-0 h-full w-full object-cover dark:brightness-90"
             />
-            <h2 id="wa-hero-panel-title" className="font-heading">{copy.panelTitle[language]}</h2>
-            <ul className="wa-prem-hero-list">
-              {copy.panelItems.map((item, index) => (
-                <li key={item.hr}>
-                  <span aria-hidden="true">{index + 1}</span>
-                  <p className="m-0">{item[language]}</p>
-                </li>
-              ))}
-            </ul>
-          </aside>
-        </div>
+          </div>
+        </header>
 
         <div className="wa-prem-section mx-auto max-w-6xl">
           <WebAtelierDemoPortfolio language={language} enableInquiryLinks={enableInquiryLinks} />
         </div>
+
+        <aside className="wa-prem-hero-panel mx-auto mt-6 max-w-2xl" aria-labelledby="wa-hero-panel-title">
+          <h2 id="wa-hero-panel-title" className="font-heading">{copy.panelTitle[language]}</h2>
+          <ul className="wa-prem-hero-list">
+            {copy.panelItems.map((item, index) => (
+              <li key={item.hr}>
+                <span aria-hidden="true">{index + 1}</span>
+                <p className="m-0">{item[language]}</p>
+              </li>
+            ))}
+          </ul>
+        </aside>
 
         <section className="wa-prem-section" aria-labelledby="wa-services-title">
           <div className="wa-prem-section-head">
