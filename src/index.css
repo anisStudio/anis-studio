@@ -906,6 +906,10 @@ html.dark body::before {
     color: #fff !important;
   }
 
+  html:not(.dark) #interiors :is(.interiors-quote-action, .interiors-step-number) {
+    color: #fff !important;
+  }
+
   /* Text shadows for readability on backgrounds */
   .text-shadow-strong {
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 20px rgba(0, 0, 0, 0.2);

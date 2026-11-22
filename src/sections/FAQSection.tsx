@@ -288,9 +288,14 @@ export default function FAQSection({
                   : 'mb-2 inline-flex items-center gap-2'
               }
             >
-              <span className="text-2xl text-pink-500" aria-hidden>
-                ❓
-              </span>
+              <img
+                src="/images/faq/ametist-upitnik.webp"
+                alt=""
+                width={48}
+                height={48}
+                decoding="async"
+                className="h-10 w-10 shrink-0 bg-transparent object-contain sm:h-12 sm:w-12"
+              />
               <h2
                 className={
                   standalonePage

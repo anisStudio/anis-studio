@@ -253,7 +253,7 @@ export default function InteriorsSection({ language }: InteriorsSectionProps) {
           </div>
           <Link
             to={INTERIORS_INQUIRY_HASH}
-            className="mx-auto mt-6 inline-flex min-h-[48px] w-full max-w-xs items-center justify-center rounded-xl bg-[#563078] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#482663] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amethyst dark:focus-visible:outline-lavender sm:w-auto"
+            className="interiors-quote-action mx-auto mt-6 inline-flex min-h-[48px] w-full max-w-xs items-center justify-center rounded-xl bg-[#563078] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#482663] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amethyst dark:focus-visible:outline-lavender sm:w-auto"
           >
             {chooser.ctaAction[language]}
           </Link>
@@ -272,7 +272,7 @@ export default function InteriorsSection({ language }: InteriorsSectionProps) {
               key={step.number} 
               className="relative flex w-full flex-col items-center rounded-2xl border border-[rgba(110,68,255,0.15)] bg-[rgba(248,246,255,0.72)] p-5 text-center shadow-sm backdrop-blur-sm dark:border-lavender/15 dark:bg-white/8 dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)] fade-in"
             >
-              <div className="absolute left-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-[#563078] dark:bg-[#6d4491] text-sm font-bold text-white shadow-md">
+              <div className="interiors-step-number absolute left-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-[#563078] dark:bg-[#6d4491] text-sm font-bold text-white shadow-md">
                 {step.number}
               </div>
 
