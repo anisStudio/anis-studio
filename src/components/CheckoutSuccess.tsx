@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { CONTACT_INFO } from '../config/contact'
 import { handleCheckoutSuccess } from '../lib/stripe'
 
 interface CheckoutSuccessProps {
@@ -39,7 +40,7 @@ export default function CheckoutSuccess({ isOpen, onClose, language }: CheckoutS
       continueShopping: 'Nastavi kupovinu',
       orderNumber: 'Broj narudžbe',
       estimatedDelivery: 'Procijenjena dostava',
-      contactInfo: 'Za pitanja o narudžbi kontaktirajte nas na info.anilrc@gmail.com'
+      contactInfo: `Za pitanja o narudžbi kontaktirajte nas na ${CONTACT_INFO.email}`
     },
     en: {
       title: 'Thank you for your purchase!',
@@ -48,7 +49,7 @@ export default function CheckoutSuccess({ isOpen, onClose, language }: CheckoutS
       continueShopping: 'Continue Shopping',
       orderNumber: 'Order Number',
       estimatedDelivery: 'Estimated Delivery',
-      contactInfo: 'For questions about your order, contact us at info.anilrc@gmail.com'
+      contactInfo: `For questions about your order, contact us at ${CONTACT_INFO.email}`
     }
   }
 

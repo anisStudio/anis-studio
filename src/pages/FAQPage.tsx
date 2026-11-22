@@ -90,8 +90,8 @@ const GLOBAL_FAQ_ITEMS: FAQItem[] = [
       en: 'How does communication look during the project?'
     },
     answer: {
-      hr: 'E-mail za službenu komunikaciju i slanje materijala. WhatsApp / Viber / Slack za brze provjere (po dogovoru). Zoom / Google Meet za ključne faze (brief, prezentacija koncepta, završni walkthrough). Na početku dogovaramo glavni kanal i okvirni ritam javljanja.',
-      en: 'Email for official communication and sending materials. WhatsApp / Viber / Slack for quick checks (by agreement). Zoom / Google Meet for key phases (brief, concept presentation, final walkthrough). At the beginning, we agree on the main channel and approximate communication rhythm.'
+      hr: 'Razgovaramo putem weba Ani’s Studio. Po dogovoru možemo se javiti i putem WhatsAppa ili Vibera.',
+      en: 'We communicate through the Ani’s Studio website. We can also use WhatsApp or Viber by arrangement.',
     }
   }
 ]

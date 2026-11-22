@@ -1,6 +1,7 @@
 import { ErrorBoundary } from '../ErrorBoundary'
 import { AnimatedPage } from '../components/AnimatedPage'
 import { InteriorsFormPageLayout } from '../components/InteriorsFormPageLayout'
+import { PublicConsultationBooking } from '../components/PublicConsultationBooking'
 import { InteriorsCarpenterForm } from '../components/InteriorsCarpenterForm'
 import { PageSEO } from '../components/PageSEO'
 import { InteriorsSettingsLoading } from '../components/InteriorsSettingsLoading'
@@ -47,6 +48,7 @@ export default function InterijeriStolariPage({ language }: InterijeriStolariPag
             panoramaSrc="/images/interijeri-upiti/stolari.webp"
           >
             <InteriorsCarpenterForm language={language} vrEnabled={vrEnabled} />
+            <PublicConsultationBooking department="interiors" language={language} />
           </InteriorsFormPageLayout>
         </ErrorBoundary>
       </main>

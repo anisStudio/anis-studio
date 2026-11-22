@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { CONTACT_INFO } from '../config/contact'
 import { Mail, Phone, MessageCircle, Zap, Users } from 'lucide-react'
 
 /** Istovjetan format kao u CONTACT_INFO za tel: URI (bez razmaka). */
@@ -85,7 +86,7 @@ export default function ContactSection({ language = 'hr' }: ContactSectionProps)
               {translations.email[language]}
             </div>
             <div className="mt-1 text-base font-bold text-plum/90 dark:text-white break-all group-hover:text-amethyst dark:group-hover:text-lavender transition-colors">
-              info.anilrc@gmail.com
+              {CONTACT_INFO.email}
             </div>
           </Link>
 

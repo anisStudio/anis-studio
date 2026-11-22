@@ -1,4 +1,5 @@
 import { ErrorBoundary } from '../ErrorBoundary'
+import { CONTACT_INFO } from '../config/contact'
 import { AnimatedPage } from '../components/AnimatedPage'
 import { LrcFormPageLayout } from '../components/LrcFormPageLayout'
 import LRCInquiryForm from '../components/LRCInquiryForm'
@@ -29,8 +30,8 @@ export default function LrcInquiryPage({ language = 'hr' }: LrcInquiryPageProps)
     en: 'Currently there are no open applications for LRC workshops.'
   }
   const disabledAdditional = {
-    hr: 'Ako želite da vam javimo kad otvorimo nove termine, javite nam se na info.anilrc@gmail.com ili nas pratite na društvenim mrežama.',
-    en: 'If you would like us to notify you when we open new dates, contact us at info.anilrc@gmail.com or follow us on social media.'
+    hr: `Ako želite da vam javimo kad otvorimo nove termine, javite nam se na ${CONTACT_INFO.email} ili nas pratite na društvenim mrežama.`,
+    en: `If you would like us to notify you when we open new dates, contact us at ${CONTACT_INFO.email} or follow us on social media.`
   }
 
   return (

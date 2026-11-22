@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { CONTACT_INFO } from '../config/contact'
 import { Link } from 'react-router-dom'
 import { DecorativeSkyBackdrop } from './DecorativeSkyBackdrop'
 import { sampleProducts, productTags } from '../data/products'
@@ -119,8 +120,8 @@ export default function LRCSection({ language = 'hr', isFormEnabled = true }: LR
       en: "Currently there are no open applications for LRC workshops."
     },
     formDisabledAdditional: {
-      hr: "Ako želite da vam javimo kad otvorimo nove termine, javite nam se na info.anilrc@gmail.com ili nas pratite na društvenim mrežama.",
-      en: "If you would like us to notify you when we open new dates, contact us at info.anilrc@gmail.com or follow us on social media."
+      hr: `Ako želite da vam javimo kad otvorimo nove termine, javite nam se na ${CONTACT_INFO.email} ili nas pratite na društvenim mrežama.`,
+      en: `If you would like us to notify you when we open new dates, contact us at ${CONTACT_INFO.email} or follow us on social media.`
     },
     reviewCtaTitle: {
       hr: 'Imate naš LRC proizvod?',

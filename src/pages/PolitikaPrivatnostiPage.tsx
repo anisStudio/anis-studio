@@ -1,4 +1,5 @@
 import { AnimatedPage } from '../components/AnimatedPage'
+import { CONTACT_INFO } from '../config/contact'
 import { PageSEO } from '../components/PageSEO'
 
 interface PolitikaPrivatnostiPageProps {
@@ -26,8 +27,8 @@ const copy = {
     controller: {
       title: { hr: 'Voditelj obrade podataka', en: 'Data Controller' },
       body: {
-        hr: "Voditelj obrade je Ani's Studio. Za sva pitanja vezana uz obradu osobnih podataka možete nas kontaktirati na: info.anilrc@gmail.com",
-        en: "The data controller is Ani's Studio. For any questions regarding the processing of personal data, you can contact us at: info.anilrc@gmail.com",
+        hr: `Voditelj obrade je Ani's Studio. Za sva pitanja vezana uz obradu osobnih podataka možete nas kontaktirati na: ${CONTACT_INFO.email}`,
+        en: `The data controller is Ani's Studio. For any questions regarding the processing of personal data, you can contact us at: ${CONTACT_INFO.email}`,
       },
     },
     whatWeCollect: {
@@ -54,8 +55,8 @@ const copy = {
     reviews: {
       title: { hr: 'Recenzije', en: 'Reviews' },
       body: {
-        hr: 'Recenzije se objavljuju na web stranici isključivo nakon pregleda i uz izričitu privolu korisnika. Korisnik može u bilo kojem trenutku zatražiti izmjenu ili uklanjanje javno prikazane recenzije slanjem poruke na info.anilrc@gmail.com.',
-        en: 'Reviews are published on the website only after review and with explicit user consent. Users may at any time request modification or removal of a publicly displayed review by contacting info.anilrc@gmail.com.',
+        hr: `Recenzije se objavljuju na web stranici isključivo nakon pregleda i uz izričitu privolu korisnika. Korisnik može u bilo kojem trenutku zatražiti izmjenu ili uklanjanje javno prikazane recenzije slanjem poruke na ${CONTACT_INFO.email}.`,
+        en: `Reviews are published on the website only after review and with explicit user consent. Users may at any time request modification or removal of a publicly displayed review by contacting ${CONTACT_INFO.email}.`,
       },
     },
     retention: {
@@ -84,8 +85,8 @@ const copy = {
     rights: {
       title: { hr: 'Vaša prava', en: 'Your Rights' },
       body: {
-        hr: 'Imate pravo zatražiti pristup, ispravak ili brisanje svojih osobnih podataka. Zahtjev možete poslati na: info.anilrc@gmail.com',
-        en: 'You have the right to request access to, correction of, or deletion of your personal data. You can send your request to: info.anilrc@gmail.com',
+        hr: `Imate pravo zatražiti pristup, ispravak ili brisanje svojih osobnih podataka. Zahtjev možete poslati na: ${CONTACT_INFO.email}`,
+        en: `You have the right to request access to, correction of, or deletion of your personal data. You can send your request to: ${CONTACT_INFO.email}`,
       },
     },
     note: {
