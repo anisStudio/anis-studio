@@ -45,6 +45,7 @@ export default function InterijeriStolariPage({ language }: InterijeriStolariPag
             title={title}
             introduction={introduction}
             panoramaSrc="/images/interijeri-upiti/stolari.webp"
+            fullPanoramaOnMobile
           >
             <InteriorsCarpenterForm language={language} vrEnabled={vrEnabled} />
           </InteriorsFormPageLayout>
