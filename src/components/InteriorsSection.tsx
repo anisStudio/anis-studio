@@ -445,7 +445,7 @@ export default function InteriorsSection({ language }: InteriorsSectionProps) {
               <Link
                 to="/interijeri/klijenti"
                 onClick={() => trackEvent('interiors_chooser_click', { type: 'klijenti' })}
-                className="group relative flex min-h-0 flex-col overflow-hidden rounded-2xl border border-[rgba(110,68,255,0.16)] bg-[rgba(248,246,255,0.80)] p-6 text-center shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-[--color-primary]/35 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[--color-primary] dark:border-lavender/18 dark:bg-white/[0.06] dark:hover:shadow-[0_20px_50px_rgba(189,166,255,0.14)] sm:p-7 sm:text-left"
+                className="group relative flex min-h-0 flex-col overflow-hidden rounded-2xl border border-[rgba(110,68,255,0.16)] bg-[rgba(248,246,255,0.80)] p-6 text-center shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-[--color-primary]/35 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[--color-primary] dark:border-lavender/18 dark:bg-white/[0.06] dark:hover:shadow-[0_20px_50px_rgba(189,166,255,0.14)] sm:p-7"
               >
                 <span className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[rgba(110,68,255,0.25)] to-transparent opacity-0 transition-opacity group-hover:opacity-100 dark:via-lavender/30" aria-hidden />
                 <img
@@ -454,15 +454,15 @@ export default function InteriorsSection({ language }: InteriorsSectionProps) {
                   width={192}
                   height={120}
                   loading="lazy"
-                  className="mx-auto mb-4 h-[120px] w-48 max-w-full object-contain sm:mx-0 sm:mb-5"
+                  className="mx-auto mb-4 h-[120px] w-48 max-w-full object-contain sm:mb-5"
                 />
                 <h4 className="font-heading text-lg font-bold leading-snug text-plum/95 dark:text-pearl sm:text-xl">
                   {chooser.clientsTitle[language]}
                 </h4>
-                <p className="mt-3 flex-1 text-sm leading-relaxed text-plum/76 dark:text-pearl/70 sm:text-[0.9375rem]">
+                <p className="mx-auto mt-3 flex-1 text-sm leading-relaxed text-plum/76 dark:text-pearl/70 sm:text-[0.9375rem]">
                   {chooser.clientsText[language]}
                 </p>
-                <span className="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-[#6E44FF] to-[#8B6FFF] px-4 py-3 text-sm font-semibold text-white shadow-md transition-[transform,box-shadow] duration-300 group-hover:shadow-lg group-hover:brightness-[1.03] dark:from-[#6E44FF] dark:to-[#9D7FFF] sm:w-auto sm:self-start">
+                <span className="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-[#6E44FF] to-[#8B6FFF] px-4 py-3 text-sm font-semibold text-white shadow-md transition-[transform,box-shadow] duration-300 group-hover:shadow-lg group-hover:brightness-[1.03] dark:from-[#6E44FF] dark:to-[#9D7FFF] sm:w-auto sm:self-center">
                   {chooser.clientAction[language]}
                   <span className="ml-1.5 transition-transform group-hover:translate-x-0.5" aria-hidden>
                     →
@@ -473,7 +473,7 @@ export default function InteriorsSection({ language }: InteriorsSectionProps) {
               <Link
                 to="/interijeri/stolari"
                 onClick={() => trackEvent('interiors_chooser_click', { type: 'stolari' })}
-                className="group relative flex min-h-0 flex-col overflow-hidden rounded-2xl border border-[rgba(110,68,255,0.16)] bg-[rgba(248,246,255,0.80)] p-6 text-center shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-[--color-primary]/35 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[--color-primary] dark:border-lavender/18 dark:bg-white/[0.06] dark:hover:shadow-[0_20px_50px_rgba(189,166,255,0.14)] sm:p-7 sm:text-left"
+                className="group relative flex min-h-0 flex-col overflow-hidden rounded-2xl border border-[rgba(110,68,255,0.16)] bg-[rgba(248,246,255,0.80)] p-6 text-center shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-[--color-primary]/35 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[--color-primary] dark:border-lavender/18 dark:bg-white/[0.06] dark:hover:shadow-[0_20px_50px_rgba(189,166,255,0.14)] sm:p-7"
               >
                 <span className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[rgba(110,68,255,0.25)] to-transparent opacity-0 transition-opacity group-hover:opacity-100 dark:via-lavender/30" aria-hidden />
                 <img
@@ -482,15 +482,15 @@ export default function InteriorsSection({ language }: InteriorsSectionProps) {
                   width={192}
                   height={120}
                   loading="lazy"
-                  className="mx-auto mb-4 h-[120px] w-48 max-w-full object-contain sm:mx-0 sm:mb-5"
+                  className="mx-auto mb-4 h-[120px] w-48 max-w-full object-contain sm:mb-5"
                 />
                 <h4 className="font-heading text-lg font-bold leading-snug text-plum/95 dark:text-pearl sm:text-xl">
                   {chooser.stolariTitle[language]}
                 </h4>
-                <p className="mt-3 flex-1 text-sm leading-relaxed text-plum/76 dark:text-pearl/70 sm:text-[0.9375rem]">
+                <p className="mx-auto mt-3 flex-1 text-sm leading-relaxed text-plum/76 dark:text-pearl/70 sm:text-[0.9375rem]">
                   {chooser.stolariText[language]}
                 </p>
-                <span className="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-[#6E44FF] to-[#8B6FFF] px-4 py-3 text-sm font-semibold text-white shadow-md transition-[transform,box-shadow] duration-300 group-hover:shadow-lg group-hover:brightness-[1.03] dark:from-[#6E44FF] dark:to-[#9D7FFF] sm:w-auto sm:self-start">
+                <span className="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-[#6E44FF] to-[#8B6FFF] px-4 py-3 text-sm font-semibold text-white shadow-md transition-[transform,box-shadow] duration-300 group-hover:shadow-lg group-hover:brightness-[1.03] dark:from-[#6E44FF] dark:to-[#9D7FFF] sm:w-auto sm:self-center">
                   {chooser.carpenterAction[language]}
                   <span className="ml-1.5 transition-transform group-hover:translate-x-0.5" aria-hidden>
                     →
