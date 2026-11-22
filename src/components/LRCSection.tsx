@@ -1,3 +1,4 @@
+import './interiors-panorama.css'
 import { useEffect, useMemo, useState } from 'react'
 import { CONTACT_INFO } from '../config/contact'
 import { Link } from 'react-router-dom'
@@ -157,35 +158,27 @@ export default function LRCSection({ language = 'hr', isFormEnabled = true }: LR
       </div>
 
       <div className="relative z-10 mx-auto min-w-0 max-w-6xl">
-        <header className="mb-10 grid overflow-hidden rounded-3xl border border-amethyst/15 bg-[#eee6f7] dark:border-lavender/20 dark:bg-[#1c1530] sm:mb-14 md:grid-cols-[1fr_1.12fr]">
-          <div className="flex min-w-0 flex-col justify-center px-5 py-7 sm:px-8 md:py-10 lg:px-12">
-            <p className="mb-3 text-sm font-bold text-plum dark:text-pearl">Ani’s LRC</p>
-            <h1 className="font-heading text-[clamp(1.75rem,4.5vw,3rem)] font-bold leading-tight tracking-tight text-plum dark:text-pearl">
+        <div className="mb-10 text-center sm:mb-12">
+          <header className="lrc-panorama mb-4">
+            <h1 className="font-heading font-bold tracking-tight text-plum dark:text-pearl">
               {translations.title[language]}
             </h1>
-            <p className="mt-4 max-w-xl text-base leading-relaxed text-plum dark:text-pearl">
-              {translations.lead[language]}
-            </p>
-            <div className="mt-5 flex flex-col flex-wrap gap-3 sm:flex-row">
-              <a href="#lrc-ponuda" className="btn btn-primary min-h-12 justify-center">
-                {translations.browse[language]}
-              </a>
-              {isFormEnabled && (
-                <Link to="/lrc/upit" className="btn btn-secondary min-h-12 justify-center">
-                  {translations.formCtaButton[language]}
-                </Link>
-              )}
-            </div>
+          </header>
+          <p className="text-sm font-bold text-plum dark:text-pearl">Ani’s LRC</p>
+          <p className="mx-auto mt-3 max-w-2xl px-2 text-base leading-relaxed text-plum dark:text-pearl">
+            {translations.lead[language]}
+          </p>
+          <div className="mx-auto mt-6 flex max-w-xs flex-col justify-center gap-3 sm:max-w-none sm:flex-row sm:flex-wrap">
+            <a href="#lrc-ponuda" className="btn btn-primary min-h-12 justify-center">
+              {translations.browse[language]}
+            </a>
+            {isFormEnabled && (
+              <Link to="/lrc/upit" className="btn btn-secondary min-h-12 justify-center">
+                {translations.formCtaButton[language]}
+              </Link>
+            )}
           </div>
-          <div className="relative -order-1 aspect-[16/9] md:order-none md:aspect-auto">
-            <img
-              src="/images/zaglavlja/lrc-radionica.webp"
-              alt=""
-              fetchPriority="high"
-              className="absolute inset-0 h-full w-full object-cover dark:brightness-90"
-            />
-          </div>
-        </header>
+        </div>
 
         {/* Ponuda / pretraga i filteri */}
         <div id="lrc-ponuda" className="mb-8 scroll-mt-24 space-y-4 sm:mb-10">

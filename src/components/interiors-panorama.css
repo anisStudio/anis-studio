@@ -1,18 +1,36 @@
 .interiors-panorama {
   --atrium-image: url('/images/atrij/maslina-dan.webp');
-  --atrium-panel: rgba(248, 245, 252, .95);
 }
 .dark .interiors-panorama {
   --atrium-image: url('/images/atrij/maslina-sumrak.webp');
-  --atrium-panel: rgba(26, 17, 43, .95);
 }
 
-.interiors-panorama {
+.lrc-panorama {
+  --atrium-image: url('/images/atrij/lrc-dan.webp');
+}
+
+.dark .lrc-panorama {
+  --atrium-image: url('/images/atrij/lrc-sumrak.webp');
+}
+
+.interiors-panorama,
+.lrc-panorama {
+  --atrium-panel: rgba(248, 245, 252, .95);
   padding: clamp(2rem, 4vw, 4rem) 1rem;
   background: var(--atrium-image) center 48% / cover no-repeat;
   border-radius: 1.25rem;
 }
-.interiors-panorama h1 {
+.dark :is(.interiors-panorama, .lrc-panorama) {
+  --atrium-panel: rgba(26, 17, 43, .95);
+}
+
+.lrc-panorama {
+  display: grid;
+  align-content: center;
+  min-height: clamp(13rem, 33vw, 25rem);
+}
+
+:is(.interiors-panorama, .lrc-panorama) h1 {
   width: fit-content;
   margin: 0 auto;
   padding: .8em 1em;
@@ -28,4 +46,24 @@
     background-size: 100% auto;
   }
   .interiors-panorama h1 { width: 100%; }
+}
+
+@media (max-width: 680px) {
+  .lrc-panorama {
+    min-height: 0;
+    padding: 0;
+    background: none;
+  }
+
+  .lrc-panorama::before {
+    content: '';
+    aspect-ratio: 1672 / 941;
+    border-radius: 1.25rem 1.25rem 0 0;
+    background: var(--atrium-image) center / cover no-repeat;
+  }
+
+  .lrc-panorama h1 {
+    width: 100%;
+    border-radius: 0 0 1.25rem 1.25rem;
+  }
 }
