@@ -31,8 +31,19 @@
   .wa-prem-hero {
     grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
     gap: 2.5rem;
-    min-height: min(72vh, 36rem);
+    min-height: min(50vh, 27rem);
   }
+}
+
+@media (max-width: 639px) {
+  .wa-prem-hero .wa-prem-cta-row > * {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+}
+
+.wa-prem :is(#web-atelier-demos, #web-atelier-configurator) {
+  scroll-margin-top: 5.5rem;
 }
 
 .wa-prem-kicker {

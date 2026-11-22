@@ -32,8 +32,8 @@ export default function WebAtelierSection({
       en: 'For small businesses, entrepreneurs, and brands that need a tidy, professional web presence — without technical chaos or overstated promises.',
     },
     ctaPrimary: { hr: 'Pošalji upit', en: 'Send inquiry' },
-    ctaSecondary: { hr: 'Pogledaj procjenu', en: 'See estimate' },
-    ctaDemos: { hr: 'Demo koncepti', en: 'Demo concepts' },
+    ctaSecondary: { hr: 'Procijeni projekt', en: 'Estimate your project' },
+    ctaDemos: { hr: 'Pogledaj primjere', en: 'Explore demos' },
     panelTitle: {
       hr: 'Što dobivate u suradnji',
       en: 'What collaboration includes',
@@ -137,10 +137,6 @@ export default function WebAtelierSection({
         },
       },
     ],
-    demosAnchorNote: {
-      hr: 'Ispod su demo koncepti (nisu klijentski radovi), zatim konfigurator procjene.',
-      en: 'Below: demo concepts (not client work), then the estimate configurator.',
-    },
     closingTitle: {
       hr: 'Spremni za sljedeći korak?',
       en: 'Ready for the next step?',
@@ -175,7 +171,7 @@ export default function WebAtelierSection({
         <div className="wa-prem-hero">
           <div>
             <p className="wa-prem-kicker">{copy.kicker[language]}</p>
-            <h1>{copy.h1[language]}</h1>
+            <h1 className="font-heading font-bold">{copy.h1[language]}</h1>
             <p className="wa-prem-lead">{copy.lead[language]}</p>
             <div className="wa-prem-cta-row">
               {enableInquiryLinks ? (
@@ -192,24 +188,29 @@ export default function WebAtelierSection({
                 </span>
               )}
               <a
-                href="#web-atelier-configurator"
-                className="wa-prem-cta-secondary"
-                onClick={() => trackEvent('inquiry_cta_click', { source: 'web-atelier-hero-config' })}
-              >
-                {copy.ctaSecondary[language]}
-              </a>
-              <a
                 href="#web-atelier-demos"
                 className="wa-prem-cta-secondary"
                 onClick={() => trackEvent('inquiry_cta_click', { source: 'web-atelier-hero-demos' })}
               >
                 {copy.ctaDemos[language]}
               </a>
+              <a
+                href="#web-atelier-configurator"
+                className="wa-prem-cta-secondary"
+                onClick={() => trackEvent('inquiry_cta_click', { source: 'web-atelier-hero-config' })}
+              >
+                {copy.ctaSecondary[language]}
+              </a>
             </div>
           </div>
 
           <aside className="wa-prem-hero-panel" aria-labelledby="wa-hero-panel-title">
-            <h2 id="wa-hero-panel-title">{copy.panelTitle[language]}</h2>
+            <img
+              src="/images/odjeli/racunalo.webp"
+              alt=""
+              className="mx-auto mb-4 h-24 w-40 object-contain sm:h-32 sm:w-52"
+            />
+            <h2 id="wa-hero-panel-title" className="font-heading">{copy.panelTitle[language]}</h2>
             <ul className="wa-prem-hero-list">
               {copy.panelItems.map((item, index) => (
                 <li key={item.hr}>
@@ -219,6 +220,10 @@ export default function WebAtelierSection({
               ))}
             </ul>
           </aside>
+        </div>
+
+        <div className="wa-prem-section mx-auto max-w-6xl">
+          <WebAtelierDemoPortfolio language={language} enableInquiryLinks={enableInquiryLinks} />
         </div>
 
         <section className="wa-prem-section" aria-labelledby="wa-services-title">
@@ -272,12 +277,7 @@ export default function WebAtelierSection({
               </article>
             ))}
           </div>
-          <p className="wa-prem-note text-center">{copy.demosAnchorNote[language]}</p>
         </section>
-
-        <div className="wa-prem-section mx-auto max-w-6xl">
-          <WebAtelierDemoPortfolio language={language} enableInquiryLinks={enableInquiryLinks} />
-        </div>
 
         <div id="web-atelier-pricing" className="wa-prem-section mx-auto w-full max-w-6xl">
           <WebAtelierConfigurator language={language} enableInquiryCta={enableInquiryLinks} />

@@ -21,7 +21,7 @@ const LRCPage: React.FC<LRCPageProps> = ({ language = 'hr' }) => {
     <AnimatedPage>
       <PageSEO
         title="Ani's LRC — Lasersko rezanje, graviranje i radionice"
-        description="Personalizirani laserski graviri i rezanje — epoksy smola, svilka, drvo i staklo. Radionice i po mjeri napravljeni pokloni u Ani's LRC studiju."
+        description="Personalizirani pokloni i ručni radovi od drva, epoksidne smole, svile i stakla. Lasersko rezanje i graviranje u Ani's LRC studiju."
         canonical="/lrc"
       />
       <main className="min-h-screen min-w-0 bg-pearl text-plum dark:bg-[#070812] dark:text-pearl">

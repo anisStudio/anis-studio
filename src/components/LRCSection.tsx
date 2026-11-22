@@ -31,9 +31,11 @@ export default function LRCSection({ language = 'hr', isFormEnabled = true }: LR
     }
   }, [selectedTag, visibleProductTags])
 
+  const query = searchTerm.trim().toLocaleLowerCase(language)
   const filteredProducts = sampleProducts.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.description.toLowerCase().includes(searchTerm.toLowerCase())
+    const name = language === 'hr' ? product.nameHr : product.name
+    const description = language === 'hr' ? product.descriptionHr : product.description
+    const matchesSearch = [name, description].some((value) => value.toLocaleLowerCase(language).includes(query))
     const matchesTag = selectedTag === 'all' || product.tags.includes(selectedTag)
     return matchesSearch && matchesTag
   })
@@ -43,6 +45,8 @@ export default function LRCSection({ language = 'hr', isFormEnabled = true }: LR
       hr: "Ani's LRC — Personalizirani ručni radovi",
       en: "Ani's LRC — Personalized handmade work",
     },
+    browse: { hr: 'Pogledaj ponudu', en: 'Browse the catalog' },
+    noResults: { hr: 'Nema proizvoda za odabranu pretragu.', en: 'No products match your search.' },
     lrcBadge: {
       hr: {
         line1: 'LRC = Laser Resin Crafting',
@@ -166,91 +170,63 @@ export default function LRCSection({ language = 'hr', isFormEnabled = true }: LR
 
   return (
     <section id="lrc" className="Section fade-in relative section-with-bg isolate overflow-hidden">
-      {/* Background wrapper (full-width hero background) */}
-      <div className="absolute inset-0 overflow-hidden">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
         <DecorativeSkyBackdrop priority="high" />
-
-        {/* Light theme full-bleed hero background (full-width) */}
-        <div
-          className="absolute inset-0 bg-center bg-cover dark:hidden pointer-events-none select-none z-0"
-          aria-hidden
-          style={{
-            backgroundImage: `url('/lrc_image/bg-lrc-hero-light.png')`,
-            backgroundSize: '100% auto',
-            backgroundPosition: 'center top',
-            backgroundRepeat: 'no-repeat',
-            opacity: 0.42,
-          }}
-        />
-
-        {/* Dark theme full-bleed hero background (full-width) */}
-        <div
-          className="absolute inset-0 hidden bg-center bg-cover dark:block pointer-events-none select-none z-0"
-          aria-hidden
-          style={{
-            backgroundImage: `url('/lrc_image/bg-lrc-hero-dark.png')`,
-            backgroundSize: '100% auto',
-            backgroundPosition: 'center top',
-            backgroundRepeat: 'no-repeat',
-            opacity: 0.62,
-          }}
-        />
-
-        {/* Overlay for readability */}
         <div className="absolute inset-0 section-bg-overlay-light dark:section-bg-overlay-dark" />
       </div>
-      
-      <div className="max-w-7xl mx-auto min-w-0 relative z-10">
-        {/* Section Header — PNG floral backdrop (theme-specific), behind title + badge */}
-        <div className="relative mb-8 overflow-visible pt-10 text-center sm:mb-10 sm:pt-12">
-            <div className="relative mx-auto min-h-[min(300px,45vh)] w-full max-w-7xl sm:min-h-[min(420px,56vh)]">
-            <div className="relative z-10 mx-auto flex max-w-[min(100%,26rem)] flex-col items-center px-4 sm:max-w-2xl sm:px-5">
-              <h2 className="mb-3 font-heading text-2xl font-bold tracking-tight text-balance text-plum/90 dark:text-pearl sm:text-3xl">
-                {translations.title[language]}
-              </h2>
-              <div
-                role="note"
-                className="w-full max-w-md rounded-2xl border border-[rgba(110,68,255,0.18)] bg-white/65 px-3 py-2.5 text-center shadow-sm backdrop-blur-sm dark:border-lavender/18 dark:bg-white/[0.07] sm:max-w-lg sm:px-4 sm:py-3"
-              >
-                <p className="text-[11px] font-medium leading-snug tracking-wide text-plum/88 dark:text-pearl/88 sm:text-xs sm:leading-snug">
-                  {translations.lrcBadge[language].line1}
+
+      <div className="relative z-10 mx-auto min-w-0 max-w-6xl">
+        <header className="relative isolate mb-10 overflow-hidden rounded-3xl border border-amethyst/15 bg-white/60 px-5 py-8 text-center dark:border-lavender/20 dark:bg-[#1c1530] sm:mb-14 sm:px-8 sm:py-12">
+          <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 hidden bg-contain bg-top bg-no-repeat sm:block sm:bg-[url('/lrc_image/bg-lrc-hero-light.webp')] dark:sm:bg-[url('/lrc_image/bg-lrc-hero-dark.webp')]" />
+          <div className="mx-auto max-w-2xl sm:rounded-2xl sm:bg-white/85 sm:px-6 sm:py-5 sm:dark:bg-[#1c1530]/90">
+            <img
+              src="/images/odjeli/poklon.webp"
+              alt=""
+              className="mx-auto mb-3 h-20 w-24 object-contain sm:h-24 sm:w-28"
+            />
+            <p className="mb-2 text-sm font-semibold text-amethyst dark:text-lavender">
+              {translations.lrcBadge[language].line1}
+            </p>
+            <h1 className="font-heading text-2xl font-bold tracking-tight text-balance text-plum dark:text-pearl sm:text-4xl">
+              {translations.title[language]}
+            </h1>
+            <div className="mt-4 space-y-2">
+              {translations.bridge[language].map((paragraph) => (
+                <p key={paragraph} className="text-base leading-relaxed text-plum dark:text-pearl">
+                  {paragraph}
                 </p>
-                <p className="mt-0.5 text-[10px] leading-snug text-plum/68 dark:text-pearl/65 sm:text-[11px] sm:leading-snug">
-                  {translations.lrcBadge[language].line2}
-                </p>
-              </div>
+              ))}
+            </div>
+            <div className="mt-5 flex flex-wrap justify-center gap-3">
+              <a href="#lrc-ponuda" className="btn btn-primary min-h-11">
+                {translations.browse[language]}
+              </a>
+              {isFormEnabled && (
+                <Link to="/lrc/upit" className="btn btn-secondary min-h-11">
+                  {translations.formCtaButton[language]}
+                </Link>
+              )}
             </div>
           </div>
-
-          {/* Kratko objašnjenje — što LRC nudi */}
-          <div className="relative z-10 mx-auto mt-5 max-w-2xl space-y-3 border-t border-amethyst/10 px-4 pt-5 text-center dark:border-lavender/15 sm:mt-6 sm:space-y-4 sm:px-5 sm:pt-6">
-            {translations.bridge[language].map((paragraph, i) => (
-              <p
-                key={i}
-                className="text-sm leading-relaxed text-plum/78 dark:text-pearl/75 sm:text-[0.9375rem] sm:leading-relaxed"
-              >
-                {paragraph}
-              </p>
-            ))}
-          </div>
-        </div>
+        </header>
 
         {/* Ponuda / pretraga i filteri */}
-        <div className="mb-10 space-y-4 sm:mb-12">
+        <div id="lrc-ponuda" className="mb-8 scroll-mt-24 space-y-4 sm:mb-10">
           <div className="mx-auto max-w-2xl px-4 text-center sm:px-5">
-            <h3 className="font-heading text-lg font-bold tracking-tight text-balance text-plum/90 dark:text-pearl sm:text-xl">
+            <h2 className="font-heading text-xl font-bold tracking-tight text-balance text-plum dark:text-pearl sm:text-2xl">
               {translations.offerTitle[language]}
-            </h3>
+            </h2>
             <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-plum/78 dark:text-pearl/72 sm:mt-4 sm:text-[0.9375rem] sm:leading-relaxed">
               {translations.offerIntro[language]}
             </p>
           </div>
           <div className="mx-auto max-w-md">
-            <label className="mb-3 block text-center font-heading text-xs font-bold uppercase tracking-[0.2em] text-[--color-primary] dark:text-lavender sm:text-sm">
+            <label htmlFor="lrc-catalog-search" className="mb-3 block text-center font-heading text-xs font-bold uppercase tracking-[0.2em] text-[--color-primary] dark:text-lavender sm:text-sm">
               {language === 'hr' ? 'PRETRAŽI' : 'SEARCH'}
             </label>
             <input
-              type="text"
+              id="lrc-catalog-search"
+              type="search"
               placeholder={translations.searchPlaceholder[language]}
               className="w-full px-4 py-3 rounded-xl border border-[rgba(110,68,255,0.2)] dark:border-lavender/20 bg-white/90 dark:bg-white/10 focus:bg-white dark:focus:bg-white/15 focus:border-[--color-primary] focus:ring-2 focus:ring-[--color-primary]/20 transition-all duration-200 outline-none text-plum/90 dark:text-pearl placeholder:text-plum/60 dark:placeholder:text-pearl/50 placeholder:text-sm"
               value={searchTerm}
@@ -274,6 +250,7 @@ export default function LRCSection({ language = 'hr', isFormEnabled = true }: LR
                     ? 'bg-gradient-to-br from-[rgba(189,166,255,0.3)] to-[rgba(110,68,255,0.2)] border-[--color-primary] text-[--color-primary] font-semibold' 
                     : 'hover:bg-[rgba(110,68,255,0.1)]'
                 }`}
+                aria-pressed={selectedTag === tag.id}
                 onClick={() => setSelectedTag(tag.id)}
               >
                 {tag.label[language]}
@@ -282,79 +259,43 @@ export default function LRCSection({ language = 'hr', isFormEnabled = true }: LR
           </div>
         </div>
 
-        {/* Products Grid */}
         <div className="mb-10 sm:mb-12">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 md:grid-cols-3 md:gap-5 lg:grid-cols-4 xl:grid-cols-5 xl:gap-5">
-          {filteredProducts.map(product => (
-            <article 
-              key={product.id} 
-              className="flex h-full flex-col overflow-hidden rounded-xl bg-white/80 dark:bg-white/8 backdrop-blur-sm border border-[rgba(110,68,255,0.15)] dark:border-lavender/15 shadow-md dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)] hover:shadow-lg dark:hover:shadow-[0_20px_50px_rgba(189,166,255,0.12)] transition-all duration-300 hover:scale-[1.02] fade-in"
-            >
-              {/* Thumb */}
-              <div className="w-full aspect-[4/5] overflow-hidden rounded-3xl bg-gradient-to-b from-violet-100/80 to-violet-50/80 relative">
-                {/* Decorative circles */}
-                <div className="absolute top-2 right-2 w-16 h-16 rounded-full bg-gradient-to-br from-[rgba(110,68,255,0.2)] to-[rgba(189,166,255,0.3)] blur-xl" />
-                <div className="absolute bottom-3 left-3 w-12 h-12 rounded-full bg-gradient-to-br from-[rgba(189,166,255,0.3)] to-[rgba(110,68,255,0.2)] blur-lg" />
-                
-                {/* Content */}
-                <div className="flex h-full w-full items-center justify-center relative z-10 p-3 sm:p-4">
-                  <div className="text-center">
-                    {/* Product Icon based on tags */}
-                    <div className="text-4xl sm:text-5xl mb-2 animate-float">
-                      {product.tags.includes('epoxy') ? '💎' :
-                       product.tags.includes('wood') || product.tags.includes('laser') ? '🪵' :
-                       product.tags.includes('macrame') ? '🪢' :
-                       product.tags.includes('ceramic') ? '☕' :
-                       product.tags.includes('silk') ? '🧣' :
-                       product.tags.includes('jewelry') ? '💍' : '🎨'}
-                    </div>
-                    
-                    {/* Badge */}
-                    <div className="inline-block px-2 py-1 rounded-full bg-white/80 backdrop-blur-sm border border-[rgba(110,68,255,0.3)] shadow-md">
-                      <p className="text-[10px] text-[#6E44FF] font-semibold uppercase tracking-wider">
-                        {language === 'hr' ? 'Fotografija uskoro' : 'Coming Soon'}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Body */}
-              <div className="flex flex-1 flex-col space-y-2 p-3.5 sm:p-5">
-                <h3 className="line-clamp-2 font-heading text-sm font-semibold leading-snug text-plum/90 dark:text-pearl sm:text-base">
+          {filteredProducts.length === 0 && (
+            <p role="status" className="text-center">{translations.noResults[language]}</p>
+          )}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {filteredProducts.map((product) => (
+              <article
+                key={product.id}
+                className="flex min-w-0 flex-col rounded-2xl border border-amethyst/15 bg-white/80 p-5 shadow-sm dark:border-lavender/20 dark:bg-white/[0.07]"
+              >
+                <h3 className="font-heading text-base font-semibold leading-snug text-plum dark:text-pearl">
                   {language === 'hr' ? product.nameHr : product.name}
                 </h3>
-                <div className="mb-1 text-lg font-bold text-[--color-primary] sm:text-xl">€{product.price}</div>
-
-                <div className="mb-1 flex flex-wrap gap-1.5">
-                  {product.tags.map(tag => (
-                    <span 
-                      key={tag} 
-                      className="px-2 py-0.5 text-[10px] font-medium rounded-full bg-[rgba(110,68,255,0.1)] text-[--color-primary] border border-[rgba(110,68,255,0.2)]"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                
-                <button 
-                  className="btn btn-primary mt-auto w-full text-xs sm:text-sm py-2"
+                <p className="mb-4 mt-2 text-sm leading-relaxed text-plum dark:text-pearl">
+                  {language === 'hr' ? product.descriptionHr : product.description}
+                </p>
+                <p className="mb-3 mt-auto text-lg font-bold text-amethyst dark:text-lavender">
+                  €{product.price}
+                </p>
+                <button
+                  type="button"
+                  className="btn btn-primary min-h-11 w-full text-sm"
                   onClick={() => {
                     cartActions.addItem({
                       id: product.id,
                       title: language === 'hr' ? product.nameHr : product.name,
                       price: product.price,
                       imageUrl: product.image,
-                      tags: product.tags
-                    });
+                      tags: product.tags,
+                    })
                   }}
                 >
                   {translations.addToCart[language]}
                 </button>
-              </div>
-            </article>
-          ))}
-        </div>
+              </article>
+            ))}
+          </div>
         </div>
 
         {/* Message when form is disabled */}
