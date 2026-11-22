@@ -9,6 +9,7 @@ import {
 import { DecorativeSkyBackdrop } from './DecorativeSkyBackdrop'
 import { WebAtelierConfigurator } from './WebAtelierConfigurator'
 import { WebAtelierDemoPortfolio } from './webAtelierDemos/WebAtelierDemoPortfolio'
+import './interiors-panorama.css'
 import './webAtelier/webAtelierPremium.css'
 
 interface WebAtelierSectionProps {
@@ -168,51 +169,46 @@ export default function WebAtelierSection({
       </div>
 
       <div className="relative z-10 mx-auto w-full min-w-0 max-w-6xl px-1 sm:px-0">
-        <header className="wa-prem-hero">
-          <div className="flex min-w-0 flex-col justify-center px-5 py-7 sm:px-8 md:py-10 lg:px-12">
-            <p className="wa-prem-kicker">{copy.kicker[language]}</p>
-            <h1 className="font-heading font-bold">{copy.h1[language]}</h1>
-            <p className="wa-prem-lead">{copy.lead[language]}</p>
-            <div className="wa-prem-cta-row">
-              {enableInquiryLinks ? (
-                <Link
-                  to="/web-atelier/upit"
-                  className="btn btn-primary"
-                  onClick={() => trackEvent('inquiry_cta_click', { source: 'web-atelier-hero-primary' })}
-                >
-                  {copy.ctaPrimary[language]}
-                </Link>
-              ) : (
-                <span className="btn btn-primary" aria-disabled="true">
-                  {copy.ctaPrimary[language]}
-                </span>
-              )}
-              <a
-                href="#web-atelier-demos"
-                className="wa-prem-cta-secondary"
-                onClick={() => trackEvent('inquiry_cta_click', { source: 'web-atelier-hero-demos' })}
+        <div className="text-center">
+          <header className="department-panorama wa-panorama mb-4">
+            <h1 className="font-heading font-bold tracking-tight text-plum dark:text-pearl">
+              {copy.h1[language]}
+            </h1>
+          </header>
+          <p className="text-sm font-bold text-plum dark:text-pearl">{copy.kicker[language]}</p>
+          <p className="mx-auto mt-3 max-w-2xl px-2 text-base leading-relaxed text-plum dark:text-pearl">
+            {copy.lead[language]}
+          </p>
+          <div className="wa-prem-cta-row wa-prem-intro-actions justify-center">
+            {enableInquiryLinks ? (
+              <Link
+                to="/web-atelier/upit"
+                className="btn btn-primary"
+                onClick={() => trackEvent('inquiry_cta_click', { source: 'web-atelier-hero-primary' })}
               >
-                {copy.ctaDemos[language]}
-              </a>
-              <a
-                href="#web-atelier-configurator"
-                className="wa-prem-cta-secondary"
-                onClick={() => trackEvent('inquiry_cta_click', { source: 'web-atelier-hero-config' })}
-              >
-                {copy.ctaSecondary[language]}
-              </a>
-            </div>
+                {copy.ctaPrimary[language]}
+              </Link>
+            ) : (
+              <span className="btn btn-primary" aria-disabled="true">
+                {copy.ctaPrimary[language]}
+              </span>
+            )}
+            <a
+              href="#web-atelier-demos"
+              className="wa-prem-cta-secondary"
+              onClick={() => trackEvent('inquiry_cta_click', { source: 'web-atelier-hero-demos' })}
+            >
+              {copy.ctaDemos[language]}
+            </a>
+            <a
+              href="#web-atelier-configurator"
+              className="wa-prem-cta-secondary"
+              onClick={() => trackEvent('inquiry_cta_click', { source: 'web-atelier-hero-config' })}
+            >
+              {copy.ctaSecondary[language]}
+            </a>
           </div>
-
-          <div className="relative -order-1 aspect-[16/9] md:order-none md:aspect-auto">
-            <img
-              src="/images/zaglavlja/web-atelier.webp"
-              alt=""
-              fetchPriority="high"
-              className="absolute inset-0 h-full w-full object-cover dark:brightness-90"
-            />
-          </div>
-        </header>
+        </div>
 
         <div className="wa-prem-section mx-auto max-w-6xl">
           <WebAtelierDemoPortfolio language={language} enableInquiryLinks={enableInquiryLinks} />

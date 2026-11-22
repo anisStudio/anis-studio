@@ -21,26 +21,8 @@
   --wa-surface-strong: rgba(28, 24, 48, 0.92);
 }
 
-.wa-prem-hero {
-  display: grid;
-  overflow: hidden;
-  border: 1px solid var(--wa-line);
-  border-radius: 1.5rem;
-  background: #eee6f7;
-}
-
-.dark .wa-prem-hero {
-  background: #1c1530;
-}
-
-@media (min-width: 768px) {
-  .wa-prem-hero {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr);
-  }
-}
-
 @media (max-width: 639px) {
-  .wa-prem-hero .wa-prem-cta-row > * {
+  .wa-prem-intro-actions > * {
     flex: 1 1 100%;
     min-width: 0;
   }
@@ -48,34 +30,6 @@
 
 .wa-prem :is(#web-atelier-demos, #web-atelier-configurator) {
   scroll-margin-top: 5.5rem;
-}
-
-.wa-prem-kicker {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--wa-accent);
-}
-
-.wa-prem-hero h1 {
-  margin: 0.65rem 0 0;
-  font-size: clamp(1.75rem, 4.5vw, 3rem);
-  line-height: 1.12;
-  letter-spacing: -0.02em;
-  color: var(--wa-ink);
-  text-wrap: balance;
-}
-
-.wa-prem-lead {
-  margin: 1rem 0 0;
-  max-width: 36rem;
-  font-size: clamp(0.95rem, 1.6vw, 1.125rem);
-  line-height: 1.65;
-  color: var(--wa-ink-soft);
 }
 
 .wa-prem-cta-row {

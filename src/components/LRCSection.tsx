@@ -159,7 +159,7 @@ export default function LRCSection({ language = 'hr', isFormEnabled = true }: LR
 
       <div className="relative z-10 mx-auto min-w-0 max-w-6xl">
         <div className="mb-10 text-center sm:mb-12">
-          <header className="lrc-panorama mb-4">
+          <header className="department-panorama lrc-panorama mb-4">
             <h1 className="font-heading font-bold tracking-tight text-plum dark:text-pearl">
               {translations.title[language]}
             </h1>
