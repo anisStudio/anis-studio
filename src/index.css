@@ -908,7 +908,7 @@ html.dark body::before {
     color: #fff !important;
   }
 
-  html:not(.dark) #interiors .interiors-step-number {
+  html:not(.dark) .section-with-bg .department-step-number {
     color: #fff !important;
   }
 

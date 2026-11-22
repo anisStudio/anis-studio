@@ -1,4 +1,5 @@
 import './interiors-panorama.css'
+import { DepartmentStepCard } from './DepartmentStepCard'
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Link, useLocation } from 'react-router-dom'
@@ -268,33 +269,13 @@ export default function InteriorsSection({ language }: InteriorsSectionProps) {
 
         <div className="mx-auto mb-12 grid w-full max-w-5xl grid-cols-1 gap-4 sm:mb-14 sm:grid-cols-2 sm:gap-5 md:grid-cols-3 md:gap-5">
           {visualizationSteps.map((step) => (
-            <div 
-              key={step.number} 
-              className="relative flex w-full flex-col items-center rounded-2xl border border-[rgba(110,68,255,0.15)] bg-[rgba(248,246,255,0.72)] p-5 text-center shadow-sm backdrop-blur-sm dark:border-lavender/15 dark:bg-white/8 dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)] fade-in"
-            >
-              <div className="interiors-step-number absolute left-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-[#563078] dark:bg-[#6d4491] text-sm font-bold text-white shadow-md">
-                {step.number}
-              </div>
-
-              <img
-                src={step.image}
-                alt=""
-                width={144}
-                height={96}
-                loading="lazy"
-                className="mb-3 h-24 w-36 max-w-[68%] object-contain"
-              />
-              
-              {/* Title */}
-              <h4 className="mb-2 text-base font-bold leading-tight text-plum/95 dark:text-pearl">
-                {step.title[language]}
-              </h4>
-              
-              {/* Description */}
-              <p className="max-w-none text-sm leading-relaxed text-plum/80 dark:text-pearl/80">
-                {step.desc[language]}
-              </p>
-            </div>
+            <DepartmentStepCard
+              key={step.number}
+              number={step.number}
+              image={step.image}
+              title={step.title[language]}
+              description={step.desc[language]}
+            />
           ))}
         </div>
 

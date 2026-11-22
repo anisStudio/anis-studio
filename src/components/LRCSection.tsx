@@ -1,4 +1,5 @@
 import './interiors-panorama.css'
+import { DepartmentStepCard } from './DepartmentStepCard'
 import { useEffect, useMemo, useState } from 'react'
 import { CONTACT_INFO } from '../config/contact'
 import { Link } from 'react-router-dom'
@@ -126,25 +127,25 @@ export default function LRCSection({ language = 'hr', isFormEnabled = true }: LR
   const customizationSteps = [
     {
       number: 1,
-      icon: '🛍️',
+      image: '/images/odjeli/poklon.webp',
       title: translations.step1.title,
       desc: translations.step1.desc
     },
     {
       number: 2,
-      icon: '✍️',
+      image: '/images/koraci-interijeri/detalji.webp',
       title: translations.step2.title,
       desc: translations.step2.desc
     },
     {
       number: 3,
-      icon: '📸',
+      image: '/images/koraci-interijeri/reference.webp',
       title: translations.step3.title,
       desc: translations.step3.desc
     },
     {
       number: 4,
-      icon: '📤',
+      image: '/images/koraci-interijeri/upit.webp',
       title: translations.step4.title,
       desc: translations.step4.desc
     }
@@ -287,35 +288,20 @@ export default function LRCSection({ language = 'hr', isFormEnabled = true }: LR
         {isFormEnabled && (
           <>
             <div className="mb-6 text-center sm:mb-8">
-              <h3 className="font-heading text-xl font-bold text-plum/90 dark:text-pearl sm:text-2xl">
+              <h3 className="font-heading text-xl font-bold tracking-tight text-balance text-plum/90 dark:text-pearl sm:text-2xl">
                 {translations.customizationTitle[language]}
               </h3>
             </div>
             
-            <div className="mb-0 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4 lg:gap-6">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
               {customizationSteps.map((step) => (
-                <div 
-                  key={step.number} 
-                  className="relative flex h-full min-h-[200px] flex-col rounded-2xl border border-[rgba(110,68,255,0.15)] bg-white/80 p-5 text-center shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-xl dark:border-lavender/15 dark:bg-white/8 dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)] dark:hover:shadow-[0_20px_50px_rgba(189,166,255,0.12)] sm:hover:scale-105 sm:p-6 fade-in"
-                >
-                  {/* Step Number Badge */}
-                  <div className="absolute left-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#6E44FF] to-[#BDA6FF] text-lg font-bold text-white shadow-md">
-                    {step.number}
-                  </div>
-                  
-                  {/* Icon */}
-                  <div className="mb-3 mt-6 text-5xl">{step.icon}</div>
-                  
-                  {/* Title */}
-                  <h4 className="mb-2 font-heading text-sm font-bold text-[--color-primary] sm:text-base">
-                    {step.title[language]}
-                  </h4>
-                  
-                  {/* Description */}
-                  <p className="mt-auto text-sm leading-relaxed text-plum/70 dark:text-pearl/65">
-                    {step.desc[language]}
-                  </p>
-                </div>
+                <DepartmentStepCard
+                  key={step.number}
+                  number={step.number}
+                  image={step.image}
+                  title={step.title[language]}
+                  description={step.desc[language]}
+                />
               ))}
             </div>
 
