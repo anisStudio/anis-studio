@@ -7,10 +7,11 @@ interface InteriorsFormPageLayoutProps {
   language: 'hr' | 'en'
   title: string
   introduction: string
+  panoramaSrc: string
   children: ReactNode
 }
 
-export function InteriorsFormPageLayout({ language, title, introduction, children }: InteriorsFormPageLayoutProps) {
+export function InteriorsFormPageLayout({ language, title, introduction, panoramaSrc, children }: InteriorsFormPageLayoutProps) {
   const backLabel = language === 'hr' ? 'Natrag na odabir vrste upita' : 'Back to inquiry types'
 
   return (
@@ -21,7 +22,7 @@ export function InteriorsFormPageLayout({ language, title, introduction, childre
       </div>
 
       <div className="relative z-10 mx-auto min-w-0 max-w-6xl px-4 py-8 sm:px-6 sm:py-10 lg:py-12">
-        <div className="mb-8">
+        <header className="mx-auto mb-6 max-w-4xl sm:mb-8">
           <Link
             to={`/interijeri${INTERIORS_INQUIRY_HASH}`}
             className="inline-flex min-h-[44px] items-center gap-2 text-sm font-semibold text-[--color-primary] transition-colors hover:underline dark:text-lavender"
@@ -29,13 +30,21 @@ export function InteriorsFormPageLayout({ language, title, introduction, childre
             <span aria-hidden>←</span>
             {backLabel}
           </Link>
-          <h1 className="mt-4 font-heading text-2xl font-bold tracking-tight text-balance text-plum/90 dark:text-pearl sm:text-3xl">
+          <img
+            src={panoramaSrc}
+            alt=""
+            width={764}
+            height={578}
+            decoding="async"
+            className="mt-2 block h-28 w-full rounded-2xl object-cover object-[center_62%] dark:brightness-90 sm:h-44 lg:h-48"
+          />
+          <h1 className="mt-5 font-heading text-2xl font-bold tracking-tight text-balance text-plum/90 dark:text-pearl sm:text-3xl">
             {title}
           </h1>
           <p className="mt-3 text-sm leading-relaxed text-plum/80 dark:text-pearl/80 sm:text-base">
             {introduction}
           </p>
-        </div>
+        </header>
         <div className="mx-auto min-w-0 max-w-4xl">
           <div className="overflow-hidden rounded-3xl border border-[rgba(110,68,255,0.16)] bg-[rgba(248,246,255,0.62)] shadow-[0_8px_40px_rgba(46,36,71,0.06)] backdrop-blur-md dark:border-lavender/12 dark:bg-white/[0.04] dark:shadow-[0_12px_48px_rgba(0,0,0,0.25)]">
             <div className="p-6 sm:p-8 md:p-10">{children}</div>

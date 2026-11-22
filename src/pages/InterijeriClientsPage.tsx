@@ -27,7 +27,12 @@ export default function InterijeriClientsPage({ language }: InterijeriClientsPag
       />
       <main className="min-w-0">
         <ErrorBoundary name="InterijeriKlijenti">
-          <InteriorsFormPageLayout language={language} title={title} introduction={introduction}>
+          <InteriorsFormPageLayout
+            language={language}
+            title={title}
+            introduction={introduction}
+            panoramaSrc="/images/interijeri-upiti/klijenti.webp"
+          >
             <InteriorsClientForm stolars={INTERIORS_STOLAR_OPTIONS} language={language} />
             <PublicConsultationBooking department="interiors" language={language} />
           </InteriorsFormPageLayout>

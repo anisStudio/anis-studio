@@ -40,7 +40,12 @@ export default function InterijeriStolariPage({ language }: InterijeriStolariPag
       />
       <main className="min-w-0">
         <ErrorBoundary name="InterijeriStolari">
-          <InteriorsFormPageLayout language={language} title={title} introduction={introduction}>
+          <InteriorsFormPageLayout
+            language={language}
+            title={title}
+            introduction={introduction}
+            panoramaSrc="/images/interijeri-upiti/stolari.webp"
+          >
             <InteriorsCarpenterForm language={language} vrEnabled={vrEnabled} />
           </InteriorsFormPageLayout>
         </ErrorBoundary>
