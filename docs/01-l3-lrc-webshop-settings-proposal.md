@@ -6,9 +6,11 @@ da poveznicu prikaže samo kada su istodobno zadovoljena oba uvjeta:
 1. zasebna postavka `lrc_webshop_enabled` ima vrijednost `true`
 2. `lrc_webshop_url` sadrži valjanu HTTPS adresu bez ugrađenih pristupnih podataka
 
-Dok polja ne postoje u retku `settings`, klijentski zadani podaci su `false` i `null`,
-pa je poveznica „Idi na webshop” skrivena. Postavka
-`lrc_public_visible` ostaje potpuno neovisna.
+Dok polja ne postoje u retku `settings`, klijentski zadani podaci su `false` i `null`.
+Prekidač u Admin → Postavke može se uključiti i bez adrese: tada se vidi postojeća
+košarica, a poveznica „Otvori webshop” ostaje skrivena. Poveznica se prikazuje samo
+uz uključen prekidač i valjanu HTTPS adresu. `lrc_public_visible` ostaje neovisna.
+Dok migracija nije primijenjena, prekidač se pamti samo u pregledniku.
 
 ## Predložena buduća migracija
 
@@ -25,6 +27,6 @@ alter table public.settings
   );
 ```
 
-Nakon primjene migracije u zasebnom odobrenom koraku, u Admin → Postavke može se
-dodati sklopka „Prikaži poveznicu na LRC webshop” i polje za adresu. Sklopka se ne
-smije moći uključiti dok adresa nije spremljena i potvrđena.
+SQL za pregled je u `supabase/review/lrc_webshop_settings.sql`. Ne primjenjivati ga
+na produkciju u ovom koraku. Nakon odobrenog koraka ista se polja spremaju kroz
+postojeći `updateSettings`.

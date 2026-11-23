@@ -233,7 +233,7 @@ export function LrcPresentationCards({
             rel="noopener noreferrer"
             className="public-action inline-flex min-h-12 items-center justify-center rounded-xl px-7 py-3 text-sm font-semibold"
           >
-            {language === 'hr' ? 'Idi na webshop' : 'Go to webshop'}
+            {language === 'hr' ? 'Otvori webshop' : 'Open webshop'}
           </a>
         </div>
       ) : null}

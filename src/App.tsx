@@ -7,6 +7,7 @@ import { AdminAuthCallbackRedirect } from './components/AdminAuthCallbackRedirec
 import { PublicServiceGuard } from './components/PublicServiceGuard'
 import { RouteFallback } from './components/RouteFallback'
 import { useCart } from './lib/cart.store'
+import { useLrcWebshop } from './hooks/useLrcWebshop'
 import { ErrorBoundary } from './ErrorBoundary'
 import LoginModal from './components/LoginModal'
 import RegisterModal from './components/RegisterModal'
@@ -81,12 +82,14 @@ function AnimatedRoutes({
   language,
   cartCount,
   onLanguageChange,
-  onCartClick
+  onCartClick,
+  showCart,
 }: {
   language: 'hr' | 'en'
   cartCount: number
   onLanguageChange: (lang: 'hr' | 'en') => void
   onCartClick: () => void
+  showCart: boolean
 }) {
   const location = useLocation()
   const adminRoute = /^\/admin(?:\/|$)/.test(location.pathname)
@@ -116,7 +119,7 @@ function AnimatedRoutes({
 
   const publicLayout = (
     <MainLayout language={language} onLanguageChange={onLanguageChange}
-      cartItemCount={cartCount} onCartClick={onCartClick} />
+      cartItemCount={cartCount} onCartClick={onCartClick} showCart={showCart} />
   )
 
   return (
@@ -189,6 +192,18 @@ function AnimatedRoutes({
               path="/starlink-hrvatska"
               element={<StarlinkHrvatskaPage language={language} />}
             />
+            {import.meta.env.DEV ? (
+              <Route path="/dev/interijeri" element={<InterijeriPage language={language} />} />
+            ) : null}
+            {import.meta.env.DEV ? (
+              <Route path="/dev/lrc" element={<LRCPage language={language} inquiryPath="/dev/lrc/upit" />} />
+            ) : null}
+            {import.meta.env.DEV ? (
+              <Route path="/dev/lrc/upit" element={<LrcInquiryPage language={language} />} />
+            ) : null}
+            {import.meta.env.DEV ? (
+              <Route path="/dev/postavke" element={<AdminSettingsPage />} />
+            ) : null}
             {import.meta.env.DEV && WebAtelierDevPagePreview ? (
               <Route
                 path="/dev/web-atelier"
@@ -278,6 +293,11 @@ export default function App() {
   })
   const [isCartOpen, setIsCartOpen] = useState(false)
   const cartCount = useCart(s => s.totalQty)
+  const webshopEnabled = useLrcWebshop().enabled
+
+  useEffect(() => {
+    if (!webshopEnabled) setIsCartOpen(false)
+  }, [webshopEnabled])
 
   // Globalni scroll animacije
   useGlobalScrollAnimations()
@@ -340,12 +360,15 @@ export default function App() {
             language={language}
             cartCount={cartCount}
             onLanguageChange={setLanguage}
-            onCartClick={() => setIsCartOpen(true)}
+            onCartClick={() => {
+              if (webshopEnabled) setIsCartOpen(true)
+            }}
+            showCart={webshopEnabled}
           />
 
           <ErrorBoundary name="CartDrawer">
             <CartDrawer
-              isOpen={isCartOpen}
+              isOpen={isCartOpen && webshopEnabled}
               onClose={() => setIsCartOpen(false)}
               language={language}
             />

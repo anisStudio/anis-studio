@@ -114,12 +114,16 @@ export function useSettings() {
     fetchSettings()
   }, [])
 
-  async function updateSettings(updates: Partial<Settings>) {
+  async function updateSettings(
+    updates: Partial<Settings>,
+    options?: { reportError?: boolean },
+  ) {
+    const reportError = options?.reportError !== false
     setError(null)
 
     // Skip API call if Supabase is not configured
     if (!isSupabaseConfigured) {
-      const updatedSettings = { ...DEFAULT_SETTINGS, ...updates }
+      const updatedSettings = { ...(settings ?? DEFAULT_SETTINGS), ...updates }
       setSettings(updatedSettings)
       return { success: true, data: updatedSettings }
     }
@@ -151,7 +155,7 @@ export function useSettings() {
     } catch (err) {
       console.error('Error updating settings:', err)
       const errorMessage = err instanceof Error ? err.message : 'Failed to update settings'
-      setError(errorMessage)
+      if (reportError) setError(errorMessage)
       return { success: false, error: errorMessage }
     }
   }

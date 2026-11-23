@@ -12,13 +12,18 @@ import { LrcPresentationCards } from './LrcPresentationCards'
 interface LRCSectionProps {
   language?: 'hr' | 'en'
   isFormEnabled?: boolean
+  /** Add-to-cart and prices. Independent of LRC public visibility. */
+  webshopEnabled?: boolean
   webshopUrl?: string | null
+  inquiryPath?: string
 }
 
 export default function LRCSection({
   language = 'hr',
   isFormEnabled = true,
+  webshopEnabled = false,
   webshopUrl = null,
+  inquiryPath = '/lrc/upit',
 }: LRCSectionProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedTag, setSelectedTag] = useState('all')
@@ -180,7 +185,7 @@ export default function LRCSection({
               {translations.browse[language]}
             </a>
             {isFormEnabled && (
-              <Link to="/lrc/upit" className="btn btn-secondary min-h-12 justify-center">
+              <Link to={inquiryPath} className="btn btn-secondary min-h-12 justify-center">
                 {translations.formCtaButton[language]}
               </Link>
             )}
@@ -254,24 +259,28 @@ export default function LRCSection({
                 <p className="mb-4 mt-2 text-sm leading-relaxed text-plum dark:text-pearl">
                   {language === 'hr' ? product.descriptionHr : product.description}
                 </p>
-                <p className="mb-3 mt-auto text-lg font-bold text-amethyst dark:text-lavender">
-                  €{product.price}
-                </p>
-                <button
-                  type="button"
-                  className="btn btn-primary min-h-11 w-full text-sm"
-                  onClick={() => {
-                    cartActions.addItem({
-                      id: product.id,
-                      title: language === 'hr' ? product.nameHr : product.name,
-                      price: product.price,
-                      imageUrl: product.image,
-                      tags: product.tags,
-                    })
-                  }}
-                >
-                  {translations.addToCart[language]}
-                </button>
+                {webshopEnabled ? (
+                  <>
+                    <p className="mb-3 mt-auto text-lg font-bold text-amethyst dark:text-lavender">
+                      €{product.price}
+                    </p>
+                    <button
+                      type="button"
+                      className="btn btn-primary min-h-11 w-full text-sm"
+                      onClick={() => {
+                        cartActions.addItem({
+                          id: product.id,
+                          title: language === 'hr' ? product.nameHr : product.name,
+                          price: product.price,
+                          imageUrl: product.image,
+                          tags: product.tags,
+                        })
+                      }}
+                    >
+                      {translations.addToCart[language]}
+                    </button>
+                  </>
+                ) : null}
               </article>
             ))}
           </div>
@@ -324,7 +333,7 @@ export default function LRCSection({
                     {translations.formCtaText[language]}
                   </p>
                   <Link
-                    to="/lrc/upit"
+                    to={inquiryPath}
                     onClick={() => trackEvent('inquiry_cta_click', { source: 'lrc' })}
                     className="btn btn-primary inline-flex min-h-[48px] w-full max-w-md items-center justify-center px-8 py-3 text-base font-semibold shadow-md transition-all duration-300 hover:shadow-lg sm:w-auto sm:px-12 sm:py-4"
                     style={{ letterSpacing: '0.02em' }}
