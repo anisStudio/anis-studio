@@ -230,9 +230,11 @@ export default function PortfolioSection({ language }: PortfolioSectionProps) {
                     {item.title}
                   </h3>
                   <span className="mt-auto inline-flex w-fit max-w-full items-center gap-1 rounded-full border border-amethyst/20 bg-gradient-to-r from-amethyst/15 to-lavender/15 px-2 py-0.5 text-[10px] font-semibold text-amethyst dark:border-lavender/20 dark:from-amethyst/25 dark:to-lavender/20 dark:text-lavender sm:text-[11px]">
-                    <span className="shrink-0 text-xs" aria-hidden>
-                      {categoryIcons[item.category]}
-                    </span>
+                    {item.category !== 'interiors' ? (
+                      <span className="shrink-0 text-xs" aria-hidden>
+                        {categoryIcons[item.category]}
+                      </span>
+                    ) : null}
                     <span className="truncate">{categoryChipLabel}</span>
                   </span>
                 </div>
