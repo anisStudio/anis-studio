@@ -8,7 +8,7 @@ import type { WebAtelierPackageTier } from './webAtelierOffers.ts'
 export const WEB_ATELIER_DEMO_BANNER_HR = 'DEMO KONCEPT — nije klijentski projekt'
 export const WEB_ATELIER_DEMO_BANNER_EN = 'DEMO CONCEPT — not a client project'
 
-export const WEB_ATELIER_DEMO_SLUGS = ['stolarija', 'grooming', 'cvjecarna'] as const
+export const WEB_ATELIER_DEMO_SLUGS = ['cvjecarna', 'grooming', 'interijeri'] as const
 export type WebAtelierDemoSlug = (typeof WEB_ATELIER_DEMO_SLUGS)[number]
 
 export interface WebAtelierDemoDefinition {
@@ -25,24 +25,24 @@ export interface WebAtelierDemoDefinition {
 
 export const WEB_ATELIER_DEMOS: readonly WebAtelierDemoDefinition[] = [
   {
-    slug: 'stolarija',
+    slug: 'cvjecarna',
     packageTier: 'start',
-    path: '/web-atelier/demo/stolarija',
+    path: '/web-atelier/demo/cvjecarna',
     title: {
-      hr: 'Stolarska radionica — START',
-      en: 'Carpentry workshop — START',
+      hr: 'Cvjećarnica — START',
+      en: 'Florist — START',
     },
     businessName: {
-      hr: 'Radionica Hrast',
-      en: 'Oak Workshop',
+      hr: 'Atelier Latice',
+      en: 'Petal Atelier',
     },
     summary: {
-      hr: 'Jednostranični demo za fiktivnog stolara: hero, usluge, galerija radova i kontakt CTA.',
-      en: 'Single-page demo for a fictional carpenter: hero, services, project gallery and contact CTA.',
+      hr: 'Jednostranični demo cvjećarne: aranžmani, odabir ponude prema prigodi i izravan kontakt.',
+      en: 'Single-page florist demo: arrangements, occasion-based browsing, and direct contact.',
     },
     packageNote: {
-      hr: 'Prikazuje opseg START paketa: 1 stranica, 1 korekcija; responzivni prikaz, osnovni SEO i kontaktni obrazac u osnovnoj cijeni. Informativni koncept.',
-      en: 'Shows START package scope: 1 page, 1 correction; responsive layout, basic SEO, and contact form in the base price. Indicative concept only.',
+      hr: 'Prikazuje opseg START paketa: jedna fokusirana stranica, responzivni prikaz, osnovni SEO i jasna kontaktna točka. Nema webshopa ni stvarne narudžbe.',
+      en: 'Shows the START package scope: one focused page, responsive layout, basic SEO, and a clear contact point. No webshop or real ordering.',
     },
     accentLabel: { hr: 'START', en: 'START' },
   },
@@ -59,8 +59,8 @@ export const WEB_ATELIER_DEMOS: readonly WebAtelierDemoDefinition[] = [
       en: 'Paw & Polish',
     },
     summary: {
-      hr: 'Višesekcijski demo salona: usluge, orijentacijske cijene, galerija i demo rezervacija (samo UI).',
-      en: 'Multi-section salon demo: services, indicative prices, gallery and demo booking (UI only).',
+      hr: 'Višesekcijski demo salona: usluge, galerija i lokalno spremljen ogledni odabir termina.',
+      en: 'Multi-section salon demo: services, gallery, and a sample appointment selection saved locally.',
     },
     packageNote: {
       hr: 'Prikazuje PRO opseg (do 5 stranica, 2 korekcije; responzivni prikaz, osnovni SEO i kontaktni obrazac u osnovnoj cijeni). Booking je opcionalna usluga — nije uključen besplatno.',
@@ -69,31 +69,31 @@ export const WEB_ATELIER_DEMOS: readonly WebAtelierDemoDefinition[] = [
     accentLabel: { hr: 'PRO + booking', en: 'PRO + booking' },
   },
   {
-    slug: 'cvjecarna',
+    slug: 'interijeri',
     packageTier: 'premium',
-    path: '/web-atelier/demo/cvjecarna',
+    path: '/web-atelier/demo/interijeri',
     title: {
-      hr: 'Cvjećarna — PREMIUM',
-      en: 'Florist — PREMIUM',
+      hr: 'Studio interijera — PREMIUM',
+      en: 'Interior studio — PREMIUM',
     },
     businessName: {
-      hr: 'Atelier Latice',
-      en: 'Petal Atelier',
+      hr: 'Studio Sloj',
+      en: 'Studio Layer',
     },
     summary: {
-      hr: 'Premium vizualni demo: kolekcije, prigode, galerija i uzorak narudžbe bez plaćanja.',
-      en: 'Premium visual demo: collections, occasions, gallery and sample ordering without payment.',
+      hr: 'Premium portfolio demo: više projekata, detaljna studija izvedbe, fotografije i materijali.',
+      en: 'Premium portfolio demo: multiple projects, a detailed execution study, photography, and materials.',
     },
     packageNote: {
-      hr: 'Prikazuje PREMIUM opseg (do 7 stranica, 3 korekcije, mini branding, 30 dana prioritetne podrške; responzivni prikaz, osnovni SEO i kontaktni obrazac u osnovnoj cijeni). E-commerce nije uključen u bazni paket.',
-      en: 'Shows PREMIUM scope (up to 7 pages, 3 corrections, mini branding, 30-day priority support; responsive layout, basic SEO, and contact form in the base price). Ecommerce is not included in the base package.',
+      hr: 'Prikazuje PREMIUM opseg: izražen vizualni identitet, bogat portfolio, detaljne studije projekta i pripremu sadržaja za više stranica. Svi projekti su jasno označeni kao demo.',
+      en: 'Shows the PREMIUM scope: a distinct visual identity, rich portfolio, detailed project studies, and content prepared for a multi-page site. Every project is clearly marked as a demo.',
     },
     accentLabel: { hr: 'PREMIUM', en: 'PREMIUM' },
   },
 ] as const
 
 export function isWebAtelierDemoSlug(value: string | undefined | null): value is WebAtelierDemoSlug {
-  return value === 'stolarija' || value === 'grooming' || value === 'cvjecarna'
+  return value === 'cvjecarna' || value === 'grooming' || value === 'interijeri'
 }
 
 export function getWebAtelierDemo(slug: string | undefined | null): WebAtelierDemoDefinition | null {
@@ -114,8 +114,8 @@ export const DEMO_ACTION_IS_LOCAL_ONLY = true
 
 export function demoBookingConfirmation(language: 'hr' | 'en'): string {
   return language === 'hr'
-    ? 'Ovo je demo rezervacija. Termin nije spremljen, e-mail nije poslan i kalendar nije ažuriran.'
-    : 'This is a demo booking. No appointment was saved, no email was sent, and no calendar was updated.'
+    ? 'Ovo je demo odabir. Spremljen je samo lokalno u ovom pregledniku; e-mail nije poslan i kalendar nije ažuriran.'
+    : 'This is a demo selection. It is saved only in this browser; no email was sent and no calendar was updated.'
 }
 
 export function demoOrderConfirmation(language: 'hr' | 'en'): string {

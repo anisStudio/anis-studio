@@ -10,7 +10,6 @@ import {
   WEB_ATELIER_DEMO_SLUGS,
   demoBannerText,
   demoBookingConfirmation,
-  demoOrderConfirmation,
   demoPath,
   getWebAtelierDemo,
   isWebAtelierDemoSlug,
@@ -24,7 +23,7 @@ function read(relativePath: string): string {
 
 // --- Metadata ---
 assert.equal(WEB_ATELIER_DEMOS.length, 3)
-assert.deepEqual([...WEB_ATELIER_DEMO_SLUGS], ['stolarija', 'grooming', 'cvjecarna'])
+assert.deepEqual([...WEB_ATELIER_DEMO_SLUGS], ['cvjecarna', 'grooming', 'interijeri'])
 assert.equal(WEB_ATELIER_DEMOS[0].packageTier, 'start')
 assert.equal(WEB_ATELIER_DEMOS[1].packageTier, 'pro')
 assert.equal(WEB_ATELIER_DEMOS[2].packageTier, 'premium')
@@ -39,7 +38,8 @@ for (const demo of WEB_ATELIER_DEMOS) {
   assert.ok(['start', 'pro', 'premium'].includes(demo.packageTier))
 }
 
-assert.equal(isWebAtelierDemoSlug('stolarija'), true)
+assert.equal(isWebAtelierDemoSlug('cvjecarna'), true)
+assert.equal(isWebAtelierDemoSlug('interijeri'), true)
 assert.equal(isWebAtelierDemoSlug('nope'), false)
 assert.equal(getWebAtelierDemo('grooming')?.slug, 'grooming')
 assert.equal(getWebAtelierDemo('x'), null)
@@ -54,16 +54,9 @@ assert.equal(DEMO_ACTION_IS_LOCAL_ONLY, true)
 const bookHr = demoBookingConfirmation('hr')
 const bookEn = demoBookingConfirmation('en')
 assert.ok(bookHr.toLowerCase().includes('demo'))
-assert.ok(bookHr.includes('nije spremljen') || bookHr.includes('nije poslan'))
+assert.ok(bookHr.includes('lokalno') || bookHr.includes('pregledniku'))
 assert.ok(bookEn.toLowerCase().includes('demo'))
-assert.ok(bookEn.includes('No appointment') || bookEn.includes('no email'))
-
-const orderHr = demoOrderConfirmation('hr')
-const orderEn = demoOrderConfirmation('en')
-assert.ok(orderHr.toLowerCase().includes('demo'))
-assert.ok(orderHr.includes('Nema naplate') || orderHr.includes('nije poslana'))
-assert.ok(orderEn.toLowerCase().includes('demo'))
-assert.ok(orderEn.includes('no payment') || orderEn.includes('No payment'))
+assert.ok(bookEn.includes('browser') || bookEn.includes('no email'))
 
 // --- Package messaging (no free booking / no base ecommerce) ---
 const grooming = getWebAtelierDemo('grooming')!
@@ -77,12 +70,15 @@ assert.ok(
 )
 
 const florist = getWebAtelierDemo('cvjecarna')!
+assert.equal(florist.packageTier, 'start')
 assert.ok(
-  florist.packageNote.hr.toLowerCase().includes('e-commerce') ||
-    florist.packageNote.hr.toLowerCase().includes('ecommerce') ||
-    florist.packageNote.hr.toLowerCase().includes('nije uključen'),
+  florist.packageNote.hr.toLowerCase().includes('jedna') ||
+    florist.packageNote.hr.toLowerCase().includes('start'),
 )
-assert.ok(florist.packageNote.en.toLowerCase().includes('ecommerce') || florist.packageNote.en.toLowerCase().includes('not included'))
+
+const interiors = getWebAtelierDemo('interijeri')!
+assert.equal(interiors.packageTier, 'premium')
+assert.ok(interiors.summary.hr.toLowerCase().includes('portfolio'))
 
 // --- Routes & guard wiring ---
 {
@@ -106,18 +102,25 @@ assert.ok(florist.packageNote.en.toLowerCase().includes('ecommerce') || florist.
 }
 
 {
-  const groomingSrc = read('src/components/webAtelierDemos/GroomingDemo.tsx')
+  const groomingSrc = read('src/components/webAtelierDemos/grooming/GroomingDemo.tsx')
   assert.ok(groomingSrc.includes('demoBookingConfirmation'))
   assert.ok(groomingSrc.includes('DEMO_ACTION_IS_LOCAL_ONLY'))
+  assert.ok(groomingSrc.includes('localStorage'))
   assert.ok(!groomingSrc.includes('fetch('))
   assert.ok(!groomingSrc.includes('supabase'))
   assert.ok(!groomingSrc.includes('mailto:'))
 
-  const floristSrc = read('src/components/webAtelierDemos/FloristDemo.tsx')
-  assert.ok(floristSrc.includes('demoOrderConfirmation'))
+  const floristSrc = read('src/components/webAtelierDemos/cvjecarna/FloristDemo.tsx')
+  assert.ok(floristSrc.includes('floristConfig'))
   assert.ok(!floristSrc.includes('fetch('))
   assert.ok(!floristSrc.includes('stripe'))
   assert.ok(!floristSrc.includes('supabase'))
+
+  const interiorsSrc = read('src/components/webAtelierDemos/interijeri/InteriorsStudioDemo.tsx')
+  assert.ok(interiorsSrc.includes('materials'))
+  assert.ok(interiorsSrc.includes('role="dialog"'))
+  assert.ok(!interiorsSrc.includes('fetch('))
+  assert.ok(!interiorsSrc.includes('supabase'))
 }
 
 {

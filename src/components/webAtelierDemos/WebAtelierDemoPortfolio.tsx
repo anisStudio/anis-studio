@@ -10,9 +10,9 @@ interface Props {
 }
 
 const visualClass: Record<string, string> = {
-  stolarija: 'wa-carp-illustration',
-  grooming: 'wa-groom-blob',
   cvjecarna: 'wa-flor-swatch',
+  grooming: 'wa-groom-blob',
+  interijeri: 'wa-int-preview',
 }
 
 export function WebAtelierDemoPortfolio({ language, enableInquiryLinks = true }: Props) {

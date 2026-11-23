@@ -1,9 +1,9 @@
 import { Link, useParams } from 'react-router-dom'
 import { AnimatedPage } from '../components/AnimatedPage'
 import { PageSEO } from '../components/PageSEO'
-import { CarpentryDemo } from '../components/webAtelierDemos/CarpentryDemo'
-import { FloristDemo } from '../components/webAtelierDemos/FloristDemo'
-import { GroomingDemo } from '../components/webAtelierDemos/GroomingDemo'
+import { FloristDemo } from '../components/webAtelierDemos/cvjecarna/FloristDemo'
+import { GroomingDemo } from '../components/webAtelierDemos/grooming/GroomingDemo'
+import { InteriorsStudioDemo } from '../components/webAtelierDemos/interijeri/InteriorsStudioDemo'
 import { WebAtelierDemoChrome } from '../components/webAtelierDemos/WebAtelierDemoChrome'
 import { getWebAtelierDemo } from '../lib/webAtelierDemos'
 
@@ -59,9 +59,9 @@ export default function WebAtelierDemoPage({ language, enableInquiryLinks = true
           demo={demo}
           enableInquiryLinks={enableInquiryLinks}
         />
-        {demo.slug === 'stolarija' && <CarpentryDemo language={language} demo={demo} />}
-        {demo.slug === 'grooming' && <GroomingDemo language={language} demo={demo} />}
         {demo.slug === 'cvjecarna' && <FloristDemo language={language} demo={demo} />}
+        {demo.slug === 'grooming' && <GroomingDemo language={language} demo={demo} />}
+        {demo.slug === 'interijeri' && <InteriorsStudioDemo language={language} demo={demo} />}
       </main>
     </AnimatedPage>
   )

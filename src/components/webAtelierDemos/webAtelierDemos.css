@@ -822,6 +822,127 @@ html.dark .wa-demo-card-body p {
   font-family: "Segoe UI", sans-serif;
 }
 
+.wa-flor-kicker,
+.wa-groom-eyebrow {
+  margin: 0 0 0.55rem;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.wa-flor-section-lead {
+  max-width: 34rem;
+  margin: -0.35rem auto 1.2rem;
+  color: var(--f-muted);
+  font-family: "Segoe UI", sans-serif;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  text-align: center;
+}
+
+.wa-flor-occasion-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.wa-flor-occasion-list button {
+  min-height: 44px;
+  border: 1px solid rgba(183, 93, 120, 0.35);
+  border-radius: 999px;
+  padding: 0.45rem 0.85rem;
+  background: #fff;
+  color: var(--f-ink);
+  font-family: "Segoe UI", sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.wa-flor-occasion-list button.is-active {
+  background: var(--f-rose);
+  color: #fff;
+}
+
+.wa-flor-visual-sunset {
+  background: linear-gradient(145deg, #f8d5b5, #d9867a 55%, #7a966f);
+}
+
+.wa-flor-visual-sage {
+  background: linear-gradient(145deg, #f4efe7, #a8b7a5 52%, #6f8f7a);
+}
+
+.wa-flor-contact {
+  margin-bottom: 2rem !important;
+  border-radius: 1rem;
+  background: linear-gradient(135deg, #f2dbe2, #e6eee5);
+  text-align: center;
+}
+
+.wa-flor-contact > p:not(.wa-flor-kicker, .wa-flor-note) {
+  max-width: 36rem;
+  margin: 0 auto 1.2rem;
+  color: var(--f-muted);
+  font-family: "Segoe UI", sans-serif;
+  line-height: 1.55;
+}
+
+.wa-flor-contact-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 0.85rem;
+}
+
+.wa-flor-contact-links > a:not(.wa-flor-btn) {
+  color: var(--f-ink);
+  font-weight: 700;
+}
+
+.wa-groom-eyebrow {
+  color: var(--g-accent);
+}
+
+.wa-groom-tile {
+  position: relative;
+  overflow: hidden;
+  margin: 0;
+}
+
+.wa-groom-tile figcaption {
+  position: absolute;
+  inset: auto 0 0;
+  padding: 0.65rem;
+  background: linear-gradient(transparent, rgba(31, 42, 51, 0.72));
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.wa-groom-demo-notice {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-bottom: 1rem;
+  border: 1px solid #e0b35c;
+  border-radius: 0.7rem;
+  padding: 0.8rem;
+  background: #fff6e5;
+  color: #5a4010;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.wa-int-preview {
+  background:
+    linear-gradient(0deg, rgba(25, 22, 19, 0.18), transparent),
+    url("/images/interijeri/kitchen-advanced.webp") center / cover;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .wa-demo-card,
   .wa-carp-btn,
