@@ -1,0 +1,188 @@
+import { useEffect, useId, useState, type FormEvent } from 'react'
+import {
+  DEMO_ACTION_IS_LOCAL_ONLY,
+  demoBookingConfirmation,
+  type WebAtelierDemoDefinition,
+} from '../../../lib/webAtelierDemos'
+import { photoSlotAttrs } from '../photoSlot'
+import { groomingConfig, groomingPhoto, type GroomingDemoSelection } from './config'
+
+interface Props {
+  language: 'hr' | 'en'
+  demo: WebAtelierDemoDefinition
+}
+
+const DEFAULT_SELECTION: GroomingDemoSelection = {
+  petName: '',
+  service: 'wash',
+  slot: 'tue-10',
+}
+
+function readLocalSelection(): GroomingDemoSelection {
+  if (typeof window === 'undefined') return DEFAULT_SELECTION
+  try {
+    const saved = window.localStorage.getItem(groomingConfig.storageKey)
+    if (!saved) return DEFAULT_SELECTION
+    const parsed = JSON.parse(saved) as Partial<GroomingDemoSelection>
+    return {
+      petName: typeof parsed.petName === 'string' ? parsed.petName : '',
+      service: groomingConfig.services.some((item) => item.id === parsed.service)
+        ? parsed.service!
+        : 'wash',
+      slot: groomingConfig.slots.some((item) => item.id === parsed.slot)
+        ? parsed.slot!
+        : 'tue-10',
+    }
+  } catch {
+    return DEFAULT_SELECTION
+  }
+}
+
+export function GroomingDemo({ language, demo }: Props) {
+  const hr = language === 'hr'
+  const formId = useId()
+  const heroPhoto = groomingPhoto('hero')
+  const [selection, setSelection] = useState<GroomingDemoSelection>(readLocalSelection)
+  const [confirmation, setConfirmation] = useState<string | null>(null)
+
+  useEffect(() => {
+    window.localStorage.setItem(groomingConfig.storageKey, JSON.stringify(selection))
+  }, [selection])
+
+  function updateSelection(patch: Partial<GroomingDemoSelection>) {
+    setSelection((current) => ({ ...current, ...patch }))
+    setConfirmation(null)
+  }
+
+  function handleDemoBook(event: FormEvent) {
+    event.preventDefault()
+    void DEMO_ACTION_IS_LOCAL_ONLY
+    window.localStorage.setItem(groomingConfig.storageKey, JSON.stringify(selection))
+    setConfirmation(demoBookingConfirmation(language))
+  }
+
+  return (
+    <div className="wa-groom">
+      <header className="wa-groom-nav">
+        <div className="wa-groom-brand">{groomingConfig.brand[language]}</div>
+        <nav aria-label={hr ? 'Navigacija salona' : 'Salon navigation'}>
+          <ul>
+            <li><a href="#usluge">{hr ? 'Usluge' : 'Services'}</a></li>
+            <li><a href="#galerija">{hr ? 'Galerija' : 'Gallery'}</a></li>
+            <li><a href="#rezervacija">{hr ? 'Demo termin' : 'Demo booking'}</a></li>
+          </ul>
+        </nav>
+      </header>
+
+      <section className="wa-groom-hero" aria-labelledby="groom-hero">
+        <div className="wa-groom-hero-inner">
+          <div>
+            <p className="wa-groom-eyebrow">{groomingConfig.hero.eyebrow[language]}</p>
+            <h1 id="groom-hero">{groomingConfig.hero.title[language]}</h1>
+            <p>{groomingConfig.hero.lead[language]}</p>
+            <a className="wa-groom-btn" href="#rezervacija">
+              {groomingConfig.hero.cta[language]}
+            </a>
+          </div>
+          <div
+            className={heroPhoto.standInClass}
+            role="img"
+            aria-label={heroPhoto.motif[language]}
+            {...photoSlotAttrs(heroPhoto)}
+          />
+        </div>
+      </section>
+
+      <section id="usluge" aria-labelledby="groom-services">
+        <h2 id="groom-services">{hr ? 'Usluge' : 'Services'}</h2>
+        <div className="wa-groom-services">
+          {groomingConfig.services.map((item) => (
+            <article key={item.id} className="wa-groom-card">
+              <h3>{item.title[language]}</h3>
+              <p>{item.description[language]}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section id="galerija" aria-labelledby="groom-gallery">
+        <h2 id="groom-gallery">{hr ? 'Ugođaj salona' : 'Inside the salon'}</h2>
+        <div className="wa-groom-gallery">
+          {groomingConfig.gallery.map((item) => {
+            const photo = groomingPhoto(item.id)
+            return (
+            <figure
+              key={item.id}
+              className={photo.standInClass}
+              {...photoSlotAttrs(photo)}
+            >
+              <figcaption>{item.label[language]}</figcaption>
+            </figure>
+            )
+          })}
+        </div>
+        <p className="wa-groom-addon">
+          {hr
+            ? 'Fotografije su fiktivni demo materijal ovog salona.'
+            : 'The photographs are fictional material for this salon demo.'}
+        </p>
+      </section>
+
+      <section id="rezervacija" aria-labelledby="groom-book">
+        <h2 id="groom-book">{hr ? 'Ogledni odabir termina' : 'Sample appointment selection'}</h2>
+        <form className="wa-groom-book" onSubmit={handleDemoBook}>
+          <div className="wa-groom-demo-notice" role="note">
+            <strong>{hr ? 'DEMO — nema stvarne rezervacije' : 'DEMO — no real appointment'}</strong>
+            <span>
+              {hr
+                ? 'Odabir se čuva samo lokalno u ovom pregledniku i ne šalje se salonu.'
+                : 'Your selection is kept only in this browser and is not sent to the salon.'}
+            </span>
+          </div>
+
+          <label htmlFor={`${formId}-pet`}>{hr ? 'Ime ljubimca' : 'Pet name'}</label>
+          <input
+            id={`${formId}-pet`}
+            value={selection.petName}
+            onChange={(event) => updateSelection({ petName: event.target.value })}
+            autoComplete="off"
+          />
+
+          <label htmlFor={`${formId}-service`}>{hr ? 'Usluga' : 'Service'}</label>
+          <select
+            id={`${formId}-service`}
+            value={selection.service}
+            onChange={(event) => updateSelection({ service: event.target.value })}
+          >
+            {groomingConfig.services.map((item) => (
+              <option key={item.id} value={item.id}>{item.title[language]}</option>
+            ))}
+          </select>
+
+          <label htmlFor={`${formId}-slot`}>{hr ? 'Termin (demo)' : 'Time slot (demo)'}</label>
+          <select
+            id={`${formId}-slot`}
+            value={selection.slot}
+            onChange={(event) => updateSelection({ slot: event.target.value })}
+          >
+            {groomingConfig.slots.map((item) => (
+              <option key={item.id} value={item.id}>{item.label[language]}</option>
+            ))}
+          </select>
+
+          <button type="submit" className="wa-groom-btn">
+            {hr ? 'Potvrdi ogledni odabir' : 'Confirm sample selection'}
+          </button>
+
+          {confirmation ? (
+            <p className="wa-groom-alert" role="status" aria-live="polite">
+              {confirmation}
+            </p>
+          ) : null}
+
+          <p className="wa-groom-addon">{demo.packageNote[language]}</p>
+        </form>
+      </section>
+    </div>
+  )
+}

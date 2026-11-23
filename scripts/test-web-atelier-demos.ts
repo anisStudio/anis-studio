@@ -2,6 +2,10 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { floristConfig, floristPhotos } from '../src/components/webAtelierDemos/cvjecarna/config.ts'
+import { groomingConfig, groomingPhotos } from '../src/components/webAtelierDemos/grooming/config.ts'
+import { interiorsStudioConfig } from '../src/components/webAtelierDemos/interijeri/config.ts'
+import { DEMO_PHOTO_PUBLIC_DIR } from '../src/components/webAtelierDemos/photoSlot.ts'
 import {
   DEMO_ACTION_IS_LOCAL_ONLY,
   WEB_ATELIER_DEMOS,
@@ -10,11 +14,11 @@ import {
   WEB_ATELIER_DEMO_SLUGS,
   demoBannerText,
   demoBookingConfirmation,
-  demoOrderConfirmation,
   demoPath,
   getWebAtelierDemo,
   isWebAtelierDemoSlug,
 } from '../src/lib/webAtelierDemos.ts'
+import { DEPARTMENT_PREVIEW_LINKS } from '../src/lib/publicServiceAccess.ts'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -24,7 +28,7 @@ function read(relativePath: string): string {
 
 // --- Metadata ---
 assert.equal(WEB_ATELIER_DEMOS.length, 3)
-assert.deepEqual([...WEB_ATELIER_DEMO_SLUGS], ['stolarija', 'grooming', 'cvjecarna'])
+assert.deepEqual([...WEB_ATELIER_DEMO_SLUGS], ['cvjecarna', 'grooming', 'interijeri'])
 assert.equal(WEB_ATELIER_DEMOS[0].packageTier, 'start')
 assert.equal(WEB_ATELIER_DEMOS[1].packageTier, 'pro')
 assert.equal(WEB_ATELIER_DEMOS[2].packageTier, 'premium')
@@ -39,7 +43,8 @@ for (const demo of WEB_ATELIER_DEMOS) {
   assert.ok(['start', 'pro', 'premium'].includes(demo.packageTier))
 }
 
-assert.equal(isWebAtelierDemoSlug('stolarija'), true)
+assert.equal(isWebAtelierDemoSlug('cvjecarna'), true)
+assert.equal(isWebAtelierDemoSlug('interijeri'), true)
 assert.equal(isWebAtelierDemoSlug('nope'), false)
 assert.equal(getWebAtelierDemo('grooming')?.slug, 'grooming')
 assert.equal(getWebAtelierDemo('x'), null)
@@ -54,16 +59,9 @@ assert.equal(DEMO_ACTION_IS_LOCAL_ONLY, true)
 const bookHr = demoBookingConfirmation('hr')
 const bookEn = demoBookingConfirmation('en')
 assert.ok(bookHr.toLowerCase().includes('demo'))
-assert.ok(bookHr.includes('nije spremljen') || bookHr.includes('nije poslan'))
+assert.ok(bookHr.includes('lokalno') || bookHr.includes('pregledniku'))
 assert.ok(bookEn.toLowerCase().includes('demo'))
-assert.ok(bookEn.includes('No appointment') || bookEn.includes('no email'))
-
-const orderHr = demoOrderConfirmation('hr')
-const orderEn = demoOrderConfirmation('en')
-assert.ok(orderHr.toLowerCase().includes('demo'))
-assert.ok(orderHr.includes('Nema naplate') || orderHr.includes('nije poslana'))
-assert.ok(orderEn.toLowerCase().includes('demo'))
-assert.ok(orderEn.includes('no payment') || orderEn.includes('No payment'))
+assert.ok(bookEn.includes('browser') || bookEn.includes('no email'))
 
 // --- Package messaging (no free booking / no base ecommerce) ---
 const grooming = getWebAtelierDemo('grooming')!
@@ -77,12 +75,15 @@ assert.ok(
 )
 
 const florist = getWebAtelierDemo('cvjecarna')!
+assert.equal(florist.packageTier, 'start')
 assert.ok(
-  florist.packageNote.hr.toLowerCase().includes('e-commerce') ||
-    florist.packageNote.hr.toLowerCase().includes('ecommerce') ||
-    florist.packageNote.hr.toLowerCase().includes('nije uključen'),
+  florist.packageNote.hr.toLowerCase().includes('jedna') ||
+    florist.packageNote.hr.toLowerCase().includes('start'),
 )
-assert.ok(florist.packageNote.en.toLowerCase().includes('ecommerce') || florist.packageNote.en.toLowerCase().includes('not included'))
+
+const interiors = getWebAtelierDemo('interijeri')!
+assert.equal(interiors.packageTier, 'premium')
+assert.ok(interiors.summary.hr.toLowerCase().includes('portfolio'))
 
 // --- Routes & guard wiring ---
 {
@@ -106,18 +107,25 @@ assert.ok(florist.packageNote.en.toLowerCase().includes('ecommerce') || florist.
 }
 
 {
-  const groomingSrc = read('src/components/webAtelierDemos/GroomingDemo.tsx')
+  const groomingSrc = read('src/components/webAtelierDemos/grooming/GroomingDemo.tsx')
   assert.ok(groomingSrc.includes('demoBookingConfirmation'))
   assert.ok(groomingSrc.includes('DEMO_ACTION_IS_LOCAL_ONLY'))
+  assert.ok(groomingSrc.includes('localStorage'))
   assert.ok(!groomingSrc.includes('fetch('))
   assert.ok(!groomingSrc.includes('supabase'))
   assert.ok(!groomingSrc.includes('mailto:'))
 
-  const floristSrc = read('src/components/webAtelierDemos/FloristDemo.tsx')
-  assert.ok(floristSrc.includes('demoOrderConfirmation'))
+  const floristSrc = read('src/components/webAtelierDemos/cvjecarna/FloristDemo.tsx')
+  assert.ok(floristSrc.includes('floristConfig'))
   assert.ok(!floristSrc.includes('fetch('))
   assert.ok(!floristSrc.includes('stripe'))
   assert.ok(!floristSrc.includes('supabase'))
+
+  const interiorsSrc = read('src/components/webAtelierDemos/interijeri/InteriorsStudioDemo.tsx')
+  assert.ok(interiorsSrc.includes('materials'))
+  assert.ok(interiorsSrc.includes('role="dialog"'))
+  assert.ok(!interiorsSrc.includes('fetch('))
+  assert.ok(!interiorsSrc.includes('supabase'))
 }
 
 {
@@ -146,6 +154,86 @@ assert.ok(florist.packageNote.en.toLowerCase().includes('ecommerce') || florist.
 {
   const header = read('src/components/Header.tsx')
   assert.ok(!header.includes('/web-atelier/demo'))
+}
+
+// --- Prepared photography (CSS stand-in until files arrive) ---
+{
+  const pending = [...floristPhotos, ...groomingPhotos]
+  assert.equal(pending.length, 10)
+  assert.equal(new Set(pending.map((photo) => photo.file)).size, 10)
+  assert.deepEqual(
+    floristPhotos.map((photo) => photo.ratio),
+    ['16:9', '4:5', '4:5', '4:5', '3:2'],
+  )
+  assert.deepEqual(
+    groomingPhotos.map((photo) => photo.ratio),
+    ['16:9', '1:1', '1:1', '1:1', '1:1'],
+  )
+
+  for (const photo of pending) {
+    assert.match(photo.file, /^[a-z0-9-]+\.webp$/)
+    assert.ok(!photo.file.includes('/'))
+    assert.ok(photo.motif.hr.length > 8)
+    assert.ok(photo.motif.en.length > 8)
+    assert.ok(photo.usedIn.length >= 1)
+    assert.ok(photo.usedIn.every((place) => place.hr.length > 3 && place.en.length > 3))
+    assert.ok(photo.standInClass.length > 0)
+  }
+
+  for (const hero of [floristPhotos[0], groomingPhotos[0]]) {
+    assert.equal(hero.id, 'hero')
+    assert.equal(hero.ratio, '16:9')
+    assert.ok(hero.usedIn.some((place) => place.hr.toLowerCase().includes('kartice')))
+    assert.ok(hero.usedIn.some((place) => place.en.toLowerCase().includes('card')))
+  }
+
+  for (const arrangement of floristConfig.arrangements) {
+    assert.ok(floristPhotos.some((photo) => photo.id === arrangement.id && photo.ratio === '4:5'))
+  }
+  for (const tile of groomingConfig.gallery) {
+    assert.ok(groomingPhotos.some((photo) => photo.id === tile.id && photo.ratio === '1:1'))
+  }
+
+  assert.equal(getWebAtelierDemo('cvjecarna')?.businessName, floristConfig.brand)
+  assert.equal(getWebAtelierDemo('grooming')?.businessName, groomingConfig.brand)
+  assert.equal(getWebAtelierDemo('interijeri')?.businessName, interiorsStudioConfig.brand)
+
+  const floristSrc = read('src/components/webAtelierDemos/cvjecarna/FloristDemo.tsx')
+  const groomingSrc = read('src/components/webAtelierDemos/grooming/GroomingDemo.tsx')
+  const portfolioSrc = read('src/components/webAtelierDemos/WebAtelierDemoPortfolio.tsx')
+  const css = read('src/components/webAtelierDemos/webAtelierDemos.css')
+
+  assert.ok(floristSrc.includes('photoSlotAttrs'))
+  assert.ok(groomingSrc.includes('photoSlotAttrs'))
+  assert.ok(!floristSrc.includes('<img'))
+  assert.ok(!groomingSrc.includes('<img'))
+  assert.ok(!floristSrc.includes(DEMO_PHOTO_PUBLIC_DIR))
+  assert.ok(!groomingSrc.includes(DEMO_PHOTO_PUBLIC_DIR))
+  assert.ok(portfolioSrc.includes("data-photo-status': 'author-material'"))
+  assert.ok(portfolioSrc.includes('floristPhoto(\'hero\')') || portfolioSrc.includes('floristPhoto("hero")'))
+  assert.match(css, /\.wa-flor-hero-frame\s*\{[^}]*aspect-ratio:\s*16\s*\/\s*9/)
+  assert.match(css, /\.wa-flor-arrangement\s*\{[^}]*aspect-ratio:\s*4\s*\/\s*5/)
+  assert.match(css, /\.wa-flor-space\s*\{[^}]*aspect-ratio:\s*3\s*\/\s*2/)
+  assert.match(css, /\.wa-groom-hero-frame\s*\{[^}]*aspect-ratio:\s*16\s*\/\s*9/)
+  assert.match(css, /\.wa-groom-tile\s*\{[^}]*aspect-ratio:\s*1\b/)
+  assert.ok(!css.includes('.wa-flor-card:nth-child(2) .wa-flor-swatch'))
+
+  for (const project of interiorsStudioConfig.projects) {
+    assert.ok(project.cover.startsWith('/images/interijeri/'))
+    for (const photo of project.photos) {
+      assert.ok(photo.src.startsWith('/images/interijeri/'))
+    }
+  }
+  assert.ok(!read('src/components/webAtelierDemos/interijeri/config.ts').includes('web-atelier-demos'))
+}
+
+{
+  const demoLinks = DEPARTMENT_PREVIEW_LINKS.webAtelier.filter((link) => link.path.includes('/demo/'))
+  assert.deepEqual(
+    demoLinks.map((link) => link.path),
+    WEB_ATELIER_DEMOS.map((demo) => demo.path),
+  )
+  assert.ok(!demoLinks.some((link) => link.path.includes('stolarija')))
 }
 
 console.log('web-atelier demos tests: OK')
