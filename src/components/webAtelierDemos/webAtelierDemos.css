@@ -397,6 +397,7 @@ html.dark .wa-demo-card-body p {
 
 /* ---- Grooming PRO ---- */
 .wa-groom {
+  /* Client palette: change these custom properties only. */
   --g-bg: #f4f8fb;
   --g-ink: #1f2a33;
   --g-muted: #4a5d6a;
@@ -493,14 +494,23 @@ html.dark .wa-demo-card-body p {
   text-decoration: none;
 }
 
-.wa-groom-blob {
-  min-height: 210px;
+.wa-groom-blob,
+.wa-groom-hero-frame {
   border-radius: 1.5rem;
   background:
     radial-gradient(circle at 30% 40%, #fff 0 18%, transparent 19%),
     radial-gradient(circle at 70% 55%, #ffd7b5 0 22%, transparent 23%),
     linear-gradient(145deg, #9fd6c8, #2f8f7b);
   box-shadow: 0 16px 36px rgba(31, 42, 51, 0.12);
+}
+
+.wa-groom-blob {
+  min-height: 210px;
+}
+
+.wa-groom-hero-frame {
+  aspect-ratio: 16 / 9;
+  width: 100%;
 }
 
 .wa-groom section {
@@ -624,8 +634,9 @@ html.dark .wa-demo-card-body p {
   margin-top: 0.75rem;
 }
 
-/* ---- Florist PREMIUM ---- */
+/* ---- Florist START ---- */
 .wa-flor {
+  /* Client palette: change these custom properties only. */
   --f-bg: #faf7f4;
   --f-ink: #2a2430;
   --f-muted: #5b5160;
@@ -748,16 +759,37 @@ html.dark .wa-demo-card-body p {
 }
 
 .wa-flor-swatch {
-  aspect-ratio: 4 / 3;
   background: linear-gradient(145deg, #f2c4d0, #b75d78 55%, #6f8f7a);
 }
 
-.wa-flor-card:nth-child(2) .wa-flor-swatch {
-  background: linear-gradient(145deg, #e8f0e4, #6f8f7a 50%, #b75d78);
+.wa-flor-hero-frame,
+.wa-flor-arrangement,
+.wa-flor-space {
+  width: min(100%, 40rem);
+  margin-inline: auto;
+  border-radius: 1rem;
 }
 
-.wa-flor-card:nth-child(3) .wa-flor-swatch {
-  background: linear-gradient(145deg, #efe6f5, #8a6b9e 45%, #d4a0b0);
+.wa-flor-hero-frame {
+  aspect-ratio: 16 / 9;
+  margin-bottom: 1.25rem;
+  background:
+    radial-gradient(circle at 32% 62%, #fff 0 7%, transparent 8%),
+    linear-gradient(145deg, #f2c4d0, #b75d78 55%, #6f8f7a);
+  box-shadow: 0 16px 36px rgba(42, 36, 48, 0.08);
+}
+
+.wa-flor-arrangement {
+  aspect-ratio: 4 / 5;
+  width: 100%;
+  background: linear-gradient(145deg, #f2c4d0, #b75d78 55%, #6f8f7a);
+}
+
+.wa-flor-space {
+  aspect-ratio: 3 / 2;
+  width: min(100%, 32rem);
+  margin-bottom: 1.2rem;
+  background: linear-gradient(160deg, #f8efe8, #e7c9d1 42%, #d5e4d6);
 }
 
 .wa-flor-card-body {
@@ -864,6 +896,10 @@ html.dark .wa-demo-card-body p {
 .wa-flor-occasion-list button.is-active {
   background: var(--f-rose);
   color: #fff;
+}
+
+.wa-flor-visual-rose {
+  background: linear-gradient(145deg, #f2c4d0, #b75d78 55%, #6f8f7a);
 }
 
 .wa-flor-visual-sunset {

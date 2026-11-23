@@ -2,6 +2,10 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { floristConfig, floristPhotos } from '../src/components/webAtelierDemos/cvjecarna/config.ts'
+import { groomingConfig, groomingPhotos } from '../src/components/webAtelierDemos/grooming/config.ts'
+import { interiorsStudioConfig } from '../src/components/webAtelierDemos/interijeri/config.ts'
+import { DEMO_PHOTO_PUBLIC_DIR } from '../src/components/webAtelierDemos/photoSlot.ts'
 import {
   DEMO_ACTION_IS_LOCAL_ONLY,
   WEB_ATELIER_DEMOS,
@@ -14,6 +18,7 @@ import {
   getWebAtelierDemo,
   isWebAtelierDemoSlug,
 } from '../src/lib/webAtelierDemos.ts'
+import { DEPARTMENT_PREVIEW_LINKS } from '../src/lib/publicServiceAccess.ts'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -149,6 +154,86 @@ assert.ok(interiors.summary.hr.toLowerCase().includes('portfolio'))
 {
   const header = read('src/components/Header.tsx')
   assert.ok(!header.includes('/web-atelier/demo'))
+}
+
+// --- Prepared photography (CSS stand-in until files arrive) ---
+{
+  const pending = [...floristPhotos, ...groomingPhotos]
+  assert.equal(pending.length, 10)
+  assert.equal(new Set(pending.map((photo) => photo.file)).size, 10)
+  assert.deepEqual(
+    floristPhotos.map((photo) => photo.ratio),
+    ['16:9', '4:5', '4:5', '4:5', '3:2'],
+  )
+  assert.deepEqual(
+    groomingPhotos.map((photo) => photo.ratio),
+    ['16:9', '1:1', '1:1', '1:1', '1:1'],
+  )
+
+  for (const photo of pending) {
+    assert.match(photo.file, /^[a-z0-9-]+\.webp$/)
+    assert.ok(!photo.file.includes('/'))
+    assert.ok(photo.motif.hr.length > 8)
+    assert.ok(photo.motif.en.length > 8)
+    assert.ok(photo.usedIn.length >= 1)
+    assert.ok(photo.usedIn.every((place) => place.hr.length > 3 && place.en.length > 3))
+    assert.ok(photo.standInClass.length > 0)
+  }
+
+  for (const hero of [floristPhotos[0], groomingPhotos[0]]) {
+    assert.equal(hero.id, 'hero')
+    assert.equal(hero.ratio, '16:9')
+    assert.ok(hero.usedIn.some((place) => place.hr.toLowerCase().includes('kartice')))
+    assert.ok(hero.usedIn.some((place) => place.en.toLowerCase().includes('card')))
+  }
+
+  for (const arrangement of floristConfig.arrangements) {
+    assert.ok(floristPhotos.some((photo) => photo.id === arrangement.id && photo.ratio === '4:5'))
+  }
+  for (const tile of groomingConfig.gallery) {
+    assert.ok(groomingPhotos.some((photo) => photo.id === tile.id && photo.ratio === '1:1'))
+  }
+
+  assert.equal(getWebAtelierDemo('cvjecarna')?.businessName, floristConfig.brand)
+  assert.equal(getWebAtelierDemo('grooming')?.businessName, groomingConfig.brand)
+  assert.equal(getWebAtelierDemo('interijeri')?.businessName, interiorsStudioConfig.brand)
+
+  const floristSrc = read('src/components/webAtelierDemos/cvjecarna/FloristDemo.tsx')
+  const groomingSrc = read('src/components/webAtelierDemos/grooming/GroomingDemo.tsx')
+  const portfolioSrc = read('src/components/webAtelierDemos/WebAtelierDemoPortfolio.tsx')
+  const css = read('src/components/webAtelierDemos/webAtelierDemos.css')
+
+  assert.ok(floristSrc.includes('photoSlotAttrs'))
+  assert.ok(groomingSrc.includes('photoSlotAttrs'))
+  assert.ok(!floristSrc.includes('<img'))
+  assert.ok(!groomingSrc.includes('<img'))
+  assert.ok(!floristSrc.includes(DEMO_PHOTO_PUBLIC_DIR))
+  assert.ok(!groomingSrc.includes(DEMO_PHOTO_PUBLIC_DIR))
+  assert.ok(portfolioSrc.includes("data-photo-status': 'author-material'"))
+  assert.ok(portfolioSrc.includes('floristPhoto(\'hero\')') || portfolioSrc.includes('floristPhoto("hero")'))
+  assert.match(css, /\.wa-flor-hero-frame\s*\{[^}]*aspect-ratio:\s*16\s*\/\s*9/)
+  assert.match(css, /\.wa-flor-arrangement\s*\{[^}]*aspect-ratio:\s*4\s*\/\s*5/)
+  assert.match(css, /\.wa-flor-space\s*\{[^}]*aspect-ratio:\s*3\s*\/\s*2/)
+  assert.match(css, /\.wa-groom-hero-frame\s*\{[^}]*aspect-ratio:\s*16\s*\/\s*9/)
+  assert.match(css, /\.wa-groom-tile\s*\{[^}]*aspect-ratio:\s*1\b/)
+  assert.ok(!css.includes('.wa-flor-card:nth-child(2) .wa-flor-swatch'))
+
+  for (const project of interiorsStudioConfig.projects) {
+    assert.ok(project.cover.startsWith('/images/interijeri/'))
+    for (const photo of project.photos) {
+      assert.ok(photo.src.startsWith('/images/interijeri/'))
+    }
+  }
+  assert.ok(!read('src/components/webAtelierDemos/interijeri/config.ts').includes('web-atelier-demos'))
+}
+
+{
+  const demoLinks = DEPARTMENT_PREVIEW_LINKS.webAtelier.filter((link) => link.path.includes('/demo/'))
+  assert.deepEqual(
+    demoLinks.map((link) => link.path),
+    WEB_ATELIER_DEMOS.map((demo) => demo.path),
+  )
+  assert.ok(!demoLinks.some((link) => link.path.includes('stolarija')))
 }
 
 console.log('web-atelier demos tests: OK')

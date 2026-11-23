@@ -4,7 +4,8 @@ import {
   demoBookingConfirmation,
   type WebAtelierDemoDefinition,
 } from '../../../lib/webAtelierDemos'
-import { groomingConfig, type GroomingDemoSelection } from './config'
+import { photoSlotAttrs } from '../photoSlot'
+import { groomingConfig, groomingPhoto, type GroomingDemoSelection } from './config'
 
 interface Props {
   language: 'hr' | 'en'
@@ -40,6 +41,7 @@ function readLocalSelection(): GroomingDemoSelection {
 export function GroomingDemo({ language, demo }: Props) {
   const hr = language === 'hr'
   const formId = useId()
+  const heroPhoto = groomingPhoto('hero')
   const [selection, setSelection] = useState<GroomingDemoSelection>(readLocalSelection)
   const [confirmation, setConfirmation] = useState<string | null>(null)
 
@@ -75,18 +77,19 @@ export function GroomingDemo({ language, demo }: Props) {
       <section className="wa-groom-hero" aria-labelledby="groom-hero">
         <div className="wa-groom-hero-inner">
           <div>
-            <p className="wa-groom-eyebrow">{hr ? 'Salon za njegu ljubimaca' : 'Pet grooming salon'}</p>
-            <h1 id="groom-hero">{hr ? 'Nježno, stručno i bez žurbe' : 'Gentle, skilled, and never rushed'}</h1>
-            <p>
-              {hr
-                ? 'Fiktivni PRO primjer salona s jasnom ponudom, galerijom i oglednim odabirom termina.'
-                : 'A fictional PRO salon example with clear services, a gallery, and a sample appointment selector.'}
-            </p>
+            <p className="wa-groom-eyebrow">{groomingConfig.hero.eyebrow[language]}</p>
+            <h1 id="groom-hero">{groomingConfig.hero.title[language]}</h1>
+            <p>{groomingConfig.hero.lead[language]}</p>
             <a className="wa-groom-btn" href="#rezervacija">
-              {hr ? 'Isprobaj ogledni termin' : 'Try the sample booking'}
+              {groomingConfig.hero.cta[language]}
             </a>
           </div>
-          <div className="wa-groom-blob" role="img" aria-label={hr ? 'Autorska demo ilustracija salona' : 'Original demo salon illustration'} />
+          <div
+            className={heroPhoto.standInClass}
+            role="img"
+            aria-label={heroPhoto.motif[language]}
+            {...photoSlotAttrs(heroPhoto)}
+          />
         </div>
       </section>
 
@@ -105,16 +108,23 @@ export function GroomingDemo({ language, demo }: Props) {
       <section id="galerija" aria-labelledby="groom-gallery">
         <h2 id="groom-gallery">{hr ? 'Ugođaj salona' : 'Inside the salon'}</h2>
         <div className="wa-groom-gallery">
-          {groomingConfig.gallery.map((item) => (
-            <figure key={item.id} className="wa-groom-tile">
+          {groomingConfig.gallery.map((item) => {
+            const photo = groomingPhoto(item.id)
+            return (
+            <figure
+              key={item.id}
+              className={photo.standInClass}
+              {...photoSlotAttrs(photo)}
+            >
               <figcaption>{item.label[language]}</figcaption>
             </figure>
-          ))}
+            )
+          })}
         </div>
         <p className="wa-groom-addon">
           {hr
-            ? 'Autorske CSS ilustracije zamjenjuju fotografije dok se ne pripreme motivi fiktivnog salona.'
-            : 'Original CSS illustrations stand in until fictional-salon photography is prepared.'}
+            ? 'Fotografije su fiktivni demo materijal ovog salona.'
+            : 'The photographs are fictional material for this salon demo.'}
         </p>
       </section>
 

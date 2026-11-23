@@ -13,15 +13,53 @@ export interface InteriorDemoProject {
   materials: readonly LocalizedText[]
 }
 
+/**
+ * Client adaptation for this PREMIUM template.
+ * Brand: `brand`. Tagline: `tagline`.
+ * Colors: `.wa-int` custom properties in interiorsStudioDemo.css.
+ * Copy: `hero`, `contact` title/note, and `projects` here.
+ *   Approach steps and section headings stay in InteriorsStudioDemo.tsx.
+ * Photos: existing author files under /images/interijeri/. Not part of the florist or grooming shot list.
+ * Contact: `contact` email and phone.
+ */
 export const interiorsStudioConfig = {
-  brand: 'Studio Sloj',
+  brand: {
+    hr: 'Studio Sloj',
+    en: 'Studio Layer',
+  },
   tagline: {
     hr: 'Interijeri i namještaj po mjeri',
     en: 'Interiors and bespoke furniture',
   },
+  hero: {
+    kicker: {
+      hr: 'Studio interijera · PREMIUM demo',
+      en: 'Interior studio · PREMIUM demo',
+    },
+    title: {
+      hr: 'Prostori koji djeluju mirno, a rade pametno',
+      en: 'Spaces that feel calm and work beautifully',
+    },
+    lead: {
+      hr: 'Fiktivni studio za interijere i namještaj po mjeri. Koncept pokazuje projektni portfolio, detaljne studije i prezentaciju materijala.',
+      en: 'A fictional interiors and bespoke furniture studio. This concept demonstrates a project portfolio, detailed case studies, and material presentation.',
+    },
+    cta: {
+      hr: 'Pogledaj projekte',
+      en: 'View projects',
+    },
+  },
   contact: {
     email: 'studio@studio-sloj.example',
     phone: '+385 91 555 0472',
+    title: {
+      hr: 'Imate prostor koji traži dobar plan?',
+      en: 'Does your space need a clear plan?',
+    },
+    note: {
+      hr: 'Podaci su fiktivni i služe samo demonstraciji PREMIUM predloška.',
+      en: 'These details are fictional and only demonstrate the PREMIUM template.',
+    },
   },
   projects: [
     {

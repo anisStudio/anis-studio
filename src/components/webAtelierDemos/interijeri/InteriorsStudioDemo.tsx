@@ -90,7 +90,7 @@ export function InteriorsStudioDemo({ language, demo }: Props) {
     <div className="wa-int">
       <header className="wa-int-nav">
         <div>
-          <strong>{interiorsStudioConfig.brand}</strong>
+          <strong>{interiorsStudioConfig.brand[language]}</strong>
           <span>{interiorsStudioConfig.tagline[language]}</span>
         </div>
         <nav aria-label={hr ? 'Navigacija studija' : 'Studio navigation'}>
@@ -102,17 +102,11 @@ export function InteriorsStudioDemo({ language, demo }: Props) {
 
       <section className="wa-int-hero" aria-labelledby="wa-int-hero-title">
         <div className="wa-int-hero-copy">
-          <p className="wa-int-kicker">{hr ? 'Studio interijera · PREMIUM demo' : 'Interior studio · PREMIUM demo'}</p>
-          <h1 id="wa-int-hero-title">
-            {hr ? 'Prostori koji djeluju mirno, a rade pametno' : 'Spaces that feel calm and work beautifully'}
-          </h1>
-          <p>
-            {hr
-              ? 'Fiktivni studio za interijere i namještaj po mjeri. Koncept pokazuje projektni portfolio, detaljne studije i prezentaciju materijala.'
-              : 'A fictional interiors and bespoke furniture studio. This concept demonstrates a project portfolio, detailed case studies, and material presentation.'}
-          </p>
+          <p className="wa-int-kicker">{interiorsStudioConfig.hero.kicker[language]}</p>
+          <h1 id="wa-int-hero-title">{interiorsStudioConfig.hero.title[language]}</h1>
+          <p>{interiorsStudioConfig.hero.lead[language]}</p>
           <a href="#projekti" className="wa-int-primary">
-            {hr ? 'Pogledaj projekte' : 'View projects'}
+            {interiorsStudioConfig.hero.cta[language]}
           </a>
         </div>
         <img
@@ -155,8 +149,8 @@ export function InteriorsStudioDemo({ language, demo }: Props) {
 
       <section id="kontakt" className="wa-int-contact" aria-labelledby="wa-int-contact">
         <p className="wa-int-kicker">{hr ? 'Kontakt' : 'Contact'}</p>
-        <h2 id="wa-int-contact">{hr ? 'Imate prostor koji traži dobar plan?' : 'Does your space need a clear plan?'}</h2>
-        <p>{hr ? 'Podaci su fiktivni i služe samo demonstraciji PREMIUM predloška.' : 'These details are fictional and only demonstrate the PREMIUM template.'}</p>
+        <h2 id="wa-int-contact">{interiorsStudioConfig.contact.title[language]}</h2>
+        <p>{interiorsStudioConfig.contact.note[language]}</p>
         <a href={`mailto:${interiorsStudioConfig.contact.email}`}>{interiorsStudioConfig.contact.email}</a>
         <span>{interiorsStudioConfig.contact.phone}</span>
         <p className="wa-int-package-note">{demo.packageNote[language]}</p>

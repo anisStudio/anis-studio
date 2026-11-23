@@ -3,6 +3,9 @@
  * Routes live under /web-atelier/demo/* and inherit PublicServiceGuard.
  */
 
+import { floristConfig } from '../components/webAtelierDemos/cvjecarna/config.ts'
+import { groomingConfig } from '../components/webAtelierDemos/grooming/config.ts'
+import { interiorsStudioConfig } from '../components/webAtelierDemos/interijeri/config.ts'
 import type { WebAtelierPackageTier } from './webAtelierOffers.ts'
 
 export const WEB_ATELIER_DEMO_BANNER_HR = 'DEMO KONCEPT — nije klijentski projekt'
@@ -32,10 +35,7 @@ export const WEB_ATELIER_DEMOS: readonly WebAtelierDemoDefinition[] = [
       hr: 'Cvjećarnica — START',
       en: 'Florist — START',
     },
-    businessName: {
-      hr: 'Atelier Latice',
-      en: 'Petal Atelier',
-    },
+    businessName: floristConfig.brand,
     summary: {
       hr: 'Jednostranični demo cvjećarne: aranžmani, odabir ponude prema prigodi i izravan kontakt.',
       en: 'Single-page florist demo: arrangements, occasion-based browsing, and direct contact.',
@@ -54,10 +54,7 @@ export const WEB_ATELIER_DEMOS: readonly WebAtelierDemoDefinition[] = [
       hr: 'Pet grooming salon — PRO',
       en: 'Pet grooming salon — PRO',
     },
-    businessName: {
-      hr: 'Šapa & Sjaj',
-      en: 'Paw & Polish',
-    },
+    businessName: groomingConfig.brand,
     summary: {
       hr: 'Višesekcijski demo salona: usluge, galerija i lokalno spremljen ogledni odabir termina.',
       en: 'Multi-section salon demo: services, gallery, and a sample appointment selection saved locally.',
@@ -76,10 +73,7 @@ export const WEB_ATELIER_DEMOS: readonly WebAtelierDemoDefinition[] = [
       hr: 'Studio interijera — PREMIUM',
       en: 'Interior studio — PREMIUM',
     },
-    businessName: {
-      hr: 'Studio Sloj',
-      en: 'Studio Layer',
-    },
+    businessName: interiorsStudioConfig.brand,
     summary: {
       hr: 'Premium portfolio demo: više projekata, detaljna studija izvedbe, fotografije i materijali.',
       en: 'Premium portfolio demo: multiple projects, a detailed execution study, photography, and materials.',

@@ -1,4 +1,5 @@
 .wa-int {
+  /* Client palette: change these custom properties only. */
   --int-ink: #22211f;
   --int-muted: #68635d;
   --int-paper: #f3f0ea;
