@@ -67,8 +67,8 @@ export default function AboutSection({ language, showPageTitle = false }: AboutS
         en: 'Interiors — I create 3D interior and kitchen visualizations so you can see layout, materials, and atmosphere before work begins.',
       },
       lrc: {
-        hr: 'LRC — Oblikujem personalizirane predmete i poklone ručnom izradom i laserskom obradom.',
-        en: 'LRC — I shape personalized gifts and items through handcraft and laser work.',
+        hr: 'LRC (Laser Resin Crafting) — Oblikujem personalizirane predmete i poklone ručnom izradom i laserskom obradom.',
+        en: 'LRC (Laser Resin Crafting) — I shape personalized gifts and items through handcraft and laser work.',
       },
       webAtelier: {
         hr: 'Web Atelier — Dizajniram web stranice za male poslovne subjekte koje jasno predstavljaju ponudu i olakšavaju prvi kontakt.',
@@ -88,16 +88,16 @@ export default function AboutSection({ language, showPageTitle = false }: AboutS
   }
 
   const departmentParagraphs = [
-    visibility.interiors ? copy.departments.interiors : null,
     visibility.lrc ? copy.departments.lrc : null,
+    visibility.interiors ? copy.departments.interiors : null,
     visibility.webAtelier ? copy.departments.webAtelier : null,
   ].filter(Boolean) as { hr: string; en: string }[]
 
   const serviceButtons = [
+    visibility.lrc ? { key: 'lrc' as const, to: '/lrc', label: copy.buttons.lrc } : null,
     visibility.interiors
       ? { key: 'interiors' as const, to: '/interijeri', label: copy.buttons.interiors }
       : null,
-    visibility.lrc ? { key: 'lrc' as const, to: '/lrc', label: copy.buttons.lrc } : null,
     visibility.webAtelier
       ? { key: 'webAtelier' as const, to: '/web-atelier', label: copy.buttons.webAtelier }
       : null,

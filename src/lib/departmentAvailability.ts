@@ -1,7 +1,7 @@
 // F2.4 I — shared department availability windows + reservations (V1).
 // Offer acceptance never auto-reserves capacity.
 
-export const DEPARTMENTS = ['web_atelier', 'interiors', 'lrc'] as const
+export const DEPARTMENTS = ['lrc', 'interiors', 'web_atelier'] as const
 export const RESERVATION_STATUSES = ['draft', 'confirmed', 'cancelled'] as const
 export const RESERVATION_ENTITY_KINDS = [
   'web_atelier_project',

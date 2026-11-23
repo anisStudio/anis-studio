@@ -175,11 +175,13 @@ export default function LRCSection({
       <div className="relative z-10 mx-auto min-w-0 max-w-6xl">
         <div className="mb-10 text-center sm:mb-12">
           <header className="department-panorama lrc-panorama mb-4">
-            <h1 className="font-heading font-bold tracking-tight text-plum dark:text-pearl">
+            <h1 className="text-center font-heading font-bold tracking-tight text-balance text-plum dark:text-pearl">
               {translations.title[language]}
             </h1>
           </header>
-          <p className="text-sm font-bold text-plum dark:text-pearl">Ani’s LRC</p>
+          <p className="mx-auto w-fit max-w-full text-balance text-center text-sm font-bold leading-snug text-plum dark:text-pearl">
+            Ani’s LRC — Laser Resin Crafting
+          </p>
           <p className="mx-auto mt-3 max-w-2xl px-2 text-base leading-relaxed text-plum dark:text-pearl">
             {translations.lead[language]}
           </p>

@@ -299,24 +299,6 @@ export default function AdminSettingsPage() {
                   <div className="flex items-center justify-between gap-4">
                     <div>
                       <p className="text-base font-medium text-slate-900">
-                        Interijeri javno vidljivi
-                      </p>
-                      <p className="mt-1 text-sm text-slate-700">
-                        {localInteriorsVisible
-                          ? 'Sekcija Interijeri vidljiva je na glavnom javnom putu.'
-                          : 'Sekcija Interijeri skrivena je s glavnog javnog puta.'}
-                      </p>
-                    </div>
-                    {visibilityToggleButton(
-                      'interiors_public_visible',
-                      localInteriorsVisible,
-                      'Javna vidljivost Interijera'
-                    )}
-                  </div>
-
-                  <div className="flex items-center justify-between gap-4">
-                    <div>
-                      <p className="text-base font-medium text-slate-900">
                         LRC javno vidljiv
                       </p>
                       <p className="mt-1 text-sm text-slate-700">
@@ -329,6 +311,24 @@ export default function AdminSettingsPage() {
                       'lrc_public_visible',
                       localLrcPublicVisible,
                       'Javna vidljivost LRC-a'
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <p className="text-base font-medium text-slate-900">
+                        Interijeri javno vidljivi
+                      </p>
+                      <p className="mt-1 text-sm text-slate-700">
+                        {localInteriorsVisible
+                          ? 'Sekcija Interijeri vidljiva je na glavnom javnom putu.'
+                          : 'Sekcija Interijeri skrivena je s glavnog javnog puta.'}
+                      </p>
+                    </div>
+                    {visibilityToggleButton(
+                      'interiors_public_visible',
+                      localInteriorsVisible,
+                      'Javna vidljivost Interijera'
                     )}
                   </div>
 

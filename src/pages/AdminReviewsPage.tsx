@@ -18,8 +18,8 @@ type FilterTab = 'pending' | 'approved' | 'rejected' | 'all'
 
 const CATEGORY_OPTIONS: { value: TestimonialSubmissionCategory; label: string }[] = [
   { value: 'general', label: 'Općenito' },
-  { value: 'interiors', label: 'Interijeri' },
   { value: 'lrc', label: 'LRC' },
+  { value: 'interiors', label: 'Interijeri' },
   { value: 'webAtelier', label: 'Web Atelier' },
 ]
 

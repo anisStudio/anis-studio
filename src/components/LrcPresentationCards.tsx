@@ -451,12 +451,12 @@ export function LrcPresentationCards({
   return (
     <section className="mb-12 sm:mb-14" aria-labelledby="lrc-presentation-title">
       <header className="mx-auto mb-6 max-w-2xl px-4 text-center sm:mb-8">
-        <p className="text-xs font-bold uppercase tracking-[0.18em] text-amethyst dark:text-lavender">
+        <p className="mx-auto w-fit max-w-full text-balance text-center text-xs font-bold uppercase leading-snug tracking-[0.18em] text-amethyst [text-indent:0.18em] dark:text-lavender">
           {language === 'hr' ? 'Izdvojeni proizvodi' : 'Featured products'}
         </p>
         <h2
           id="lrc-presentation-title"
-          className="mt-2 font-heading text-xl font-bold tracking-tight text-plum dark:text-pearl sm:text-2xl"
+          className="mx-auto mt-2 w-fit max-w-full text-balance text-center font-heading text-xl font-bold tracking-tight text-plum dark:text-pearl sm:text-2xl"
         >
           {language === 'hr' ? 'Personalizirane kutije' : 'Personalized boxes'}
         </h2>

@@ -166,9 +166,9 @@ export default function CjeniciPage({ language, webAtelierPreview }: CjeniciPage
 
   const seoDescription = useMemo(() => {
     const names: string[] = []
+    if (visibility.lrc) names.push('LRC')
     if (visibility.interiors) names.push(language === 'hr' ? 'Interijeri' : 'Interiors')
     if (visibility.webAtelier) names.push('Web Atelier')
-    if (visibility.lrc) names.push('LRC')
     if (names.length === 0) {
       return language === 'hr'
         ? "Pregled cjenika Ani's Studija."
