@@ -6,7 +6,6 @@ import {
   formatLrcEuro,
   lrcPresentationInquirySummary,
 } from './LrcPresentationCards'
-import { lrcInquiryCustomIdeaOption, sampleProducts } from '../data/products'
 import { trackEvent } from '../lib/analytics'
 import { submitLrcInquiry } from '../lib/lrcInquiries'
 
@@ -180,14 +179,6 @@ export default function LRCInquiryForm({ language }: LRCInquiryFormProps) {
               {LRC_PRESENTATION_PRODUCTS.map((product) => (
                 <option key={product.code} value={product.code}>
                   {product.code} — {product.title[language]} ({formatLrcEuro(product.retailPriceEuro)})
-                </option>
-              ))}
-              <option value={lrcInquiryCustomIdeaOption.id}>
-                {language === 'hr' ? lrcInquiryCustomIdeaOption.nameHr : lrcInquiryCustomIdeaOption.name}
-              </option>
-              {sampleProducts.map(product => (
-                <option key={product.id} value={product.id}>
-                  {language === 'hr' ? product.nameHr : product.name}
                 </option>
               ))}
             </select>

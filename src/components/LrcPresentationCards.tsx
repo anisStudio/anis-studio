@@ -440,11 +440,9 @@ function ProductDetails({
 
 export function LrcPresentationCards({
   language,
-  webshopUrl,
   inquiryPath = '/lrc/upit',
 }: {
   language: Language
-  webshopUrl?: string | null
   inquiryPath?: string
 }) {
   const [selectedProduct, setSelectedProduct] = useState<LrcPresentationProduct | null>(null)
@@ -504,19 +502,6 @@ export function LrcPresentationCards({
           )
         })}
       </div>
-
-      {webshopUrl ? (
-        <div className="mt-7 text-center">
-          <a
-            href={webshopUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="public-action inline-flex min-h-12 items-center justify-center rounded-xl px-7 py-3 text-sm font-semibold"
-          >
-            {language === 'hr' ? 'Otvori webshop' : 'Open webshop'}
-          </a>
-        </div>
-      ) : null}
 
       {selectedProduct && typeof document !== 'undefined'
         ? createPortal(

@@ -187,6 +187,16 @@ export default function LRCSection({
             <a href="#lrc-ponuda" className="btn btn-primary min-h-12 justify-center">
               {translations.browse[language]}
             </a>
+            {webshopUrl ? (
+              <a
+                href={webshopUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-secondary min-h-12 justify-center"
+              >
+                {language === 'hr' ? 'Otvori webshop' : 'Open webshop'}
+              </a>
+            ) : null}
             {isFormEnabled && (
               <Link to={inquiryPath} className="btn btn-secondary min-h-12 justify-center">
                 {translations.formCtaButton[language]}
@@ -198,7 +208,6 @@ export default function LRCSection({
         <div id={SHOW_LEGACY_LRC_CATALOG ? undefined : 'lrc-ponuda'} className="scroll-mt-24">
           <LrcPresentationCards
             language={language}
-            webshopUrl={webshopUrl}
             inquiryPath={inquiryPath}
           />
         </div>

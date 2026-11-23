@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import { AdminPasswordChangeForm } from '../components/AdminPasswordChangeForm'
 import { useLrcWebshop } from '../hooks/useLrcWebshop'
 import { useSettings } from '../hooks/useSettings'
@@ -15,6 +16,8 @@ type VisibilityKey =
   | 'interiors_vr_enabled'
 
 export default function AdminSettingsPage() {
+  const { pathname } = useLocation()
+  const isLocalDemo = pathname === '/dev/postavke'
   const { settings, isLoading, error, updateSettings } = useSettings()
   const [isToggling, setIsToggling] = useState(false)
   const [isVisibilityToggling, setIsVisibilityToggling] = useState(false)
@@ -122,8 +125,8 @@ export default function AdminSettingsPage() {
     if (result.success) {
       setSuccessMessage(
         newValue
-          ? 'LRC prijave su sada omogućene.'
-          : 'LRC prijave su sada onemogućene.'
+          ? 'LRC upiti za proizvode su sada omogućeni.'
+          : 'LRC upiti za proizvode su sada onemogućeni.'
       )
       setTimeout(() => setSuccessMessage(null), 3000)
     } else {
@@ -243,6 +246,13 @@ export default function AdminSettingsPage() {
             </p>
           </header>
 
+          {isLocalDemo ? (
+            <p className="mb-6 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm font-medium leading-relaxed text-amber-950">
+              Lokalna demonstracija. Ovo nije admin okvir. Stvarne Postavke
+              otvaraju se iz admin izbornika, stavka Postavke, na /admin/settings.
+            </p>
+          ) : null}
+
           {/* Error message */}
           {error && (
             <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
@@ -265,78 +275,7 @@ export default function AdminSettingsPage() {
             </div>
           )}
 
-          {/* Settings Card */}
           <div className="rounded-xl bg-white shadow-sm">
-            <div className="border-b px-6 py-4">
-              <h2 className="text-lg font-semibold text-slate-900">
-                LRC prijave
-              </h2>
-              <p className="mt-1 text-sm text-slate-700">
-                Kada je isključeno, public LRC forma se skriva i na stranici se
-                prikazuje poruka da trenutno nema otvorenih prijava za LRC
-                radionice.
-              </p>
-            </div>
-
-            <div className="px-6 py-6">
-              {isLoading ? (
-                <div className="flex items-center justify-center py-8">
-                  <p className="font-medium text-slate-700">
-                    Učitavanje postavki...
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-base font-medium text-slate-900">
-                        Omogući LRC prijave
-                      </p>
-                      <p className="mt-1 text-sm text-slate-700">
-                        {localEnabled
-                          ? 'Prijave su trenutno omogućene i forma za prijavu na LRC radionice je vidljiva korisnicima.'
-                          : 'Prijave su trenutno onemogućene i korisnici vide poruku da trenutno nema otvorenih prijava za LRC radionice.'}
-                      </p>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={handleToggle}
-                      disabled={isToggling || isLoading}
-                      className={`
-                        relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent
-                        transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2
-                        ${localEnabled ? 'bg-violet-600' : 'bg-slate-200'}
-                        ${isToggling || isLoading ? 'opacity-50 cursor-not-allowed' : ''}
-                      `}
-                      role="switch"
-                      aria-checked={localEnabled}
-                      aria-label="Toggle LRC form"
-                    >
-                      <span
-                        className={`
-                        pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0
-                        transition duration-200 ease-in-out
-                        ${localEnabled ? 'translate-x-5' : 'translate-x-0'}
-                      `}
-                      />
-                    </button>
-                  </div>
-
-                  {toggleError && (
-                    <div className="rounded-lg border border-red-200 bg-red-50 p-3">
-                      <p className="text-xs font-semibold text-red-950">
-                        {toggleError}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Javna vidljivost sekcija */}
-          <div className="mt-6 rounded-xl bg-white shadow-sm">
             <div className="border-b px-6 py-4">
               <h2 className="text-lg font-semibold text-slate-900">
                 Javna vidljivost sekcija
@@ -348,7 +287,6 @@ export default function AdminSettingsPage() {
                 objavljivanje novog koda (za to koristite Vercel Preview).
               </p>
             </div>
-
             <div className="px-6 py-6">
               {isLoading ? (
                 <div className="flex items-center justify-center py-8">
@@ -427,14 +365,70 @@ export default function AdminSettingsPage() {
           <div className="mt-6 rounded-xl bg-white shadow-sm">
             <div className="border-b px-6 py-4">
               <h2 className="text-lg font-semibold text-slate-900">
-                LRC webshop
+                Ani’s LRC
               </h2>
               <p className="mt-1 text-sm text-slate-700">
-                Zaseban prekidač od javne vidljivosti LRC-a. Isključen je zadano,
-                i dok se postavka ne učita. Isključivanje ne briše košaricu.
+                Upiti za proizvode i poveznica webshopa. Isključeni upiti skrivaju
+                obrazac i gumbe „Pošalji upit”. Webshop je zaseban prekidač i ne
+                briše košaricu.
               </p>
             </div>
-            <div className="space-y-5 px-6 py-6">
+            <div className="px-6 py-6">
+              {isLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <p className="font-medium text-slate-700">
+                    Učitavanje postavki...
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-base font-medium text-slate-900">
+                        Omogući LRC upite za proizvode
+                      </p>
+                      <p className="mt-1 text-sm text-slate-700">
+                        {localEnabled
+                          ? 'Upiti za proizvode su uključeni. Obrazac i gumbi „Pošalji upit” su vidljivi.'
+                          : 'Upiti za proizvode su isključeni. Obrazac i gumbi „Pošalji upit” nisu dostupni.'}
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleToggle}
+                      disabled={isToggling || isLoading}
+                      className={`
+                        relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent
+                        transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2
+                        ${localEnabled ? 'bg-violet-600' : 'bg-slate-200'}
+                        ${isToggling || isLoading ? 'opacity-50 cursor-not-allowed' : ''}
+                      `}
+                      role="switch"
+                      aria-checked={localEnabled}
+                      aria-label="Omogući LRC upite za proizvode"
+                    >
+                      <span
+                        className={`
+                        pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0
+                        transition duration-200 ease-in-out
+                        ${localEnabled ? 'translate-x-5' : 'translate-x-0'}
+                      `}
+                      />
+                    </button>
+                  </div>
+
+                  {toggleError && (
+                    <div className="rounded-lg border border-red-200 bg-red-50 p-3">
+                      <p className="text-xs font-semibold text-red-950">
+                        {toggleError}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            <div className="space-y-5 border-t px-6 py-6">
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <p className="text-base font-medium text-slate-900">
@@ -516,7 +510,7 @@ export default function AdminSettingsPage() {
           <div className="mt-6 rounded-xl bg-white shadow-sm">
             <div className="border-b px-6 py-4">
               <h2 className="text-lg font-semibold text-slate-900">
-                VR opcija – Interijeri
+                Ani’s Interijeri
               </h2>
               <p className="mt-1 text-sm text-slate-700">
                 Kada je uključeno, VR opcije su vidljive u formi za stolare i u admin pregledu projekata.
@@ -583,9 +577,8 @@ export default function AdminSettingsPage() {
           <div className="mt-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
             <p className="text-sm font-medium leading-relaxed text-blue-950">
               <strong>Napomena:</strong> Promjene se primjenjuju odmah. Kada su
-              LRC prijave onemogućene, korisnici vide poruku da trenutno nema
-              otvorenih prijava za LRC radionice. Košarica slijedi zaseban
-              prekidač webshopa i ne ovisi o toj poruci.
+              LRC upiti za proizvode onemogućeni, obrazac i gumbi „Pošalji upit”
+              nisu dostupni. Košarica slijedi zaseban prekidač webshopa.
             </p>
           </div>
         </div>
