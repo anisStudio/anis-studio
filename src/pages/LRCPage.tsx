@@ -5,6 +5,7 @@ import { ErrorBoundary } from "../ErrorBoundary";
 import FAQSection from "../sections/FAQSection";
 import { AnimatedPage } from "../components/AnimatedPage";
 import { PageSEO } from "../components/PageSEO";
+import { resolveLrcWebshopUrl } from "../lib/lrcWebshop";
 
 interface LRCPageProps {
   language?: 'hr' | 'en';
@@ -16,6 +17,10 @@ const LRCPage: React.FC<LRCPageProps> = ({ language = 'hr' }) => {
     error === null &&
     settings !== null &&
     settings.is_lrc_form_enabled === true;
+  const webshopUrl = resolveLrcWebshopUrl(
+    settings?.lrc_webshop_enabled === true,
+    settings?.lrc_webshop_url,
+  );
 
   return (
     <AnimatedPage>
@@ -35,7 +40,11 @@ const LRCPage: React.FC<LRCPageProps> = ({ language = 'hr' }) => {
               </p>
             </div>
           ) : (
-            <LRCSection language={language} isFormEnabled={isFormEnabled} />
+            <LRCSection
+              language={language}
+              isFormEnabled={isFormEnabled}
+              webshopUrl={webshopUrl}
+            />
           )}
         </div>
       </section>

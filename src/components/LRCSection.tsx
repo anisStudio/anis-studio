@@ -7,13 +7,19 @@ import { DecorativeSkyBackdrop } from './DecorativeSkyBackdrop'
 import { sampleProducts, productTags } from '../data/products'
 import { cartActions } from '../lib/cart.store'
 import { trackEvent } from '../lib/analytics'
+import { LrcPresentationCards } from './LrcPresentationCards'
 
 interface LRCSectionProps {
   language?: 'hr' | 'en'
   isFormEnabled?: boolean
+  webshopUrl?: string | null
 }
 
-export default function LRCSection({ language = 'hr', isFormEnabled = true }: LRCSectionProps) {
+export default function LRCSection({
+  language = 'hr',
+  isFormEnabled = true,
+  webshopUrl = null,
+}: LRCSectionProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedTag, setSelectedTag] = useState('all')
 
@@ -180,6 +186,8 @@ export default function LRCSection({ language = 'hr', isFormEnabled = true }: LR
             )}
           </div>
         </div>
+
+        <LrcPresentationCards language={language} webshopUrl={webshopUrl} />
 
         {/* Ponuda / pretraga i filteri */}
         <div id="lrc-ponuda" className="mb-8 scroll-mt-24 space-y-4 sm:mb-10">
