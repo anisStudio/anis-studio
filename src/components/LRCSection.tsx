@@ -9,6 +9,9 @@ import { cartActions } from '../lib/cart.store'
 import { trackEvent } from '../lib/analytics'
 import { LrcPresentationCards } from './LrcPresentationCards'
 
+/** Stari katalog ostaje u kodu za webshop, ali se uz tri kutije ne prikazuje. */
+const SHOW_LEGACY_LRC_CATALOG = false
+
 interface LRCSectionProps {
   language?: 'hr' | 'en'
   isFormEnabled?: boolean
@@ -192,10 +195,16 @@ export default function LRCSection({
           </div>
         </div>
 
-        <LrcPresentationCards language={language} webshopUrl={webshopUrl} />
+        <div id={SHOW_LEGACY_LRC_CATALOG ? undefined : 'lrc-ponuda'} className="scroll-mt-24">
+          <LrcPresentationCards
+            language={language}
+            webshopUrl={webshopUrl}
+            inquiryPath={inquiryPath}
+          />
+        </div>
 
-        {/* Ponuda / pretraga i filteri */}
-        <div id="lrc-ponuda" className="mb-8 scroll-mt-24 space-y-4 sm:mb-10">
+        {/* Ponuda / pretraga i filteri — skriveni uz tri kutije, kod ostaje za webshop. */}
+        {SHOW_LEGACY_LRC_CATALOG && <div id="lrc-ponuda" className="mb-8 scroll-mt-24 space-y-4 sm:mb-10">
           <div className="mx-auto max-w-2xl px-4 text-center sm:px-5">
             <h2 className="font-heading text-xl font-bold tracking-tight text-balance text-plum dark:text-pearl sm:text-2xl">
               {translations.offerTitle[language]}
@@ -241,9 +250,9 @@ export default function LRCSection({
               </button>
             ))}
           </div>
-        </div>
+        </div>}
 
-        <div className="mb-10 sm:mb-12">
+        {SHOW_LEGACY_LRC_CATALOG && <div className="mb-10 sm:mb-12">
           {filteredProducts.length === 0 && (
             <p role="status" className="text-center">{translations.noResults[language]}</p>
           )}
@@ -284,7 +293,7 @@ export default function LRCSection({
               </article>
             ))}
           </div>
-        </div>
+        </div>}
 
         {/* Message when form is disabled */}
         {!isFormEnabled && (
