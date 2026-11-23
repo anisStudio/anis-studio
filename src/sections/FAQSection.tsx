@@ -42,8 +42,8 @@ export const FAQ_ITEMS: FAQItem[] = [
       en: 'How can I order a product?'
     },
     answer: {
-      hr: 'Možete naručiti proizvod direktno preko web stranice dodavanjem u košaricu, ili možete kontaktirati nas putem kontakt formulara za personalizirane narudžbe.',
-      en: 'You can order a product directly through the website by adding it to your cart, or you can contact us through the contact form for personalized orders.'
+      hr: 'Otvorite detalje proizvoda i odaberite Pošalji upit. Javit ćemo vam se radi dogovora o izradi.',
+      en: 'Open the product details and choose Send inquiry. We will contact you to arrange the making.'
     }
   },
   {
@@ -78,8 +78,8 @@ export const FAQ_ITEMS: FAQItem[] = [
       en: 'What payment methods do you accept?'
     },
     answer: {
-      hr: 'Prihvaćamo plaćanja karticom putem Stripe-a, te možete kontaktirati nas za druge opcije plaćanja ako je potrebno.',
-      en: 'We accept card payments via Stripe, and you can contact us for other payment options if needed.'
+      hr: 'Plaćanje je isključivo uplatom na transakcijski račun. Podatke za uplatu dobit ćete nakon dogovora.',
+      en: 'Payment is by bank transfer only. You will receive the payment details after the arrangement is agreed.'
     }
   },
   {

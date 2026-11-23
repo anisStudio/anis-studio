@@ -8,6 +8,7 @@ interface MainLayoutProps {
   onLanguageChange: (lang: 'hr' | 'en') => void
   cartItemCount: number
   onCartClick: () => void
+  showCart?: boolean
 }
 
 const MainLayout: React.FC<MainLayoutProps> = ({
@@ -15,6 +16,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
   onLanguageChange,
   cartItemCount,
   onCartClick,
+  showCart = false,
 }) => {
   return (
     <div className="public-site">
@@ -24,6 +26,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
           onLanguageChange={onLanguageChange}
           cartItemCount={cartItemCount}
           onCartClick={onCartClick}
+          showCart={showCart}
         />
       </ErrorBoundary>
 

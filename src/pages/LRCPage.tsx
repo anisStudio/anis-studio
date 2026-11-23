@@ -5,13 +5,17 @@ import { ErrorBoundary } from "../ErrorBoundary";
 import FAQSection from "../sections/FAQSection";
 import { AnimatedPage } from "../components/AnimatedPage";
 import { PageSEO } from "../components/PageSEO";
+import { useLrcWebshop } from "../hooks/useLrcWebshop";
 
 interface LRCPageProps {
   language?: 'hr' | 'en';
+  /** Local preview can keep the inquiry on a dev route. */
+  inquiryPath?: string;
 }
 
-const LRCPage: React.FC<LRCPageProps> = ({ language = 'hr' }) => {
+const LRCPage: React.FC<LRCPageProps> = ({ language = 'hr', inquiryPath = '/lrc/upit' }) => {
   const { settings, isLoading, error } = useSettings();
+  const webshop = useLrcWebshop();
   const isFormEnabled =
     error === null &&
     settings !== null &&
@@ -25,7 +29,7 @@ const LRCPage: React.FC<LRCPageProps> = ({ language = 'hr' }) => {
         canonical="/lrc"
       />
       <main className="min-h-screen min-w-0 bg-pearl text-plum dark:bg-[#070812] dark:text-pearl">
-      {/* Glavni sadržaj: webshop uvijek vidljiv, forma ovisno o isFormEnabled */}
+      {/* Detalji i upit ostaju. Kupnja ovisi o zasebnom prekidaču webshopa. */}
       <section className="pb-10 sm:pb-14">
         <div className="mx-auto max-w-6xl min-w-0">
           {isLoading ? (
@@ -35,7 +39,13 @@ const LRCPage: React.FC<LRCPageProps> = ({ language = 'hr' }) => {
               </p>
             </div>
           ) : (
-            <LRCSection language={language} isFormEnabled={isFormEnabled} />
+            <LRCSection
+              language={language}
+              isFormEnabled={isFormEnabled}
+              webshopEnabled={webshop.enabled}
+              webshopUrl={webshop.webshopUrl}
+              inquiryPath={inquiryPath}
+            />
           )}
         </div>
       </section>

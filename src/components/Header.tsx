@@ -9,6 +9,8 @@ interface HeaderProps {
   onLanguageChange: (lang: 'hr' | 'en') => void
   cartItemCount: number
   onCartClick: () => void
+  /** Hidden unless the LRC webshop switch is explicitly on. */
+  showCart?: boolean
 }
 
 type NavKey = 'lrc' | 'interiors' | 'webAtelier' | 'about' | 'faq' | 'contact'
@@ -40,7 +42,7 @@ function isDevPreviewPath(pathname: string): boolean {
   return pathname === '/dev' || pathname.startsWith('/dev/')
 }
 
-export default function Header({ language, onLanguageChange, cartItemCount, onCartClick }: HeaderProps) {
+export default function Header({ language, onLanguageChange, cartItemCount, onCartClick, showCart = false }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const location = useLocation()
   const devPreviewChrome = isDevPreviewPath(location.pathname)
@@ -173,8 +175,8 @@ export default function Header({ language, onLanguageChange, cartItemCount, onCa
             </button>
           ) : null}
 
-          {/* Cart Button - Elegant Design */}
-          <button 
+          {/* Cart Button - Elegant Design. Absent while the webshop is off. */}
+          {showCart ? <button 
             onClick={onCartClick} 
             className="relative group p-2 sm:p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center transition-all duration-300 rounded-xl hover:bg-gradient-to-br hover:from-[rgba(110,68,255,0.08)] hover:to-[rgba(189,166,255,0.08)] dark:hover:from-[rgba(110,68,255,0.15)] dark:hover:to-[rgba(189,166,255,0.15)] hover:shadow-md hover:scale-105 active:scale-95 hover:-translate-y-0.5 text-plum/90 dark:text-pearl/90" 
             aria-label={language === 'hr' ? 'Košarica' : 'Shopping cart'}
@@ -276,7 +278,7 @@ export default function Header({ language, onLanguageChange, cartItemCount, onCa
                 }}
               />
             )}
-          </button>
+          </button> : null}
 
           {/* Theme Toggle */}
           <div className="hidden min-[360px]:block">

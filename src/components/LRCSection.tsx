@@ -7,13 +7,27 @@ import { DecorativeSkyBackdrop } from './DecorativeSkyBackdrop'
 import { sampleProducts, productTags } from '../data/products'
 import { cartActions } from '../lib/cart.store'
 import { trackEvent } from '../lib/analytics'
+import { LrcPresentationCards } from './LrcPresentationCards'
+
+/** Stari katalog ostaje u kodu za webshop, ali se uz tri kutije ne prikazuje. */
+const SHOW_LEGACY_LRC_CATALOG = false
 
 interface LRCSectionProps {
   language?: 'hr' | 'en'
   isFormEnabled?: boolean
+  /** Add-to-cart and prices. Independent of LRC public visibility. */
+  webshopEnabled?: boolean
+  webshopUrl?: string | null
+  inquiryPath?: string
 }
 
-export default function LRCSection({ language = 'hr', isFormEnabled = true }: LRCSectionProps) {
+export default function LRCSection({
+  language = 'hr',
+  isFormEnabled = true,
+  webshopEnabled = false,
+  webshopUrl = null,
+  inquiryPath = '/lrc/upit',
+}: LRCSectionProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedTag, setSelectedTag] = useState('all')
 
@@ -173,16 +187,33 @@ export default function LRCSection({ language = 'hr', isFormEnabled = true }: LR
             <a href="#lrc-ponuda" className="btn btn-primary min-h-12 justify-center">
               {translations.browse[language]}
             </a>
+            {webshopUrl ? (
+              <a
+                href={webshopUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-secondary min-h-12 justify-center"
+              >
+                {language === 'hr' ? 'Otvori webshop' : 'Open webshop'}
+              </a>
+            ) : null}
             {isFormEnabled && (
-              <Link to="/lrc/upit" className="btn btn-secondary min-h-12 justify-center">
+              <Link to={inquiryPath} className="btn btn-secondary min-h-12 justify-center">
                 {translations.formCtaButton[language]}
               </Link>
             )}
           </div>
         </div>
 
-        {/* Ponuda / pretraga i filteri */}
-        <div id="lrc-ponuda" className="mb-8 scroll-mt-24 space-y-4 sm:mb-10">
+        <div id={SHOW_LEGACY_LRC_CATALOG ? undefined : 'lrc-ponuda'} className="scroll-mt-24">
+          <LrcPresentationCards
+            language={language}
+            inquiryPath={inquiryPath}
+          />
+        </div>
+
+        {/* Ponuda / pretraga i filteri — skriveni uz tri kutije, kod ostaje za webshop. */}
+        {SHOW_LEGACY_LRC_CATALOG && <div id="lrc-ponuda" className="mb-8 scroll-mt-24 space-y-4 sm:mb-10">
           <div className="mx-auto max-w-2xl px-4 text-center sm:px-5">
             <h2 className="font-heading text-xl font-bold tracking-tight text-balance text-plum dark:text-pearl sm:text-2xl">
               {translations.offerTitle[language]}
@@ -228,9 +259,9 @@ export default function LRCSection({ language = 'hr', isFormEnabled = true }: LR
               </button>
             ))}
           </div>
-        </div>
+        </div>}
 
-        <div className="mb-10 sm:mb-12">
+        {SHOW_LEGACY_LRC_CATALOG && <div className="mb-10 sm:mb-12">
           {filteredProducts.length === 0 && (
             <p role="status" className="text-center">{translations.noResults[language]}</p>
           )}
@@ -246,28 +277,32 @@ export default function LRCSection({ language = 'hr', isFormEnabled = true }: LR
                 <p className="mb-4 mt-2 text-sm leading-relaxed text-plum dark:text-pearl">
                   {language === 'hr' ? product.descriptionHr : product.description}
                 </p>
-                <p className="mb-3 mt-auto text-lg font-bold text-amethyst dark:text-lavender">
-                  €{product.price}
-                </p>
-                <button
-                  type="button"
-                  className="btn btn-primary min-h-11 w-full text-sm"
-                  onClick={() => {
-                    cartActions.addItem({
-                      id: product.id,
-                      title: language === 'hr' ? product.nameHr : product.name,
-                      price: product.price,
-                      imageUrl: product.image,
-                      tags: product.tags,
-                    })
-                  }}
-                >
-                  {translations.addToCart[language]}
-                </button>
+                {webshopEnabled ? (
+                  <>
+                    <p className="mb-3 mt-auto text-lg font-bold text-amethyst dark:text-lavender">
+                      €{product.price}
+                    </p>
+                    <button
+                      type="button"
+                      className="btn btn-primary min-h-11 w-full text-sm"
+                      onClick={() => {
+                        cartActions.addItem({
+                          id: product.id,
+                          title: language === 'hr' ? product.nameHr : product.name,
+                          price: product.price,
+                          imageUrl: product.image,
+                          tags: product.tags,
+                        })
+                      }}
+                    >
+                      {translations.addToCart[language]}
+                    </button>
+                  </>
+                ) : null}
               </article>
             ))}
           </div>
-        </div>
+        </div>}
 
         {/* Message when form is disabled */}
         {!isFormEnabled && (
@@ -316,7 +351,7 @@ export default function LRCSection({ language = 'hr', isFormEnabled = true }: LR
                     {translations.formCtaText[language]}
                   </p>
                   <Link
-                    to="/lrc/upit"
+                    to={inquiryPath}
                     onClick={() => trackEvent('inquiry_cta_click', { source: 'lrc' })}
                     className="btn btn-primary inline-flex min-h-[48px] w-full max-w-md items-center justify-center px-8 py-3 text-base font-semibold shadow-md transition-all duration-300 hover:shadow-lg sm:w-auto sm:px-12 sm:py-4"
                     style={{ letterSpacing: '0.02em' }}

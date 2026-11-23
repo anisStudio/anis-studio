@@ -8,6 +8,8 @@ export interface Settings {
   lrc_public_visible: boolean
   web_atelier_public_visible: boolean
   interiors_vr_enabled: boolean
+  lrc_webshop_enabled: boolean
+  lrc_webshop_url: string | null
 }
 
 const DEFAULT_SETTINGS: Settings = {
@@ -17,6 +19,8 @@ const DEFAULT_SETTINGS: Settings = {
   lrc_public_visible: false,
   web_atelier_public_visible: false,
   interiors_vr_enabled: false,
+  lrc_webshop_enabled: false,
+  lrc_webshop_url: null,
 }
 
 const SETTINGS_KEYS: (keyof Settings)[] = [
@@ -26,6 +30,8 @@ const SETTINGS_KEYS: (keyof Settings)[] = [
   'lrc_public_visible',
   'web_atelier_public_visible',
   'interiors_vr_enabled',
+  'lrc_webshop_enabled',
+  'lrc_webshop_url',
 ]
 
 /** Merge a server row without wiping fields that are missing from the response (PostgREST/RLS/cache). */
@@ -44,6 +50,11 @@ function mergeSettingsFromServer(
     if (k === 'id') {
       const v = row[k]
       if (typeof v === 'number') next.id = v
+      continue
+    }
+    if (k === 'lrc_webshop_url') {
+      const v = row[k]
+      if (typeof v === 'string' || v === null) next.lrc_webshop_url = v
       continue
     }
     if (Object.prototype.hasOwnProperty.call(row, k)) {
@@ -103,12 +114,16 @@ export function useSettings() {
     fetchSettings()
   }, [])
 
-  async function updateSettings(updates: Partial<Settings>) {
+  async function updateSettings(
+    updates: Partial<Settings>,
+    options?: { reportError?: boolean },
+  ) {
+    const reportError = options?.reportError !== false
     setError(null)
 
     // Skip API call if Supabase is not configured
     if (!isSupabaseConfigured) {
-      const updatedSettings = { ...DEFAULT_SETTINGS, ...updates }
+      const updatedSettings = { ...(settings ?? DEFAULT_SETTINGS), ...updates }
       setSettings(updatedSettings)
       return { success: true, data: updatedSettings }
     }
@@ -140,7 +155,7 @@ export function useSettings() {
     } catch (err) {
       console.error('Error updating settings:', err)
       const errorMessage = err instanceof Error ? err.message : 'Failed to update settings'
-      setError(errorMessage)
+      if (reportError) setError(errorMessage)
       return { success: false, error: errorMessage }
     }
   }

@@ -1,6 +1,11 @@
 import { useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { lrcInquiryCustomIdeaOption, sampleProducts } from '../data/products'
+import {
+  LRC_PRESENTATION_PRODUCTS,
+  formatLrcEuro,
+  lrcPresentationInquirySummary,
+} from './LrcPresentationCards'
 import { trackEvent } from '../lib/analytics'
 import { submitLrcInquiry } from '../lib/lrcInquiries'
 
@@ -8,9 +13,16 @@ interface LRCInquiryFormProps {
   language: 'hr' | 'en'
 }
 
+function presentationProductFromQuery(code: string | null) {
+  const normalized = code?.trim().toUpperCase() ?? ''
+  return LRC_PRESENTATION_PRODUCTS.find((product) => product.code === normalized) ?? null
+}
+
 export default function LRCInquiryForm({ language }: LRCInquiryFormProps) {
+  const [searchParams] = useSearchParams()
+  const requestedProduct = presentationProductFromQuery(searchParams.get('proizvod'))
   const [formData, setFormData] = useState({
-    product: '',
+    product: requestedProduct?.code ?? '',
     description: '',
     name: '',
     email: '',
@@ -100,8 +112,11 @@ export default function LRCInquiryForm({ language }: LRCInquiryFormProps) {
     setIsSubmitting(true)
 
     try {
+      const selectedPresentation = presentationProductFromQuery(formData.product)
       await submitLrcInquiry({
-        product: formData.product,
+        product: selectedPresentation
+          ? lrcPresentationInquirySummary(selectedPresentation, language)
+          : formData.product,
         description: formData.description,
         name: formData.name,
         email: formData.email,
@@ -161,15 +176,37 @@ export default function LRCInquiryForm({ language }: LRCInquiryFormProps) {
               className="min-h-[48px] w-full rounded-xl border border-[rgba(110,68,255,0.18)] bg-white px-4 py-3 text-base shadow-sm outline-none transition-all duration-200 focus:border-[--color-primary] focus:ring-2 focus:ring-[--color-primary]/25 dark:border-lavender/22 dark:bg-white/10 dark:text-pearl dark:focus:bg-white/15"
             >
               <option value="" className="text-plum/55 dark:text-pearl/55">{translations.selectProductPlaceholder[language]}</option>
-              <option value={lrcInquiryCustomIdeaOption.id}>
-                {language === 'hr' ? lrcInquiryCustomIdeaOption.nameHr : lrcInquiryCustomIdeaOption.name}
-              </option>
-              {sampleProducts.map(product => (
-                <option key={product.id} value={product.id}>
-                  {language === 'hr' ? product.nameHr : product.name}
+              {LRC_PRESENTATION_PRODUCTS.map((product) => (
+                <option key={product.code} value={product.code}>
+                  {product.code} — {product.title[language]} ({formatLrcEuro(product.retailPriceEuro)})
                 </option>
               ))}
             </select>
+            {(() => {
+              const selected = presentationProductFromQuery(formData.product)
+              if (!selected) return null
+              const rows = language === 'hr'
+                ? [
+                    ['Naziv', selected.title.hr],
+                    ['Maloprodajna cijena', formatLrcEuro(selected.retailPriceEuro)],
+                    ['Šifra', selected.code],
+                  ]
+                : [
+                    ['Name', selected.title.en],
+                    ['Retail price', formatLrcEuro(selected.retailPriceEuro)],
+                    ['Code', selected.code],
+                  ]
+              return (
+                <dl className="rounded-xl border border-amethyst/15 bg-white/70 px-4 py-3 text-sm dark:border-lavender/20 dark:bg-white/[0.04]">
+                  {rows.map(([label, value]) => (
+                    <div key={label} className="flex flex-col gap-0.5 py-1.5 sm:flex-row sm:gap-3">
+                      <dt className="shrink-0 font-semibold text-plum/70 dark:text-pearl/65 sm:w-44">{label}</dt>
+                      <dd className="text-plum dark:text-pearl">{value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              )
+            })()}
           </div>
 
           <div className="space-y-2">
