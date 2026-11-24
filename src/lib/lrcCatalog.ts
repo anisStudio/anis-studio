@@ -412,6 +412,24 @@ export function lrcProductImageObjectPath(src: string): string | null {
   return path.length > 0 ? path : null
 }
 
+/** Storage paths that no remaining product still shows. Static card images are never included. */
+export function unusedLrcStorageObjectPaths(
+  candidateSrcs: readonly string[],
+  products: readonly { photos: readonly { src: string }[] }[],
+): string[] {
+  const used = new Set(products.flatMap((product) => product.photos.map((photo) => photo.src)))
+  const paths: string[] = []
+  const seen = new Set<string>()
+  for (const src of candidateSrcs) {
+    if (used.has(src)) continue
+    const path = lrcProductImageObjectPath(src)
+    if (!path || seen.has(path)) continue
+    seen.add(path)
+    paths.push(path)
+  }
+  return paths
+}
+
 function localized(value: unknown): LrcLocalizedText | null {
   if (!value || typeof value !== 'object') return null
   const record = value as Record<string, unknown>

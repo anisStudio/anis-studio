@@ -17,6 +17,7 @@ import {
   lrcProductContent,
   lrcProductFromParts,
   lrcProductImageObjectPath,
+  unusedLrcStorageObjectPaths,
   lrcPresentationInquirySummary,
   lrcPublishBlock,
   lrcStoredProductLabel,
@@ -171,6 +172,20 @@ assert.match(stored, /22,00 €/)
 assert.equal(lrcStoredProductLabel('1', 'hr', legacy), 'Set podmetača od epoksidne smole')
 assert.equal(lrcStoredProductLabel('custom-idea', 'en', legacy), 'I have my own idea / a new product')
 
+const sharedSrc = 'http://127.0.0.1:54421/storage/v1/object/public/lrc-product-images/LRC-TEST-01/shared.webp'
+const onlySrc = 'http://127.0.0.1:54421/storage/v1/object/public/lrc-product-images/LRC-TEST-01/only.webp?v=1'
+const staticSrc = '/lrc_image/proizvodi/slike/lrc-bab-03-01-zatvorena.webp'
+const productsAfterSave = [
+  { photos: [{ src: sharedSrc }] },
+  { photos: [{ src: staticSrc }] },
+]
+assert.deepEqual(
+  unusedLrcStorageObjectPaths([sharedSrc, onlySrc, staticSrc, onlySrc], productsAfterSave),
+  ['LRC-TEST-01/only.webp'],
+)
+assert.deepEqual(unusedLrcStorageObjectPaths([onlySrc], []), ['LRC-TEST-01/only.webp'])
+assert.deepEqual(removeLrcPhoto([{ src: onlySrc, alt: { hr: '', en: '' }, caption: { hr: '', en: '' }, frame: '#d8cfc8' }], 0), [])
+
 const migration = read('supabase/migrations/20261124000000_lrc_product_catalog.sql')
 assert.match(migration, /is_visible boolean not null default false/)
 assert.match(migration, /grant insert, update on public\.lrc_products to authenticated/)
@@ -187,6 +202,13 @@ for (const product of approved) {
   assert.ok(migration.includes(product.title.hr))
   assert.ok(migration.includes(product.description.hr))
 }
+
+const productDelete = read('supabase/migrations/20261124230000_lrc_product_delete.sql')
+assert.match(productDelete, /grant delete on public\.lrc_products to authenticated/)
+assert.match(productDelete, /Admins delete LRC products/)
+assert.match(productDelete, /is_admin\(\)/)
+assert.match(productDelete, /Do not apply this migration to production/)
+assert.doesNotMatch(productDelete, /(?:update|delete|drop)\s+(?:from\s+)?public\.lrc_inquiries/i)
 
 const storage = read('supabase/migrations/20261124010000_lrc_product_images.sql')
 assert.match(storage, /lrc-product-images/)
@@ -226,6 +248,11 @@ assert.doesNotMatch(app, /path="\/(?:cart|checkout|kosarica)"/)
 assert.match(adminPage, /EyeOff/)
 assert.match(adminPage, /createLrcProduct/)
 assert.match(adminPage, /setLrcProductVisibility/)
+assert.match(adminPage, /Trajno izbriši proizvod/)
+assert.match(adminPage, /deleteLrcProduct\(editor\.code\)/)
+assert.match(adminPage, /deleteUnusedLrcProductImages\(removedSrcs, rows\)/)
+assert.match(adminPage, /deleteUnusedLrcProductImages\(candidates, rows\)/)
+assert.doesNotMatch(adminPage, /deleteLrcProductImage/)
 assert.match(adminPage, /object-contain/)
 assert.match(api, /frameColorFromImageFile/)
 assert.match(api, /\.upload\(objectPath, file/)

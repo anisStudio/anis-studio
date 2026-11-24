@@ -5,6 +5,7 @@ import {
   lrcProductContent,
   lrcProductImageObjectPath,
   newLrcProductInsert,
+  unusedLrcStorageObjectPaths,
   publicCatalogFromFetch,
   publicCatalogWhenUnconfigured,
   sortLrcProducts,
@@ -136,6 +137,16 @@ export async function updateLrcProduct(code: string, draft: LrcProductDraft): Pr
   }
 }
 
+export async function deleteLrcProduct(code: string): Promise<void> {
+  const client = requireClient()
+  await requireAuth(client)
+  const { data, error } = await client.from(TABLE).delete().eq('code', code).select('code')
+  if (error) throwQueryError(error, 'Brisanje proizvoda')
+  if (!data?.length) {
+    throw lrcCatalogError('request', 'Proizvod nije obrisan. Provjeri administratorske ovlasti.')
+  }
+}
+
 export async function setLrcProductVisibility(code: string, isVisible: boolean): Promise<void> {
   const client = requireClient()
   await requireAuth(client)
@@ -185,11 +196,31 @@ export async function uploadLrcProductImage(file: File, code: string): Promise<{
 export async function deleteLrcProductImage(src: string): Promise<void> {
   const objectPath = lrcProductImageObjectPath(src)
   if (!objectPath) return
+  await deleteLrcStorageObjects([objectPath])
+}
+
+/** Removes storage files only when none of the given products still reference them. */
+export async function deleteUnusedLrcProductImages(
+  candidateSrcs: readonly string[],
+  products: readonly { photos: readonly { src: string }[] }[],
+): Promise<void> {
+  const paths = unusedLrcStorageObjectPaths(candidateSrcs, products)
+  if (paths.length === 0) return
+  await deleteLrcStorageObjects(paths)
+}
+
+async function deleteLrcStorageObjects(objectPaths: readonly string[]): Promise<void> {
   const client = requireClient()
   await requireAuth(client)
-  const { data, error } = await client.storage.from(BUCKET).remove([objectPath])
-  if (error) throw lrcCatalogError('request', `Uklanjanje fotografije: ${error.message}`)
-  if (!data?.length) {
-    throw lrcCatalogError('request', 'Fotografija nije uklonjena iz pohrane.')
+  for (const objectPath of objectPaths) {
+    const { data, error } = await client.storage.from(BUCKET).remove([objectPath])
+    if (error) {
+      const message = error.message.toLowerCase()
+      if (message.includes('not found') || message.includes('does not exist')) continue
+      throw lrcCatalogError('request', `Uklanjanje fotografije: ${error.message}`)
+    }
+    if (!data?.length) {
+      throw lrcCatalogError('request', 'Fotografija nije uklonjena iz pohrane.')
+    }
   }
 }

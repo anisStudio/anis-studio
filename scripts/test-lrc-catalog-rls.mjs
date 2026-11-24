@@ -14,6 +14,10 @@ const migration = readFileSync(
   join(root, 'supabase/migrations/20261124000000_lrc_product_catalog.sql'),
   'utf8',
 )
+const deleteMigration = readFileSync(
+  join(root, 'supabase/migrations/20261124230000_lrc_product_delete.sql'),
+  'utf8',
+)
 
 const setupSql = `
 create role anon nologin;
@@ -55,6 +59,11 @@ function run(command, args, input) {
 
 async function psql(sql) {
   return run('docker', ['exec', '-i', container, 'psql', '-U', 'postgres', '-v', 'ON_ERROR_STOP=1'], sql)
+}
+
+function lastCount(stdout) {
+  const matches = [...stdout.matchAll(/^\s*(\d+)\s*$/gm)]
+  return matches.at(-1)?.[1] ?? ''
 }
 
 function roleScript(role, adminFlag, statements) {
@@ -109,6 +118,8 @@ async function main() {
     if (prepared.code !== 0) throw new Error(prepared.stderr || prepared.stdout)
     const applied = await psql(migration)
     if (applied.code !== 0) throw new Error(applied.stderr || applied.stdout)
+    const deleteApplied = await psql(deleteMigration)
+    if (deleteApplied.code !== 0) throw new Error(deleteApplied.stderr || deleteApplied.stdout)
 
     const report = `
 create table public.lrc_rls_report (step text primary key, actual int not null);
@@ -178,6 +189,26 @@ ${roleScript('authenticated', 'false', `insert into public.lrc_products (code, s
 ${roleScript('anon', 'false', `insert into public.lrc_products (code, sort_order, content) values ('LRC-NOPE-02', 8, '${content}'::jsonb);`)}
 `)
     if (anonDenied.code === 0) throw new Error('Anonymous insert was allowed.')
+
+    const memberDelete = await psql(`
+${roleScript('authenticated', 'false', `delete from public.lrc_products where code = 'LRC-NEW-01';`)}
+select count(*)::text from public.lrc_products where code = 'LRC-NEW-01';
+`)
+    if (memberDelete.code !== 0) throw new Error(memberDelete.stderr || memberDelete.stdout)
+    if (lastCount(memberDelete.stdout) !== '1') {
+      throw new Error(`Non-admin delete changed the test product.\n${memberDelete.stdout}`)
+    }
+
+    const adminDelete = await psql(`
+${roleScript('authenticated', 'true', `delete from public.lrc_products where code = 'LRC-NEW-01';`)}
+select count(*)::text from public.lrc_products where code = 'LRC-NEW-01';
+select count(*)::text from public.lrc_products where code in ('LRC-BAB-03', 'LRC-VIN-02', 'LRC-VIN-03');
+`)
+    if (adminDelete.code !== 0) throw new Error(adminDelete.stderr || adminDelete.stdout)
+    const counts = [...adminDelete.stdout.matchAll(/^\s*(\d+)\s*$/gm)].map((match) => match[1])
+    if (counts.at(-2) !== '0' || counts.at(-1) !== '3') {
+      throw new Error(`Admin delete did not leave the three boxes.\n${adminDelete.stdout}`)
+    }
 
     console.log('lrc catalog rls: ok')
   } finally {

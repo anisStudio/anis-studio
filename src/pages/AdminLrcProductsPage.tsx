@@ -3,7 +3,8 @@ import toast from 'react-hot-toast'
 import { Eye, EyeOff } from 'lucide-react'
 import {
   createLrcProduct,
-  deleteLrcProductImage,
+  deleteLrcProduct,
+  deleteUnusedLrcProductImages,
   fetchAdminLrcProducts,
   lrcCatalogErrorCode,
   setLrcProductVisibility,
@@ -17,7 +18,6 @@ import {
   lrcCoverIndex,
   lrcDraftFromInput,
   lrcFrameStyle,
-  lrcProductImageObjectPath,
   lrcPublishBlock,
   moveLrcPhoto,
   productToInput,
@@ -36,6 +36,7 @@ interface EditorState {
   mode: 'create' | 'edit'
   code: string
   input: LrcProductInput
+  removedSrcs: string[]
 }
 
 function messageFrom(error: unknown): string {
@@ -51,6 +52,8 @@ export default function AdminLrcProductsPage() {
   const [editor, setEditor] = useState<EditorState | null>(null)
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
   const [pendingCodes, setPendingCodes] = useState<Set<string>>(new Set())
 
   async function loadProducts() {
@@ -79,12 +82,14 @@ export default function AdminLrcProductsPage() {
   function openCreate() {
     const nextOrder = products.reduce((max, product) => Math.max(max, product.sortOrder), 0) + 1
     setError(null)
-    setEditor({ mode: 'create', code: '', input: emptyLrcProductInput(nextOrder) })
+    setConfirmDelete(false)
+    setEditor({ mode: 'create', code: '', input: emptyLrcProductInput(nextOrder), removedSrcs: [] })
   }
 
   function openEdit(product: LrcProduct) {
     setError(null)
-    setEditor({ mode: 'edit', code: product.code, input: productToInput(product) })
+    setConfirmDelete(false)
+    setEditor({ mode: 'edit', code: product.code, input: productToInput(product), removedSrcs: [] })
   }
 
   function patchInput(patch: Partial<LrcProductInput>) {
@@ -113,6 +118,7 @@ export default function AdminLrcProductsPage() {
     }
     setSaving(true)
     setError(null)
+    const removedSrcs = editor.removedSrcs
     try {
       if (editor.mode === 'create') {
         await createLrcProduct(parsed.draft)
@@ -123,12 +129,57 @@ export default function AdminLrcProductsPage() {
       }
       const rows = sortLrcProducts(await fetchAdminLrcProducts())
       setProducts(rows)
+      let cleanupError: string | null = null
+      if (removedSrcs.length > 0) {
+        try {
+          await deleteUnusedLrcProductImages(removedSrcs, rows)
+        } catch (err) {
+          cleanupError = `Proizvod je spremljen, ali fotografija je ostala u pohrani. ${messageFrom(err)}`
+        }
+      }
       const saved = rows.find((product) => product.code === parsed.draft.code)
-      if (saved) setEditor({ mode: 'edit', code: saved.code, input: productToInput(saved) })
+      if (saved) {
+        setEditor({
+          mode: 'edit',
+          code: saved.code,
+          input: productToInput(saved),
+          removedSrcs: cleanupError ? removedSrcs : [],
+        })
+      }
+      if (cleanupError) setError(cleanupError)
     } catch (err) {
       setError(messageFrom(err))
     } finally {
       setSaving(false)
+    }
+  }
+
+  async function handleDelete() {
+    if (!editor || editor.mode !== 'edit') return
+    const saved = products.find((product) => product.code === editor.code)
+    const candidates = [
+      ...(saved?.photos.map((photo) => photo.src) ?? []),
+      ...editor.input.photos.map((photo) => photo.src),
+      ...editor.removedSrcs,
+    ]
+    setDeleting(true)
+    setError(null)
+    try {
+      await deleteLrcProduct(editor.code)
+      const rows = sortLrcProducts(await fetchAdminLrcProducts())
+      setProducts(rows)
+      setEditor(null)
+      setConfirmDelete(false)
+      toast.success('Proizvod je trajno izbrisan.')
+      try {
+        await deleteUnusedLrcProductImages(candidates, rows)
+      } catch (err) {
+        setError(`Proizvod je izbrisan, ali fotografija je ostala u pohrani. ${messageFrom(err)}`)
+      }
+    } catch (err) {
+      setError(messageFrom(err))
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -189,17 +240,20 @@ export default function AdminLrcProductsPage() {
     }
   }
 
-  async function handleRemovePhoto(index: number) {
-    if (!editor) return
-    const photo = editor.input.photos[index]
-    if (!photo) return
+  function handleRemovePhoto(index: number) {
+    const photo = editor?.input.photos[index]
+    if (!editor || !photo) return
     setError(null)
-    try {
-      if (lrcProductImageObjectPath(photo.src)) await deleteLrcProductImage(photo.src)
-      patchInput({ photos: removeLrcPhoto(editor.input.photos, index) })
-    } catch (err) {
-      setError(messageFrom(err))
-    }
+    setEditor((current) => {
+      if (!current) return current
+      return {
+        ...current,
+        removedSrcs: current.removedSrcs.includes(photo.src)
+          ? current.removedSrcs
+          : [...current.removedSrcs, photo.src],
+        input: { ...current.input, photos: removeLrcPhoto(current.input.photos, index) },
+      }
+    })
   }
 
   const coverIndex = editor ? lrcCoverIndex(editor.input.photos) : -1
@@ -428,8 +482,9 @@ export default function AdminLrcProductsPage() {
                           </button>
                           <button
                             type="button"
-                            className="rounded-md border border-red-200 px-2 py-1 text-xs text-red-700"
-                            onClick={() => void handleRemovePhoto(index)}
+                            className="rounded-md border border-red-200 px-2 py-1 text-xs text-red-700 disabled:opacity-50"
+                            disabled={saving || deleting}
+                            onClick={() => handleRemovePhoto(index)}
                           >
                             Ukloni
                           </button>
@@ -470,19 +525,62 @@ export default function AdminLrcProductsPage() {
             <div className="flex flex-wrap gap-2">
               <button
                 type="submit"
-                disabled={saving || uploading}
+                disabled={saving || uploading || deleting}
                 className="rounded-md bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700 disabled:opacity-50"
               >
                 {saving ? 'Spremam...' : 'Spremi'}
               </button>
               <button
                 type="button"
-                onClick={() => setEditor(null)}
+                onClick={() => {
+                  setConfirmDelete(false)
+                  setEditor(null)
+                }}
                 className="rounded-md border border-slate-200 px-4 py-2 text-sm text-slate-700"
               >
                 Zatvori
               </button>
             </div>
+
+            {editor.mode === 'edit' ? (
+              <div className="rounded-lg border border-red-200 p-4">
+                {confirmDelete ? (
+                  <div className="space-y-3">
+                    <p className="text-sm text-slate-900">
+                      Trajno izbrisati proizvod „{editor.input.titleHr.trim() || 'Bez naziva'}” ({editor.code})?
+                    </p>
+                    <p className="text-xs text-slate-600">
+                      Nestaje iz admin popisa, javnih kartica i odabira za nove upite. Raniji upiti ostaju sa spremljenim podacima.
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        disabled={deleting || saving || uploading}
+                        onClick={() => void handleDelete()}
+                        className="rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm font-medium text-red-800 disabled:opacity-50"
+                      >
+                        {deleting ? 'Brišem...' : 'Trajno izbriši proizvod'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setConfirmDelete(false)}
+                        className="rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700"
+                      >
+                        Odustani
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setConfirmDelete(true)}
+                    className="rounded-md border border-red-200 px-3 py-2 text-sm text-red-700"
+                  >
+                    Trajno izbriši proizvod
+                  </button>
+                )}
+              </div>
+            ) : null}
           </form>
         ) : null}
       </section>
