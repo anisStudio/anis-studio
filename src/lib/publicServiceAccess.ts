@@ -144,6 +144,6 @@ export const DEPARTMENT_PREVIEW_LINKS: Record<PublicService, DepartmentPreviewLi
     },
     { label: 'Demo — cvjećarna', path: '/web-atelier/demo/cvjecarna' },
     { label: 'Demo — grooming', path: '/web-atelier/demo/grooming' },
-    { label: 'Demo — stolarija', path: '/web-atelier/demo/stolarija' },
+    { label: 'Demo — interijeri', path: '/web-atelier/demo/interijeri' },
   ],
 }

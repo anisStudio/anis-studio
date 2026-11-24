@@ -1,0 +1,344 @@
+.wa-int {
+  /* Client palette: change these custom properties only. */
+  --int-ink: #22211f;
+  --int-muted: #68635d;
+  --int-paper: #f3f0ea;
+  --int-panel: #fffdf9;
+  --int-accent: #77583f;
+  background: var(--int-paper);
+  color: var(--int-ink);
+  font-family: Inter, "Segoe UI", sans-serif;
+}
+
+.wa-int * {
+  box-sizing: border-box;
+}
+
+.wa-int-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem 1.5rem;
+  padding: 1rem clamp(1rem, 4vw, 3rem);
+  border-bottom: 1px solid rgba(34, 33, 31, 0.12);
+  background: var(--int-panel);
+}
+
+.wa-int-nav > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.wa-int-nav strong {
+  font-family: Georgia, serif;
+  font-size: 1.2rem;
+  letter-spacing: 0.04em;
+}
+
+.wa-int-nav span {
+  color: var(--int-muted);
+  font-size: 0.72rem;
+}
+
+.wa-int-nav nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 1.1rem;
+}
+
+.wa-int-nav a {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  color: var(--int-ink);
+  font-size: 0.83rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.wa-int-hero {
+  display: grid;
+  max-width: 80rem;
+  margin: 0 auto;
+  background: #ded6ca;
+}
+
+.wa-int-hero-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: clamp(2rem, 6vw, 5rem) clamp(1.2rem, 5vw, 4rem);
+}
+
+.wa-int-kicker {
+  margin: 0 0 0.65rem;
+  color: var(--int-accent);
+  font-size: 0.69rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.wa-int-hero h1 {
+  max-width: 14ch;
+  margin: 0;
+  font-family: Georgia, serif;
+  font-size: clamp(2.1rem, 5vw, 4.6rem);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 0.98;
+}
+
+.wa-int-hero-copy > p:not(.wa-int-kicker) {
+  max-width: 34rem;
+  margin: 1.4rem 0;
+  color: #514b45;
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+
+.wa-int-primary,
+.wa-int-contact > a {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--int-ink);
+  padding: 0.7rem 1.3rem;
+  background: var(--int-ink);
+  color: #fff !important;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.wa-int-hero > img {
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+  object-fit: cover;
+}
+
+@media (min-width: 800px) {
+  .wa-int-hero {
+    grid-template-columns: 0.85fr 1.15fr;
+    min-height: 590px;
+  }
+}
+
+.wa-int-section {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: clamp(2.8rem, 7vw, 6rem) clamp(1rem, 4vw, 3rem);
+}
+
+.wa-int-section-heading {
+  max-width: 44rem;
+  margin-bottom: 2rem;
+}
+
+.wa-int-section h2,
+.wa-int-approach h2,
+.wa-int-contact h2,
+.wa-int-modal h2 {
+  margin: 0;
+  font-family: Georgia, serif;
+  font-size: clamp(1.8rem, 4vw, 3.3rem);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+}
+
+.wa-int-project-grid {
+  display: grid;
+  gap: 1.2rem;
+}
+
+.wa-int-project-card {
+  overflow: hidden;
+  border: 1px solid rgba(34, 33, 31, 0.12);
+  background: var(--int-panel);
+}
+
+.wa-int-project-card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.wa-int-project-card > div {
+  padding: 1.2rem;
+}
+
+.wa-int-project-card h3 {
+  margin: 0;
+  font-family: Georgia, serif;
+  font-size: 1.4rem;
+  font-weight: 500;
+}
+
+.wa-int-project-card > div > p:not(.wa-int-kicker) {
+  min-height: 4.3em;
+  margin: 0.7rem 0 1rem;
+  color: var(--int-muted);
+  font-size: 0.84rem;
+  line-height: 1.55;
+}
+
+.wa-int-project-card button,
+.wa-int-close {
+  min-height: 44px;
+  border: 1px solid var(--int-ink);
+  padding: 0.55rem 0.9rem;
+  background: transparent;
+  color: var(--int-ink);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@media (min-width: 720px) {
+  .wa-int-project-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.wa-int-approach {
+  padding: clamp(2.8rem, 7vw, 5.5rem) clamp(1rem, 5vw, 4rem);
+  background: #252421;
+  color: #f5f1e9;
+  text-align: center;
+}
+
+.wa-int-approach .wa-int-kicker {
+  color: #d8b897;
+}
+
+.wa-int-approach > div {
+  display: grid;
+  max-width: 64rem;
+  margin: 2rem auto 0;
+  gap: 1rem;
+}
+
+.wa-int-approach article {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 1rem 0;
+  text-align: left;
+}
+
+.wa-int-approach strong {
+  color: #d8b897;
+  font-family: Georgia, serif;
+  font-size: 1.5rem;
+}
+
+@media (min-width: 720px) {
+  .wa-int-approach > div {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.wa-int-contact {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(3rem, 8vw, 6rem) 1rem;
+  text-align: center;
+}
+
+.wa-int-contact > p:not(.wa-int-kicker, .wa-int-package-note) {
+  max-width: 38rem;
+  color: var(--int-muted);
+  line-height: 1.6;
+}
+
+.wa-int-contact > span {
+  margin-top: 0.8rem;
+  color: var(--int-muted);
+}
+
+.wa-int-package-note,
+.wa-int-rights {
+  max-width: 46rem;
+  margin-top: 1.4rem;
+  color: var(--int-muted);
+  font-size: 0.73rem;
+  line-height: 1.5;
+}
+
+.wa-int-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  padding: 1rem;
+  background: rgba(20, 18, 16, 0.82);
+  backdrop-filter: blur(5px);
+}
+
+.wa-int-modal {
+  position: relative;
+  width: min(100%, 68rem);
+  max-height: calc(100dvh - 2rem);
+  overflow-y: auto;
+  padding: clamp(1rem, 3vw, 2.2rem);
+  background: var(--int-panel);
+  color: var(--int-ink);
+}
+
+.wa-int-close {
+  display: block;
+  margin: 0 0 1.5rem auto;
+}
+
+.wa-int-detail-gallery {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 1.5rem;
+}
+
+.wa-int-detail-gallery img {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+}
+
+.wa-int-detail-copy {
+  display: grid;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.wa-int-detail-copy h3 {
+  margin: 0 0 0.6rem;
+  font-family: Georgia, serif;
+  font-size: 1.2rem;
+}
+
+.wa-int-detail-copy p,
+.wa-int-detail-copy li {
+  color: var(--int-muted);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.wa-int-detail-copy ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+@media (min-width: 720px) {
+  .wa-int-detail-gallery,
+  .wa-int-detail-copy {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
