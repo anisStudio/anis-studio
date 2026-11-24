@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
-import { PanelsTopLeft, Images, MessageSquare, Armchair, Inbox, Mail, FileText, Folders, CalendarDays, Settings, Menu, X, LogOut } from 'lucide-react'
+import { PanelsTopLeft, Images, MessageSquare, Armchair, Box, Inbox, Mail, FileText, Folders, CalendarDays, Settings, Menu, X, LogOut } from 'lucide-react'
 import { useAdminAuth } from '../providers/AdminAuthProvider'
 
 const groups = [
   { title: 'Studio', items: [['Pregled stranice', '/admin/preview', PanelsTopLeft], ['Portfolio', '/admin/portfolio', Images], ['Recenzije', '/admin/reviews', MessageSquare]] },
-  { title: 'LRC', items: [['LRC upiti', '/admin/lrc-inquiries', Inbox]] },
+  { title: 'LRC', items: [['Proizvodi', '/admin/lrc-products', Box], ['LRC upiti', '/admin/lrc-inquiries', Inbox]] },
   { title: 'Interijeri', items: [['Interijer projekti', '/admin/interiors-projects', Armchair]] },
   { title: 'Web Atelier', items: [['WA upiti', '/admin/web-atelier-inquiries', Mail], ['WA ponude', '/admin/web-atelier-offers', FileText], ['WA projekti', '/admin/web-atelier-projects', Folders]] },
   { title: 'Upravljanje', items: [['Kapacitet', '/admin/availability', CalendarDays], ['Postavke', '/admin/settings', Settings]] },

@@ -39,6 +39,7 @@ const PublicProjectVrPage = lazy(() => import('./pages/PublicProjectVrPage'))
 
 const AdminLoginPage = lazy(() => import('./pages/AdminLoginPage'))
 const AdminSettingsPage = lazy(() => import('./pages/AdminSettingsPage'))
+const AdminLrcProductsPage = lazy(() => import('./pages/AdminLrcProductsPage'))
 const AdminLrcInquiriesPage = lazy(() => import('./pages/AdminLrcInquiriesPage'))
 const AdminInteriorsProjectsPage = lazy(() => import('./pages/AdminInteriorsProjectsPage'))
 const AdminInteriorsProjectDetailPage = lazy(
@@ -251,6 +252,7 @@ function AnimatedRoutes({
             <Route index element={<Navigate to="preview" replace />} />
             <Route path="settings" element={<AdminSettingsPage />} />
             <Route path="preview" element={<AdminSitePreviewPage />} />
+            <Route path="lrc-products" element={<AdminLrcProductsPage />} />
             <Route path="lrc-inquiries" element={<AdminLrcInquiriesPage />} />
             <Route path="interiors-projects" element={<AdminInteriorsProjectsPage />} />
             <Route path="interiors-projects/:id" element={<AdminInteriorsProjectDetailPage />} />
