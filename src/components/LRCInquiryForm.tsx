@@ -1,11 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import {
-  LRC_PRESENTATION_PRODUCTS,
-  formatLrcEuro,
-  lrcPresentationInquirySummary,
-} from './LrcPresentationCards'
+import { formatLrcEuro, lrcPresentationInquirySummary } from '../lib/lrcCatalog'
+import { usePublicLrcProducts } from '../hooks/usePublicLrcProducts'
 import { trackEvent } from '../lib/analytics'
 import { submitLrcInquiry } from '../lib/lrcInquiries'
 
@@ -13,21 +10,28 @@ interface LRCInquiryFormProps {
   language: 'hr' | 'en'
 }
 
-function presentationProductFromQuery(code: string | null) {
-  const normalized = code?.trim().toUpperCase() ?? ''
-  return LRC_PRESENTATION_PRODUCTS.find((product) => product.code === normalized) ?? null
-}
-
 export default function LRCInquiryForm({ language }: LRCInquiryFormProps) {
   const [searchParams] = useSearchParams()
-  const requestedProduct = presentationProductFromQuery(searchParams.get('proizvod'))
+  const requestedCode = (searchParams.get('proizvod') ?? '').trim().toUpperCase()
+  const catalog = usePublicLrcProducts()
+  const products = catalog.products
   const [formData, setFormData] = useState({
-    product: requestedProduct?.code ?? '',
+    product: '',
     description: '',
     name: '',
     email: '',
     phone: ''
   })
+
+  useEffect(() => {
+    if (catalog.status !== 'ready') return
+    setFormData((prev) => {
+      const currentVisible = products.some((product) => product.code === prev.product)
+      if (currentVisible) return prev
+      const fromQuery = products.find((product) => product.code === requestedCode)
+      return { ...prev, product: fromQuery?.code ?? '' }
+    })
+  }, [catalog.status, products, requestedCode])
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -104,7 +108,8 @@ export default function LRCInquiryForm({ language }: LRCInquiryFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!formData.product || !formData.description || !formData.name || !formData.email) {
+    const selectedPresentation = products.find((product) => product.code === formData.product) ?? null
+    if (!selectedPresentation || !formData.description || !formData.name || !formData.email) {
       alert(language === 'hr' ? 'Molimo ispunite sva obavezna polja' : 'Please fill in all required fields')
       return
     }
@@ -112,11 +117,8 @@ export default function LRCInquiryForm({ language }: LRCInquiryFormProps) {
     setIsSubmitting(true)
 
     try {
-      const selectedPresentation = presentationProductFromQuery(formData.product)
       await submitLrcInquiry({
-        product: selectedPresentation
-          ? lrcPresentationInquirySummary(selectedPresentation, language)
-          : formData.product,
+        product: lrcPresentationInquirySummary(selectedPresentation, language),
         description: formData.description,
         name: formData.name,
         email: formData.email,
@@ -173,17 +175,34 @@ export default function LRCInquiryForm({ language }: LRCInquiryFormProps) {
               value={formData.product}
               onChange={handleInputChange}
               required
+              disabled={catalog.status !== 'ready' || isSubmitting}
               className="min-h-[48px] w-full rounded-xl border border-[rgba(110,68,255,0.18)] bg-white px-4 py-3 text-base shadow-sm outline-none transition-all duration-200 focus:border-[--color-primary] focus:ring-2 focus:ring-[--color-primary]/25 dark:border-lavender/22 dark:bg-white/10 dark:text-pearl dark:focus:bg-white/15"
             >
-              <option value="" className="text-plum/55 dark:text-pearl/55">{translations.selectProductPlaceholder[language]}</option>
-              {LRC_PRESENTATION_PRODUCTS.map((product) => (
+              <option value="" className="text-plum/55 dark:text-pearl/55">
+                {catalog.status === 'loading'
+                  ? (language === 'hr' ? 'Učitavanje proizvoda...' : 'Loading products...')
+                  : translations.selectProductPlaceholder[language]}
+              </option>
+              {products.map((product) => (
                 <option key={product.code} value={product.code}>
                   {product.code} — {product.title[language]} ({formatLrcEuro(product.retailPriceEuro)})
                 </option>
               ))}
             </select>
+            {catalog.status === 'ready' && products.length === 0 ? (
+              <p className="text-sm text-plum/70 dark:text-pearl/70">
+                {language === 'hr' ? 'Nema javno vidljivih proizvoda.' : 'There are no publicly visible products.'}
+              </p>
+            ) : null}
+            {catalog.status === 'error' ? (
+              <p className="text-sm text-plum/70 dark:text-pearl/70">
+                {language === 'hr'
+                  ? 'Proizvodi se trenutno ne mogu učitati.'
+                  : 'The products cannot be loaded right now.'}
+              </p>
+            ) : null}
             {(() => {
-              const selected = presentationProductFromQuery(formData.product)
+              const selected = products.find((product) => product.code === formData.product) ?? null
               if (!selected) return null
               const rows = language === 'hr'
                 ? [

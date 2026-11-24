@@ -1,226 +1,27 @@
-import { useEffect, useState, type CSSProperties } from 'react'
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
+import {
+  APPROVED_LRC_CODES,
+  formatLrcEuro,
+  lrcCoverIndex,
+  lrcCoverPhoto,
+  lrcFrameStyle,
+  type LrcProduct,
+} from '../lib/lrcCatalog'
+import { usePublicLrcProducts } from '../hooks/usePublicLrcProducts'
 
 type Language = 'hr' | 'en'
 
-const IMAGE_BASE = '/lrc_image/proizvodi/slike'
+export type { LrcProduct as LrcPresentationProduct } from '../lib/lrcCatalog'
+export { formatLrcEuro, lrcPresentationInquirySummary } from '../lib/lrcCatalog'
 
-export interface LrcPresentationProduct {
-  code: 'LRC-BAB-03' | 'LRC-VIN-02' | 'LRC-VIN-03'
-  /** Maloprodajna cijena, ista kao na kartici u trenutku slanja upita. */
-  retailPriceEuro: number
-  /** Bazna cijena. Prikazuje se uz datum, bez precrtavanja. */
-  basePriceEuro: number
-  /** Datum prvog stavljanja u ponudu, kako je zapisan uz baznu cijenu. */
-  basePriceDate: string
-  title: Record<Language, string>
-  specs: Record<Language, string>
-  description: Record<Language, string>
-  photos: readonly {
-    src: string
-    alt: Record<Language, string>
-    caption: Record<Language, string>
-    /** Bež uz lijevi i desni rub fotografije. Okvir izvan kadra koristi istu nijansu. */
-    frame: string
-  }[]
-}
-
-function photo(
-  file: string,
-  altHr: string,
-  altEn: string,
-  frame: string,
-  captionHr = '',
-  captionEn = '',
-) {
-  return {
-    src: `${IMAGE_BASE}/${file}`,
-    alt: { hr: altHr, en: altEn },
-    caption: { hr: captionHr, en: captionEn },
-    frame,
-  }
-}
-
-function softenFrame(frame: string): string {
-  const value = Number.parseInt(frame.slice(1), 16)
-  const channel = (shift: number) => Math.min(255, ((value >> shift) & 255) + 12)
-  return `#${[channel(16), channel(8), channel(0)].map((part) => part.toString(16).padStart(2, '0')).join('')}`
-}
-
-function frameStyle(frame: string): CSSProperties {
-  const edge = softenFrame(frame)
-  return {
-    backgroundColor: frame,
-    backgroundImage: `linear-gradient(90deg, ${edge} 0%, transparent 14%, transparent 86%, ${edge} 100%)`,
-  }
-}
-
-export const LRC_PRESENTATION_PRODUCTS: readonly LrcPresentationProduct[] = [
-  {
-    code: 'LRC-BAB-03',
-    retailPriceEuro: 25,
-    basePriceEuro: 25,
-    basePriceDate: '10. 9. 2026.',
-    title: {
-      hr: 'Personalizirana kutija uspomena za bebe',
-      en: 'Personalized baby memory box',
-    },
-    specs: {
-      hr: '350 × 110 × 112 mm · bijeli MDF, 3 mm',
-      en: '350 × 110 × 112 mm · white MDF, 3 mm',
-    },
-    description: {
-      hr: 'Kutija s unutarnjim pregradama i prigodnom gravurom s imenom i podacima o rođenju, prema želji kupca. U nju, primjerice, stanu dva bodija veličine 3–6 mjeseci, mala igračka i prve cipelice. Kutija se prodaje prazna, a uspomene koje ćeš u nju staviti biraš samostalno.',
-      en: 'A box with interior dividers and an engraving of the name and birth details, as you wish. It can hold, for example, two bodysuits in size 3–6 months, a small toy, and the first shoes. The box is sold empty, and you choose the keepsakes yourself.',
-    },
-    photos: [
-      photo(
-        'lrc-bab-03-01-zatvorena.webp',
-        'Zatvorena bijela kutija uspomena za bebe s motivom medvjedića i oglednim imenom Lana',
-        'Closed white baby memory box with a teddy-bear motif and the sample name Lana',
-        '#cec0bc',
-        'Ogledni prikaz s izmišljenim podacima.',
-        'Sample view with fictional details.',
-      ),
-      photo(
-        'lrc-bab-03-02-primjer-sadrzaja.webp',
-        'Otvorena kutija s pregradama, dvama bodijima, plišanom igračkom i prvim cipelicama',
-        'Open box with dividers, two bodysuits, a plush toy, and first shoes',
-        '#d3c2bc',
-        'Primjer korištenja. Kutija se prodaje prazna. Prikazana odjeća, igračka i cipelice nisu uključene u cijenu.',
-        'Example of use. The box is sold empty. The clothing, toy, and shoes shown are not included in the price.',
-      ),
-      photo(
-        'lrc-bab-03-03-primjer-za-djecaka.webp',
-        'Zatvorena kutija snimljena sprijeda, s motivom medvjedića i oglednim imenom Lovro',
-        'Closed box photographed from the front, with a teddy-bear motif and the sample name Lovro',
-        '#d8c6c2',
-        'Ogledni prikaz s izmišljenim podacima.',
-        'Sample view with fictional details.',
-      ),
-    ],
-  },
-  {
-    code: 'LRC-VIN-02',
-    retailPriceEuro: 25,
-    basePriceEuro: 25,
-    basePriceDate: '10. 9. 2026.',
-    title: {
-      hr: 'Personalizirana poklon kutija za bocu od 0,75 l',
-      en: 'Personalized gift box for a 0.75 L bottle',
-    },
-    specs: {
-      hr: '350 × 110 × 112 mm · bijeli MDF, 3 mm',
-      en: '350 × 110 × 112 mm · white MDF, 3 mm',
-    },
-    description: {
-      hr: 'Poklon kutija s kliznim poklopcem za jednu bocu od 0,75 l odgovarajućeg oblika. U cijenu je uključena gravura po želji. Na poklopac možemo ugravirati portret prema tvojoj fotografiji, posvetu ili oboje. Boca nije uključena.',
-      en: 'A gift box with a sliding lid for one 0.75 L bottle of a suitable shape. Engraving to your wishes is included. We can engrave a portrait from your photo, a dedication, or both on the lid. The bottle is not included.',
-    },
-    photos: [
-      photo(
-        'lrc-vin-02-03-digitalni-primjer-gravure.webp',
-        'Digitalni primjer gravure portreta para i posvete na poklopcu',
-        'Digital example of an engraved couple portrait and dedication on the lid',
-        '#cab5aa',
-        'Digitalni primjer gravure portreta prema fotografiji.',
-        'Digital example of a portrait engraving from a photograph.',
-      ),
-      photo(
-        'lrc-vin-02-01-zatvorena.webp',
-        'Zatvorena bijela poklon kutija za bocu od 0,75 l s kliznim poklopcem i ručkom',
-        'Closed white gift box for a 0.75 L bottle, with a sliding lid and a handle',
-        '#cbb8ae',
-      ),
-      photo(
-        'lrc-vin-02-02-unutrasnjost.webp',
-        'Otvorena prazna kutija od 0,75 l s vidljivim držačima za bocu',
-        'Open empty 0.75 L box with the bottle holders visible',
-        '#cdb9ae',
-      ),
-      photo(
-        'lrc-vin-usporedba-05-i-075.webp',
-        'Dvije bijele kutije za boce, manja lijevo i veća desno',
-        'Two white bottle boxes, the smaller on the left and the larger on the right',
-        '#c4b1a8',
-        'Lijevo kutija za bocu od 0,5 l, desno kutija za bocu od 0,75 l.',
-        'Left: box for a 0.5 L bottle. Right: box for a 0.75 L bottle.',
-      ),
-    ],
-  },
-  {
-    code: 'LRC-VIN-03',
-    retailPriceEuro: 22,
-    basePriceEuro: 22,
-    basePriceDate: '1. 11. 2026.',
-    title: {
-      hr: 'Personalizirana poklon kutija za bocu likera od 0,5 l',
-      en: 'Personalized gift box for a 0.5 L liqueur bottle',
-    },
-    specs: {
-      hr: '250 × 110 × 112 mm · bijeli MDF, 3 mm',
-      en: '250 × 110 × 112 mm · white MDF, 3 mm',
-    },
-    description: {
-      hr: 'Poklon kutija s kliznim poklopcem za jednu bocu likera od 0,5 l odgovarajućeg oblika, primjerice teranina. U cijenu je uključena gravura po želji. Boca nije uključena.',
-      en: 'A gift box with a sliding lid for one 0.5 L liqueur bottle of a suitable shape, such as teranino. Engraving to your wishes is included. The bottle is not included.',
-    },
-    photos: [
-      photo(
-        'lrc-vin-03-03-digitalni-primjer-gravure.webp',
-        'Digitalni primjer gravure ženskog portreta i natpisa Sretan rođendan na manjoj kutiji',
-        'Digital example of an engraved female portrait and the words Happy birthday on the smaller box',
-        '#c8b5ae',
-        'Digitalni primjer rođendanske gravure s izmišljenim portretom.',
-        'Digital example of a birthday engraving with a fictional portrait.',
-      ),
-      photo(
-        'lrc-vin-03-01-zatvorena.webp',
-        'Zatvorena manja bijela poklon kutija za bocu likera od 0,5 l',
-        'Closed smaller white gift box for a 0.5 L liqueur bottle',
-        '#c8b5ac',
-      ),
-      photo(
-        'lrc-vin-03-02-unutrasnjost.webp',
-        'Otvorena prazna manja kutija s podignutim poklopcem i držačem za bocu',
-        'Open empty smaller box with the lid raised and a bottle holder',
-        '#cab3a8',
-      ),
-      photo(
-        'lrc-vin-usporedba-05-i-075.webp',
-        'Dvije bijele kutije za boce, manja lijevo i veća desno',
-        'Two white bottle boxes, the smaller on the left and the larger on the right',
-        '#c4b1a8',
-        'Lijevo kutija za bocu od 0,5 l, desno kutija za bocu od 0,75 l.',
-        'Left: box for a 0.5 L bottle. Right: box for a 0.75 L bottle.',
-      ),
-    ],
-  },
-]
-
-export function formatLrcEuro(amount: number): string {
-  const [whole, fraction] = amount.toFixed(2).split('.')
-  return `${whole},${fraction} €`
-}
-
-/** Sažetak koji ide u postojeće polje `product` tablice lrc_inquiries. */
-export function lrcPresentationInquirySummary(
-  product: LrcPresentationProduct,
-  language: Language,
-): string {
-  const price = formatLrcEuro(product.retailPriceEuro)
-  const title = product.title[language]
-  return language === 'hr'
-    ? `${product.code} — ${title} — maloprodajna cijena ${price}`
-    : `${product.code} — ${title} — retail price ${price}`
-}
 
 function ProductPrices({
   product,
   language,
 }: {
-  product: LrcPresentationProduct
+  product: LrcProduct
   language: Language
 }) {
   const priceLabel = language === 'hr' ? 'Cijena' : 'Price'
@@ -261,7 +62,7 @@ function ProductPhoto({
     <figure className="min-w-0">
       <div
         className="flex h-[210px] items-center justify-center overflow-hidden lg:h-[240px]"
-        style={frameStyle(frame)}
+        style={lrcFrameStyle(frame)}
       >
         <img
           src={src}
@@ -286,21 +87,29 @@ function ProductGallery({
   product,
 }: {
   language: Language
-  product: LrcPresentationProduct
+  product: LrcProduct
 }) {
-  const [index, setIndex] = useState(0)
+  const [index, setIndex] = useState(() => lrcCoverIndex(product.photos))
   const count = product.photos.length
-  const current = product.photos[index]
+  const current = product.photos[index] ?? product.photos[0]
   const show = (next: number) => setIndex((next + count) % count)
   const previousLabel = language === 'hr' ? 'Prethodna slika' : 'Previous image'
   const nextLabel = language === 'hr' ? 'Sljedeća slika' : 'Next image'
+
+  if (!current) {
+    return (
+      <p className="text-sm text-plum/70 dark:text-pearl/70">
+        {language === 'hr' ? 'Nema fotografija.' : 'No photographs.'}
+      </p>
+    )
+  }
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="relative min-h-[6.5rem] flex-1">
         <div
           className="absolute inset-0 flex items-center justify-center overflow-hidden rounded-2xl"
-          style={frameStyle(current.frame)}
+          style={lrcFrameStyle(current.frame)}
         >
           <img
             src={current.src}
@@ -309,22 +118,26 @@ function ProductGallery({
             style={{ boxShadow: `0 0 18px 8px ${current.frame}` }}
           />
         </div>
-        <button
-          type="button"
-          onClick={() => show(index - 1)}
-          className="absolute left-2 top-1/2 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-amethyst/20 bg-white/95 text-xl font-semibold text-plum shadow-sm dark:border-lavender/25 dark:bg-[#211a35] dark:text-pearl"
-          aria-label={previousLabel}
-        >
-          ‹
-        </button>
-        <button
-          type="button"
-          onClick={() => show(index + 1)}
-          className="absolute right-2 top-1/2 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-amethyst/20 bg-white/95 text-xl font-semibold text-plum shadow-sm dark:border-lavender/25 dark:bg-[#211a35] dark:text-pearl"
-          aria-label={nextLabel}
-        >
-          ›
-        </button>
+        {count > 1 ? (
+          <>
+            <button
+              type="button"
+              onClick={() => show(index - 1)}
+              className="absolute left-2 top-1/2 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-amethyst/20 bg-white/95 text-xl font-semibold text-plum shadow-sm dark:border-lavender/25 dark:bg-[#211a35] dark:text-pearl"
+              aria-label={previousLabel}
+            >
+              ‹
+            </button>
+            <button
+              type="button"
+              onClick={() => show(index + 1)}
+              className="absolute right-2 top-1/2 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-amethyst/20 bg-white/95 text-xl font-semibold text-plum shadow-sm dark:border-lavender/25 dark:bg-[#211a35] dark:text-pearl"
+              aria-label={nextLabel}
+            >
+              ›
+            </button>
+          </>
+        ) : null}
       </div>
       {current.caption[language] ? (
         <p className="shrink-0 px-1 pt-2 text-xs leading-relaxed text-plum/75 dark:text-pearl/70">
@@ -336,7 +149,7 @@ function ProductGallery({
           const selected = photoIndex === index
           return (
             <button
-              key={item.src}
+              key={`${item.src}-${photoIndex}`}
               type="button"
               onClick={() => setIndex(photoIndex)}
               aria-label={item.alt[language]}
@@ -364,7 +177,7 @@ function ProductDetails({
   onClose,
 }: {
   language: Language
-  product: LrcPresentationProduct
+  product: LrcProduct
   inquiryPath: string
   onClose: () => void
 }) {
@@ -421,7 +234,7 @@ function ProductDetails({
 
         <div className="mt-3 flex min-h-0 flex-1 flex-col gap-3 lg:flex-row lg:items-stretch">
           <div className="flex min-h-0 flex-1 flex-col lg:max-w-[46%]">
-            <ProductGallery language={language} product={product} />
+            <ProductGallery key={product.code} language={language} product={product} />
           </div>
           <p className="min-h-0 shrink-0 overflow-y-auto text-sm leading-relaxed text-plum/85 max-lg:max-h-24 dark:text-pearl/82 lg:min-h-0 lg:flex-1 lg:shrink lg:text-base">
             {product.description[language]}
@@ -445,8 +258,13 @@ export function LrcPresentationCards({
   language: Language
   inquiryPath?: string
 }) {
-  const [selectedProduct, setSelectedProduct] = useState<LrcPresentationProduct | null>(null)
-  const cover = (product: LrcPresentationProduct) => product.photos[0]
+  const catalog = usePublicLrcProducts()
+  const products = catalog.products
+  const [selectedProduct, setSelectedProduct] = useState<LrcProduct | null>(null)
+  const approvedIntro =
+    catalog.status !== 'ready' ||
+    (products.length === APPROVED_LRC_CODES.length &&
+      products.every((product, index) => product.code === APPROVED_LRC_CODES[index]))
 
   return (
     <section className="mb-12 sm:mb-14" aria-labelledby="lrc-presentation-title">
@@ -461,27 +279,58 @@ export function LrcPresentationCards({
           {language === 'hr' ? 'Personalizirane kutije' : 'Personalized boxes'}
         </h2>
         <p className="mx-auto mt-3 text-sm leading-relaxed text-plum/78 dark:text-pearl/72 sm:text-[0.9375rem]">
-          {language === 'hr'
-            ? 'Tri kutije za uspomene i poklon boce, s gravurom po želji.'
-            : 'Three boxes for keepsakes and gift bottles, with engraving to your wishes.'}
+          {approvedIntro
+            ? language === 'hr'
+              ? 'Tri kutije za uspomene i poklon boce, s gravurom po želji.'
+              : 'Three boxes for keepsakes and gift bottles, with engraving to your wishes.'
+            : language === 'hr'
+              ? 'Personalizirane kutije za uspomene i poklon boce, s gravurom po želji.'
+              : 'Personalized boxes for keepsakes and gift bottles, with engraving to your wishes.'}
         </p>
       </header>
 
+      {catalog.status === 'loading' ? (
+        <p className="px-4 text-center text-sm text-plum/70 dark:text-pearl/70">
+          {language === 'hr' ? 'Učitavanje proizvoda...' : 'Loading products...'}
+        </p>
+      ) : null}
+      {catalog.status === 'error' ? (
+        <p className="px-4 text-center text-sm text-plum/70 dark:text-pearl/70">
+          {language === 'hr'
+            ? 'Proizvodi se trenutno ne mogu učitati.'
+            : 'The products cannot be loaded right now.'}
+        </p>
+      ) : null}
+      {catalog.status === 'ready' && products.length === 0 ? (
+        <p className="px-4 text-center text-sm text-plum/70 dark:text-pearl/70">
+          {language === 'hr'
+            ? 'Trenutno nema javno vidljivih proizvoda.'
+            : 'There are no publicly visible products right now.'}
+        </p>
+      ) : null}
+
+      {catalog.status === 'ready' && products.length > 0 ? (
       <div className="mx-auto grid max-w-6xl grid-cols-1 gap-5 px-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
-        {LRC_PRESENTATION_PRODUCTS.map((product) => {
-          const main = cover(product)
+        {products.map((product) => {
+          const main = lrcCoverPhoto(product.photos)
           return (
             <article
               key={product.code}
               className="surface-premium flex min-w-0 flex-col overflow-hidden rounded-2xl"
             >
               <div className="border-b border-amethyst/15 dark:border-lavender/15">
-                <ProductPhoto
-                  src={main.src}
-                  alt={main.alt[language]}
-                  caption={main.caption[language]}
-                  frame={main.frame}
-                />
+                {main ? (
+                  <ProductPhoto
+                    src={main.src}
+                    alt={main.alt[language]}
+                    caption={main.caption[language]}
+                    frame={main.frame}
+                  />
+                ) : (
+                  <div className="flex h-[210px] items-center justify-center bg-[#f3ece8] text-sm text-plum/60 lg:h-[240px]">
+                    {language === 'hr' ? 'Bez fotografije' : 'No photograph'}
+                  </div>
+                )}
               </div>
               <div className="flex flex-1 flex-col p-5 sm:p-6">
                 <h3 className="font-heading text-lg font-bold leading-snug text-plum dark:text-pearl sm:text-xl">
@@ -502,6 +351,7 @@ export function LrcPresentationCards({
           )
         })}
       </div>
+      ) : null}
 
       {selectedProduct && typeof document !== 'undefined'
         ? createPortal(
