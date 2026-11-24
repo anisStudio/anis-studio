@@ -71,18 +71,14 @@ export const interiorsStudioConfig = {
         en: 'Warm oak, matte fronts, and carefully planned lighting for an open living space.',
       },
       execution: {
-        hr: 'Koncept spaja visoke elemente uz puni zid, radni otok za pripremu i druženje te skrivenu LED rasvjetu. Prikazane su dvije ogledne varijante kako bi klijent mogao usporediti raspored i količinu otvorenih polica.',
-        en: 'The concept combines a full-height storage wall, a preparation and social island, and concealed LED lighting. Two sample variants let the client compare layout and the amount of open shelving.',
+        hr: 'Koncept spaja visoke elemente uz puni zid, radni otok za pripremu i druženje te skrivenu LED rasvjetu.',
+        en: 'The concept combines a full-height storage wall, a preparation and social island, and concealed LED lighting.',
       },
       cover: '/images/interijeri/kitchen-advanced.webp',
       photos: [
         {
           src: '/images/interijeri/kitchen-advanced.webp',
           alt: { hr: 'Demo kuhinja s otokom i toplom rasvjetom', en: 'Demo kitchen with an island and warm lighting' },
-        },
-        {
-          src: '/images/interijeri/kitchen-complex.webp',
-          alt: { hr: 'Alternativna demo varijanta kutne kuhinje', en: 'Alternative demo corner-kitchen variant' },
         },
       ],
       materials: [

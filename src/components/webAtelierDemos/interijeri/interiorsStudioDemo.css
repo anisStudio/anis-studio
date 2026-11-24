@@ -341,4 +341,8 @@
   .wa-int-detail-copy {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  .wa-int-detail-gallery:has(> img:only-child) {
+    grid-template-columns: 1fr;
+  }
 }

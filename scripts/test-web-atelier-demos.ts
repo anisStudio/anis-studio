@@ -224,6 +224,16 @@ assert.ok(interiors.summary.hr.toLowerCase().includes('portfolio'))
       assert.ok(photo.src.startsWith('/images/interijeri/'))
     }
   }
+  const mirna = interiorsStudioConfig.projects.find((project) => project.id === 'kuhinja-mirna')
+  assert.deepEqual(
+    mirna?.photos.map((photo) => photo.src),
+    ['/images/interijeri/kitchen-advanced.webp'],
+  )
+  assert.equal(mirna?.execution.hr.includes('dvije ogledne'), false)
+  assert.equal(mirna?.execution.en.toLowerCase().includes('two sample'), false)
+  assert.ok(interiorsStudioConfig.projects.some((project) => project.photos.some((photo) => photo.src.endsWith('kitchen-complex.webp'))))
+  assert.match(css, /\.wa-flor-contact > \.wa-flor-kicker/)
+  assert.match(read('src/components/webAtelierDemos/interijeri/interiorsStudioDemo.css'), /img:only-child/)
   assert.ok(!read('src/components/webAtelierDemos/interijeri/config.ts').includes('web-atelier-demos'))
 }
 
