@@ -212,6 +212,11 @@
   text-align: center;
 }
 
+/* Beats html.dark h2 so the approach title keeps the paper tone in both themes. */
+.wa-int .wa-int-approach > h2 {
+  color: #f5f1e9;
+}
+
 .wa-int-approach .wa-int-kicker {
   color: #d8b897;
 }

@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { floristConfig, floristPhotos } from '../src/components/webAtelierDemos/cvjecarna/config.ts'
@@ -209,8 +209,14 @@ assert.ok(interiors.summary.hr.toLowerCase().includes('portfolio'))
   assert.ok(!groomingSrc.includes('<img'))
   assert.ok(!floristSrc.includes(DEMO_PHOTO_PUBLIC_DIR))
   assert.ok(!groomingSrc.includes(DEMO_PHOTO_PUBLIC_DIR))
-  assert.ok(portfolioSrc.includes("data-photo-status': 'author-material'"))
-  assert.ok(portfolioSrc.includes('floristPhoto(\'hero\')') || portfolioSrc.includes('floristPhoto("hero")'))
+  assert.ok(portfolioSrc.includes('wa-demo-cvjecarna.webp'))
+  assert.ok(portfolioSrc.includes('wa-demo-grooming.webp'))
+  assert.ok(portfolioSrc.includes('wa-demo-interijeri.webp'))
+  assert.ok(portfolioSrc.includes('Snimka demo stranice Cvjećarnica'))
+  assert.ok(portfolioSrc.includes('Screenshot of the Interior studio'))
+  assert.ok(existsSync(join(root, 'public/images/web-atelier-demos/wa-demo-cvjecarna.webp')))
+  assert.ok(existsSync(join(root, 'public/images/web-atelier-demos/wa-demo-grooming.webp')))
+  assert.ok(existsSync(join(root, 'public/images/web-atelier-demos/wa-demo-interijeri.webp')))
   assert.match(css, /\.wa-flor-hero-frame\s*\{[^}]*aspect-ratio:\s*16\s*\/\s*9/)
   assert.match(css, /\.wa-flor-arrangement\s*\{[^}]*aspect-ratio:\s*4\s*\/\s*5/)
   assert.match(css, /\.wa-flor-space\s*\{[^}]*aspect-ratio:\s*3\s*\/\s*2/)

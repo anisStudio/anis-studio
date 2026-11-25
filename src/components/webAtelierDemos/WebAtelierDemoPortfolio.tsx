@@ -1,9 +1,7 @@
 import { Link } from 'react-router-dom'
 import { trackEvent } from '../../lib/analytics'
-import { WEB_ATELIER_DEMOS, demoBannerText } from '../../lib/webAtelierDemos'
-import { floristPhoto } from './cvjecarna/config'
-import { groomingPhoto } from './grooming/config'
-import { photoSlotAttrs } from './photoSlot'
+import { WEB_ATELIER_DEMOS, demoBannerText, type WebAtelierDemoSlug } from '../../lib/webAtelierDemos'
+import { DEMO_PHOTO_PUBLIC_DIR } from './photoSlot'
 import './webAtelierDemos.css'
 
 interface Props {
@@ -12,21 +10,29 @@ interface Props {
   enableInquiryLinks?: boolean
 }
 
-const visualClass: Record<string, string> = {
-  cvjecarna: 'wa-flor-swatch',
-  grooming: 'wa-groom-blob',
-  interijeri: 'wa-int-preview',
-}
-
-const AUTHOR_CARD_COVER = {
-  'data-photo-file': '/images/interijeri/kitchen-advanced.webp',
-  'data-photo-status': 'author-material',
-} as const
-
-function cardCoverAttrs(slug: string) {
-  if (slug === 'cvjecarna') return photoSlotAttrs(floristPhoto('hero'))
-  if (slug === 'grooming') return photoSlotAttrs(groomingPhoto('hero'))
-  return AUTHOR_CARD_COVER
+/** Real page screenshots for the three portfolio cards. Kept at 16:10 to match the card frame. */
+const CARD_COVERS: Record<WebAtelierDemoSlug, { file: string; alt: { hr: string; en: string } }> = {
+  cvjecarna: {
+    file: 'wa-demo-cvjecarna.webp',
+    alt: {
+      hr: 'Snimka demo stranice Cvjećarnica — START',
+      en: 'Screenshot of the Florist — START demo page',
+    },
+  },
+  grooming: {
+    file: 'wa-demo-grooming.webp',
+    alt: {
+      hr: 'Snimka demo stranice Salon za njegu ljubimaca — PRO',
+      en: 'Screenshot of the Pet grooming salon — PRO demo page',
+    },
+  },
+  interijeri: {
+    file: 'wa-demo-interijeri.webp',
+    alt: {
+      hr: 'Snimka demo stranice Studio interijera — PREMIUM',
+      en: 'Screenshot of the Interior studio — PREMIUM demo page',
+    },
+  },
 }
 
 export function WebAtelierDemoPortfolio({ language, enableInquiryLinks = true }: Props) {
@@ -51,11 +57,17 @@ export function WebAtelierDemoPortfolio({ language, enableInquiryLinks = true }:
       <div className="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-3">
         {WEB_ATELIER_DEMOS.map((demo) => (
           <article key={demo.slug} className="wa-demo-card fade-in">
-            <div
-              className={`wa-demo-card-visual ${visualClass[demo.slug] ?? ''}`}
-              aria-hidden="true"
-              {...cardCoverAttrs(demo.slug)}
-            />
+            <div className="wa-demo-card-visual">
+              <img
+                className="wa-demo-card-cover"
+                src={`${DEMO_PHOTO_PUBLIC_DIR}/${CARD_COVERS[demo.slug].file}`}
+                alt={CARD_COVERS[demo.slug].alt[language]}
+                width={800}
+                height={500}
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
             <div className="wa-demo-card-body">
               <p className="wa-demo-card-meta">{demo.accentLabel[language]}</p>
               <h4>{demo.title[language]}</h4>
