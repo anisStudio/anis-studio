@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { fetchLrcInquiries, updateLrcInquiryStatus, type LrcInquiry, type LrcInquiryStatus } from '../lib/lrcInquiries'
+import { lrcInquiryProductLabel } from '../lib/lrcInquiryLabel'
 import { isSupabaseConfigured } from '../lib/supabase'
-import { lrcInquiryCustomIdeaOption, sampleProducts } from '../data/products'
 import { TableSkeleton } from '../components/Skeleton'
 import { StatusBadge } from '../components/StatusBadge'
 
@@ -15,16 +15,6 @@ function formatDate(dateString: string): string {
     minute: '2-digit'
   })
 }
-
-function getProductName(productId: string, language: 'hr' | 'en' = 'hr'): string {
-  if (productId === lrcInquiryCustomIdeaOption.id) {
-    return language === 'hr' ? lrcInquiryCustomIdeaOption.nameHr : lrcInquiryCustomIdeaOption.name
-  }
-  const product = sampleProducts.find(p => p.id === productId)
-  if (!product) return productId
-  return language === 'hr' ? product.nameHr : product.name
-}
-
 
 const AdminLrcInquiriesPage: React.FC = () => {
   const [inquiries, setInquiries] = useState<LrcInquiry[]>([])
@@ -207,7 +197,7 @@ const AdminLrcInquiriesPage: React.FC = () => {
                       <td className="px-4 py-3 text-sm text-slate-900">
                         <div className="max-w-xs">
                           <div className="font-medium">
-                            {getProductName(inquiry.product, inquiry.language as 'hr' | 'en')}
+                            {lrcInquiryProductLabel(inquiry.product, inquiry.language)}
                           </div>
                           <div className="text-xs text-slate-500 mt-1 line-clamp-2">
                             {inquiry.description}
