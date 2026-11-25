@@ -109,12 +109,56 @@ function AnimatedRoutes({
     const { hash } = location
     if (!hash) {
       window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
-    } else {
-      const id = hash.replace('#', '')
-      const el = document.getElementById(id)
-      if (el) {
-        el.scrollIntoView({ behavior: 'auto', block: 'start' })
+      return
+    }
+
+    const id = hash.slice(1)
+    let attempts = 0
+    let frame = 0
+    let finished = false
+
+    const scrollToTarget = () => {
+      const target = document.getElementById(id)
+      if (!target) return false
+
+      target.scrollIntoView({ behavior: 'auto', block: 'start' })
+      attempts += 1
+      // Lazy pages can grow after the first paint; keep aligning briefly.
+      if (attempts < 12) {
+        frame = window.requestAnimationFrame(() => {
+          if (!finished) scrollToTarget()
+        })
+      } else {
+        finished = true
       }
+      return true
+    }
+
+    if (scrollToTarget()) {
+      return () => {
+        finished = true
+        window.cancelAnimationFrame(frame)
+      }
+    }
+
+    // Lazy routes and public-service guards can mount the target after navigation.
+    const observer = new MutationObserver(() => {
+      if (scrollToTarget()) {
+        observer.disconnect()
+        window.clearTimeout(timeout)
+      }
+    })
+    const timeout = window.setTimeout(() => {
+      observer.disconnect()
+      finished = true
+    }, 10000)
+    observer.observe(document.body, { childList: true, subtree: true })
+
+    return () => {
+      finished = true
+      observer.disconnect()
+      window.clearTimeout(timeout)
+      window.cancelAnimationFrame(frame)
     }
   }, [location])
 

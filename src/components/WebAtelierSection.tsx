@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { OFFICIAL_PARRA_PRICE_LIST_PATH } from '../config/officialPriceList'
 import { trackEvent } from '../lib/analytics'
 import {
   WEB_ATELIER_PACKAGE_DEFINITIONS,
@@ -233,8 +234,11 @@ export default function WebAtelierSection({
 
         <section className="wa-prem-section" aria-labelledby="wa-services-title">
           <div className="wa-prem-section-head">
-            <h2 id="wa-services-title">{copy.servicesTitle[language]}</h2>
+            <h2 id="wa-services-title" className="scroll-mt-24">{copy.servicesTitle[language]}</h2>
             <p>{copy.servicesIntro[language]}</p>
+            <a href={OFFICIAL_PARRA_PRICE_LIST_PATH} className="wa-prem-cta-secondary">
+              {language === 'hr' ? 'Službeni cjenik i bazne cijene' : 'Official price list and reference prices'}
+            </a>
           </div>
           <div className="wa-prem-service-grid">
             {WEB_ATELIER_PACKAGE_DEFINITIONS.map((pkg) => (

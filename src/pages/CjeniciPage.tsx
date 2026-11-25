@@ -6,14 +6,12 @@ import { PageSEO } from '../components/PageSEO'
 import { OfficialParraPriceListHubCta } from '../components/pricing/OfficialParraPriceListLink'
 import { usePublicDepartmentVisibility } from '../hooks/usePublicDepartmentVisibility'
 import { formatInteriorsPriceById } from '../lib/interiorsPricing'
+import { formatEur, WEB_ATELIER_PACKAGE_DEFINITIONS } from '../lib/webAtelierConfigurator'
 import type { PublicService } from '../lib/publicServiceAccess'
 
 interface CjeniciPageProps {
   language: 'hr' | 'en'
-  /**
-   * Local preview only. Public /cjenici leaves this empty, so the card stays
-   * on its published status and does not gain a DEV price-list link.
-   */
+  /** Local preview only. Public links use the published department routes. */
   webAtelierPreview?: { priceLine: string; href: string }
 }
 
@@ -25,16 +23,16 @@ function PricingHubCard({
   subtitle,
   description,
   priceLine,
-  status,
   cta,
+  secondaryCta,
 }: {
   image: string
   title: string
   subtitle?: string
   description: string
   priceLine?: string
-  status?: string
-  cta?: { label: string; to: string }
+  cta: { label: string; to: string }
+  secondaryCta?: { label: string; to: string }
 }) {
   /** Half of hub circle (108px mobile / 128px sm+) — reserved in flow so grid row-gap clears the protrusion. */
   const circleTopClass = 'top-[3.375rem] sm:top-16'
@@ -69,19 +67,20 @@ function PricingHubCard({
           {priceLine ? (
             <p className="mt-3 text-lg font-bold text-[--color-primary] dark:text-lavender">{priceLine}</p>
           ) : null}
-          {status ? (
-            <p className="mt-3 text-sm font-medium text-plum/58 dark:text-pearl/55">{status}</p>
-          ) : null}
-          {cta ? (
+          {secondaryCta ? (
             <Link
-              to={cta.to}
-              className="mt-4 inline-flex min-h-[40px] w-full items-center justify-center rounded-xl border border-amethyst/22 bg-white/80 px-4 py-2 text-sm font-semibold text-plum/88 transition hover:border-[--color-primary]/40 hover:bg-white dark:border-lavender/22 dark:bg-white/[0.08] dark:text-pearl dark:hover:bg-white/[0.12]"
+              to={secondaryCta.to}
+              className="mt-4 flex min-h-[44px] items-center justify-center text-center text-sm font-semibold underline underline-offset-4"
             >
-              {cta.label}
+              {secondaryCta.label}
             </Link>
-          ) : (
-            <div className="mt-4 min-h-[40px]" aria-hidden />
-          )}
+          ) : null}
+          <Link
+            to={cta.to}
+            className={`${secondaryCta ? 'mt-1' : 'mt-4'} inline-flex min-h-[40px] w-full items-center justify-center rounded-xl border border-amethyst/22 bg-white/80 px-4 py-2 text-sm font-semibold text-plum/88 transition hover:border-[--color-primary]/40 hover:bg-white dark:border-lavender/22 dark:bg-white/[0.08] dark:text-pearl dark:hover:bg-white/[0.12]`}
+          >
+            {cta.label}
+          </Link>
         </div>
       </article>
     </div>
@@ -107,6 +106,10 @@ export default function CjeniciPage({ language, webAtelierPreview }: CjeniciPage
   }, [navigate])
 
   const interiorsFromPrice = formatInteriorsPriceById('interior-small-set', language)
+  const fromLabel = language === 'hr' ? 'od' : 'from'
+  const webAtelierFromPrices = WEB_ATELIER_PACKAGE_DEFINITIONS.map(
+    (pkg) => `${pkg.id.toUpperCase()} ${fromLabel} ${formatEur(pkg.fromEur, language)}`,
+  ).join(' · ')
 
   const copy = {
     title: { hr: 'Cjenici', en: 'Price lists' },
@@ -135,13 +138,11 @@ export default function CjeniciPage({ language, webAtelierPreview }: CjeniciPage
         image: '/images/pricing/web-atelier.png',
         title: { hr: 'Web Atelier', en: 'Web Atelier' },
         description: {
-          hr: 'START od 300 €, PRO od 500 €, PREMIUM od 800 € — orijentacijski. U svakom paketu: responzivni prikaz, osnovni SEO i kontaktni obrazac. Hosting, domena i održavanje definiraju se ponudom.',
-          en: 'START from €300, PRO from €500, PREMIUM from €800 — indicative. Every package: responsive layout, basic SEO, and a contact form. Hosting, domain, and maintenance are defined in the quote.',
+          hr: 'Početne cijene paketa izrade web stranica. Konačna cijena ovisi o opsegu i odabranim dodacima.',
+          en: 'Starting prices for website packages. The final price depends on the scope and selected add-ons.',
         },
-        status: {
-          hr: 'Detalji i konfigurator u Web Atelier sekciji (kada je odjel javno dostupan)',
-          en: 'Details and configurator in the Web Atelier section (when the department is publicly available)',
-        },
+        cta: { hr: 'Pogledaj pakete', en: 'View packages' },
+        configurator: { hr: 'Otvori konfigurator', en: 'Open configurator' },
       },
       lrc: {
         image: '/images/pricing/lrc.png',
@@ -151,7 +152,7 @@ export default function CjeniciPage({ language, webAtelierPreview }: CjeniciPage
           hr: 'Personalizirani proizvodi, laserska izrada i graviranje.',
           en: 'Personalised products, laser work, and engraving.',
         },
-        status: { hr: 'Objašnjenje uskoro', en: 'Explanation coming soon' },
+        cta: { hr: 'Pogledaj proizvode i cijene', en: 'View products and prices' },
       },
     },
   }
@@ -261,7 +262,7 @@ export default function CjeniciPage({ language, webAtelierPreview }: CjeniciPage
                         title={lrcDept.title[language]}
                         subtitle={lrcDept.acronym[language]}
                         description={lrcDept.description[language]}
-                        status={lrcDept.status[language]}
+                        cta={{ label: lrcDept.cta[language], to: '/lrc#lrc-ponuda' }}
                       />
                     )
                   }
@@ -271,16 +272,13 @@ export default function CjeniciPage({ language, webAtelierPreview }: CjeniciPage
                       image={webDept.image}
                       title={webDept.title[language]}
                       description={webDept.description[language]}
-                      priceLine={webAtelierPreview?.priceLine}
-                      status={webAtelierPreview ? undefined : webDept.status[language]}
-                      cta={
-                        webAtelierPreview
-                          ? {
-                              label: copy.departments.interijeri.cta[language],
-                              to: webAtelierPreview.href,
-                            }
-                          : undefined
-                      }
+                      priceLine={webAtelierPreview?.priceLine ?? webAtelierFromPrices}
+                      cta={webAtelierPreview
+                        ? { label: copy.departments.interijeri.cta[language], to: webAtelierPreview.href }
+                        : { label: webDept.cta[language], to: '/web-atelier#wa-services-title' }}
+                      secondaryCta={webAtelierPreview
+                        ? undefined
+                        : { label: webDept.configurator[language], to: '/web-atelier#web-atelier-configurator' }}
                     />
                   )
                 })}
