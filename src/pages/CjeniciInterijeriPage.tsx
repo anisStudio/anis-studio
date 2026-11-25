@@ -107,12 +107,12 @@ function InteriorsPriceListContent({ language }: { language: 'hr' | 'en' }) {
       advanced: {
         title: { hr: 'Zahtjevnija kuhinja', en: 'More demanding kitchen' },
         scenario: {
-          hr: 'Primjer kuhinje u U s otokom.',
-          en: 'Example of a U-shaped kitchen with an island.',
+          hr: 'Primjer L-kuhinje s otokom.',
+          en: 'Example of a L-shaped kitchen with an island.',
         },
         imageAlt: {
-          hr: 'Primjer zahtjevnije U-kuhinje s otokom',
-          en: 'Example of a more demanding U-shaped kitchen with an island',
+          hr: 'Primjer zahtjevnije L-kuhinje s otokom',
+          en: 'Example of a more demanding L-shaped kitchen with an island',
         },
       },
     },
