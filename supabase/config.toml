@@ -7,3 +7,6 @@ verify_jwt = false
 
 [functions.book-consultation-slot]
 verify_jwt = false
+
+[functions.lrc-product-image]
+verify_jwt = false

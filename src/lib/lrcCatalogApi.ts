@@ -3,6 +3,7 @@ import {
   isMissingLrcCatalogError,
   lrcProductFromParts,
   lrcProductContent,
+  lrcProductImageDirectUrl,
   lrcProductImageObjectPath,
   newLrcProductInsert,
   unusedLrcStorageObjectPaths,
@@ -186,11 +187,22 @@ export async function uploadLrcProductImage(file: File, code: string): Promise<{
     contentType: mime,
   })
   if (error) throw lrcCatalogError('request', `Upload fotografije: ${error.message}`)
-  const { data } = client.storage.from(BUCKET).getPublicUrl(objectPath)
-  if (!data?.publicUrl) {
-    throw lrcCatalogError('request', 'Upload je uspio, ali javni URL nije dostupan.')
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+  if (typeof supabaseUrl !== 'string' || supabaseUrl.trim().length === 0) {
+    throw lrcCatalogError('not_configured', 'Supabase nije konfiguriran. Katalog se ne može uređivati.')
   }
-  return { src: data.publicUrl, frame }
+  return { src: lrcProductImageDirectUrl(supabaseUrl, objectPath), frame }
+}
+
+/** Admin preview for every product, including hidden ones. Static card images stay as plain URLs. */
+export async function loadLrcAdminImage(src: string): Promise<string> {
+  const objectPath = lrcProductImageObjectPath(src)
+  if (!objectPath) return src
+  const client = requireClient()
+  await requireAuth(client)
+  const { data, error } = await client.storage.from(BUCKET).download(objectPath)
+  if (error || !data) throw lrcCatalogError('request', 'Fotografija nije učitana.')
+  return URL.createObjectURL(data)
 }
 
 export async function deleteLrcProductImage(src: string): Promise<void> {

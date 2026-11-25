@@ -18,10 +18,17 @@ const deleteMigration = readFileSync(
   join(root, 'supabase/migrations/20261124230000_lrc_product_delete.sql'),
   'utf8',
 )
+const privateMigration = readFileSync(
+  join(root, 'supabase/migrations/20261125010000_lrc_product_images_private.sql'),
+  'utf8',
+)
 
 const setupSql = `
 create role anon nologin;
 create role authenticated nologin;
+create role service_role nologin;
+create table public.admin_users (user_id uuid primary key);
+insert into public.admin_users (user_id) values ('11111111-1111-1111-1111-111111111111');
 create or replace function public.is_admin()
 returns boolean
 language sql
@@ -120,6 +127,8 @@ async function main() {
     if (applied.code !== 0) throw new Error(applied.stderr || applied.stdout)
     const deleteApplied = await psql(deleteMigration)
     if (deleteApplied.code !== 0) throw new Error(deleteApplied.stderr || deleteApplied.stdout)
+    const privateApplied = await psql(privateMigration)
+    if (privateApplied.code !== 0) throw new Error(privateApplied.stderr || privateApplied.stdout)
 
     const report = `
 create table public.lrc_rls_report (step text primary key, actual int not null);
@@ -209,6 +218,44 @@ select count(*)::text from public.lrc_products where code in ('LRC-BAB-03', 'LRC
     if (counts.at(-2) !== '0' || counts.at(-1) !== '3') {
       throw new Error(`Admin delete did not leave the three boxes.\n${adminDelete.stdout}`)
     }
+
+    const sharedSrc = 'http://127.0.0.1:54421/functions/v1/lrc-product-image/LRC-IMG-01/shared.png'
+    const imageContent = JSON.stringify({
+      title: { hr: 'Test', en: 'Test' },
+      specs: { hr: '', en: '' },
+      description: { hr: '', en: '' },
+      retailPriceEuro: 1,
+      basePriceEuro: 1,
+      basePriceDate: '1. 1. 2026.',
+      photos: [{ src: sharedSrc, alt: { hr: 'a', en: 'a' }, caption: { hr: '', en: '' }, frame: '#d8cfc8' }],
+    }).replace(/'/g, "''")
+    const imageGate = await psql(`
+insert into public.lrc_products (code, is_visible, sort_order, content)
+values
+  ('LRC-IMG-01', true, 9, '${imageContent}'::jsonb),
+  ('LRC-IMG-02', true, 10, '${imageContent}'::jsonb);
+select public.lrc_product_image_is_public('LRC-IMG-01/shared.png');
+update public.lrc_products set is_visible = false where code = 'LRC-IMG-01';
+select public.lrc_product_image_is_public('LRC-IMG-01/shared.png');
+update public.lrc_products set is_visible = false where code = 'LRC-IMG-02';
+select public.lrc_product_image_is_public('LRC-IMG-01/shared.png');
+select public.lrc_photo_object_name('/lrc_image/proizvodi/slike/lrc-bab-03-01-zatvorena.webp');
+select public.lrc_product_image_is_allowed('LRC-IMG-01/shared.png', '11111111-1111-1111-1111-111111111111');
+select public.lrc_product_image_is_allowed('LRC-IMG-01/shared.png', '00000000-0000-0000-0000-000000000000');
+delete from public.lrc_products where code in ('LRC-IMG-01', 'LRC-IMG-02');
+select count(*)::text from public.lrc_products where code in ('LRC-BAB-03', 'LRC-VIN-02', 'LRC-VIN-03');
+`)
+    if (imageGate.code !== 0) throw new Error(imageGate.stderr || imageGate.stdout)
+    const flags = [...imageGate.stdout.matchAll(/^\s*([tf])\s*$/gm)].map((match) => match[1])
+    const boxCount = lastCount(imageGate.stdout)
+    if (flags.join('') !== 'ttftf' || boxCount !== '3') {
+      throw new Error(`Private image gate did not follow visibility.\n${imageGate.stdout}`)
+    }
+    const anonImage = await psql(`
+set role anon;
+select public.lrc_product_image_is_public('LRC-IMG-01/shared.png');
+`)
+    if (anonImage.code === 0) throw new Error('Anonymous role could call the image gate.')
 
     console.log('lrc catalog rls: ok')
   } finally {

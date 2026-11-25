@@ -16,6 +16,7 @@ import {
   lrcDraftFromInput,
   lrcProductContent,
   lrcProductFromParts,
+  lrcProductImageDirectUrl,
   lrcProductImageObjectPath,
   unusedLrcStorageObjectPaths,
   lrcPresentationInquirySummary,
@@ -141,6 +142,15 @@ assert.equal(
   ),
   'LRC-NEW-01/file.webp',
 )
+assert.equal(
+  lrcProductImageObjectPath('http://127.0.0.1:54421/functions/v1/lrc-product-image/LRC-NEW-01/file.webp'),
+  'LRC-NEW-01/file.webp',
+)
+assert.equal(
+  lrcProductImageDirectUrl('http://127.0.0.1:54421/', 'LRC-NEW-01/file.webp'),
+  'http://127.0.0.1:54421/functions/v1/lrc-product-image/LRC-NEW-01/file.webp',
+)
+assert.equal(lrcProductImageObjectPath('/lrc_image/proizvodi/slike/lrc-bab-03-01-zatvorena.webp'), null)
 
 const width = 3
 const height = 1
@@ -217,6 +227,18 @@ assert.match(storage, /image\/webp/)
 assert.match(storage, /Do not apply this migration to production/)
 assert.doesNotMatch(storage, /lrc-bab-03/)
 
+const privateImages = read('supabase/migrations/20261125010000_lrc_product_images_private.sql')
+assert.match(privateImages, /set public = false/)
+assert.match(privateImages, /lrc_product_image_is_public/)
+assert.match(privateImages, /lrc_product_image_is_allowed/)
+assert.match(privateImages, /grant execute on function public\.lrc_product_image_is_allowed\(text, uuid\) to service_role/)
+assert.match(privateImages, /Do not apply this migration to production/)
+assert.doesNotMatch(privateImages, /lrc_inquiries|lrc-bab-03|createSignedUrl|sign\(/)
+const imageFunction = read('supabase/functions/lrc-product-image/index.ts')
+assert.match(imageFunction, /lrc_product_image_is_allowed/)
+assert.match(imageFunction, /private, no-store/)
+assert.doesNotMatch(imageFunction, /createSignedUrl|\/object\/sign\//)
+
 const cards = read('src/components/LrcPresentationCards.tsx')
 const form = read('src/components/LRCInquiryForm.tsx')
 const section = read('src/components/LRCSection.tsx')
@@ -254,7 +276,12 @@ assert.match(adminPage, /deleteUnusedLrcProductImages\(removedSrcs, rows\)/)
 assert.match(adminPage, /deleteUnusedLrcProductImages\(candidates, rows\)/)
 assert.doesNotMatch(adminPage, /deleteLrcProductImage/)
 assert.match(adminPage, /object-contain/)
+assert.match(adminPage, /LrcAdminProductImage/)
+assert.doesNotMatch(adminPage, /<img src=\{(?:cover|photo)\.src\}/)
 assert.match(api, /frameColorFromImageFile/)
+assert.match(api, /lrcProductImageDirectUrl/)
+assert.match(api, /loadLrcAdminImage/)
+assert.doesNotMatch(api, /getPublicUrl/)
 assert.match(api, /\.upload\(objectPath, file/)
 assert.match(api, /newLrcProductInsert/)
 assert.match(api, /is_visible !== false/)

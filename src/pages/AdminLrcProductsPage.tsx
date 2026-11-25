@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { Eye, EyeOff } from 'lucide-react'
+import { LrcAdminProductImage } from '../components/LrcAdminProductImage'
 import {
   createLrcProduct,
   deleteLrcProduct,
@@ -304,7 +305,7 @@ export default function AdminLrcProductsPage() {
                     style={cover ? lrcFrameStyle(cover.frame) : undefined}
                   >
                     {cover ? (
-                      <img src={cover.src} alt="" className="max-h-full max-w-full object-contain" />
+                      <LrcAdminProductImage src={cover.src} className="max-h-full max-w-full object-contain" />
                     ) : null}
                   </div>
                   <div className="min-w-0 flex-1">
@@ -451,7 +452,7 @@ export default function AdminLrcProductsPage() {
                         className="flex h-24 w-20 shrink-0 items-center justify-center overflow-hidden rounded-md"
                         style={lrcFrameStyle(photo.frame)}
                       >
-                        <img src={photo.src} alt="" className="max-h-full max-w-full object-contain" />
+                        <LrcAdminProductImage src={photo.src} className="max-h-full max-w-full object-contain" />
                       </div>
                       <div className="min-w-0 flex-1 space-y-2">
                         <p className="truncate text-xs text-slate-500">{photo.src}</p>

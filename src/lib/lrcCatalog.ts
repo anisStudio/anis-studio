@@ -404,12 +404,30 @@ export function edgePixels(
   return samples
 }
 
+const LRC_IMAGE_MARKERS = ['/lrc-product-images/', '/lrc-product-image/'] as const
+
+/** Object path inside the private LRC bucket. Static /lrc_image paths return null. */
 export function lrcProductImageObjectPath(src: string): string | null {
-  const marker = '/lrc-product-images/'
-  const index = src.indexOf(marker)
-  if (index === -1) return null
-  const path = decodeURIComponent(src.slice(index + marker.length).split('?')[0] ?? '')
-  return path.length > 0 ? path : null
+  const withoutQuery = src.split('?')[0] ?? ''
+  for (const marker of LRC_IMAGE_MARKERS) {
+    const index = withoutQuery.indexOf(marker)
+    if (index === -1) continue
+    let path: string
+    try {
+      path = decodeURIComponent(withoutQuery.slice(index + marker.length))
+    } catch {
+      return null
+    }
+    if (path.length === 0 || path.includes('..') || path.startsWith('/')) return null
+    return path
+  }
+  return null
+}
+
+/** Stable direct link. Access is checked on every request, so hiding the last public product revokes it. */
+export function lrcProductImageDirectUrl(supabaseUrl: string, objectPath: string): string {
+  const base = supabaseUrl.replace(/\/$/, '')
+  return `${base}/functions/v1/lrc-product-image/${objectPath}`
 }
 
 /** Storage paths that no remaining product still shows. Static card images are never included. */
