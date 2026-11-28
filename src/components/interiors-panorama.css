@@ -84,4 +84,10 @@
   .interiors-panorama.interiors-panorama--compact + * {
     margin-top: 0.5rem;
   }
+
+  /* Keep WA kicker on the same centered axis as the atrium image */
+  .wa-panorama {
+    max-width: 42rem;
+    margin-inline: auto;
+  }
 }

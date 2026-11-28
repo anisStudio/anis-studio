@@ -22,28 +22,48 @@ export default function WelcomeSection({ language = 'hr' }: WelcomeSectionProps)
 
   const onlyInteriors = serviceCardVisibility.interiors && !serviceCardVisibility.lrc && !serviceCardVisibility.webAtelier
 
+  const quickLinks = [
+    {
+      visible: serviceCardVisibility.lrc,
+      path: '/lrc',
+      line: 'welcome_quick_lrc',
+      label: {
+        hr: 'Personalizirani pokloni i graviranje',
+        en: 'Personalized gifts and engraving',
+      },
+    },
+    {
+      visible: serviceCardVisibility.interiors,
+      path: '/interijeri',
+      line: 'welcome_quick_interiors',
+      label: {
+        hr: '3D vizualizacije',
+        en: '3D visualizations',
+      },
+    },
+    {
+      visible: serviceCardVisibility.webAtelier,
+      path: '/web-atelier',
+      line: 'welcome_quick_web_atelier',
+      label: {
+        hr: 'Izrada web stranica',
+        en: 'Website creation',
+      },
+    },
+  ].filter(link => link.visible)
+
   const translations = {
     headline: {
       hr: 'Mjesto gdje ideje postaju stvarnost.',
       en: 'Where ideas become reality.'
     },
     subtitle: {
-      hr: '3D vizualizacije interijera i kuhinja — prostor, raspored i materijale jasno vidite prije izvedbe. Fotorealistični prikaz moguć je po dogovoru, uz konzistentnu vizualnu priču.',
-      en: '3D interior and kitchen visualizations — see space, layout, and materials clearly before work begins. Photorealistic rendering is available by arrangement, with a clear, cohesive visual story.',
-    },
-    bridge: {
-      hr: [
-        "Javni fokus Ani's Studija danas je na vizualnoj prezentaciji prostora: priprema prikaza prije gradnje ili montaže, kako biste donijeli odluke uz mir u glavi.",
-        'Svaki projekt gradimo uz direktnu komunikaciju i transparentan tijek — bez agencijskog “telefona”, uz pažnju na stil, funkciju i realne detalje izvedbe.',
-      ],
-      en: [
-        "Ani's Studio’s public focus is on visualizing spaces before work begins — so you can decide with confidence, from layout to materials and overall mood.",
-        'We collaborate directly with a transparent process — no agency layers — with attention to style, function, and build-ready detail.',
-      ],
+      hr: "U Ani's Studiju izrađujemo personalizirane poklone i gravure, oblikujemo 3D prikaze interijera i izrađujemo web-stranice. Zajedno dogovaramo što vam treba, kako će izgledati i koji su sljedeći koraci.",
+      en: "At Ani's Studio we create personalized gifts and engravings, shape 3D interior views, and build websites. Together we agree what you need, how it will look, and what the next steps are.",
     },
     ctaPrimary: {
-      hr: 'Započnimo projekt',
-      en: "Let's start a project"
+      hr: 'Odaberi uslugu',
+      en: 'Choose a service'
     },
     ctaSecondary: {
       hr: 'Pogledaj radove',
@@ -90,10 +110,31 @@ export default function WelcomeSection({ language = 'hr' }: WelcomeSectionProps)
             <h1 className="font-heading font-extrabold tracking-tight break-words text-balance">
               {translations.headline[language]}
             </h1>
-          {/* Subtitle */}
+          {/* Subtitle — same intro for every public-visibility combination */}
           <p className="mt-4 sm:mt-5 text-[0.9375rem] leading-relaxed sm:text-lg md:text-xl text-plum/80 dark:text-pearl/80">
             {translations.subtitle[language]}
           </p>
+          {quickLinks.length > 0 && (
+            <nav
+              className="welcome-quick-links"
+              aria-label={language === 'hr' ? 'Usluge' : 'Services'}
+            >
+              {quickLinks.map(link => (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  onClick={() =>
+                    trackEvent('homepage_line_click', {
+                      line: link.line,
+                      destination: link.path,
+                    })
+                  }
+                >
+                  {link.label[language]}
+                </Link>
+              ))}
+            </nav>
+          )}
           </div>
 
           {/* CTA buttons */}
@@ -120,24 +161,6 @@ export default function WelcomeSection({ language = 'hr' }: WelcomeSectionProps)
               {translations.ctaSecondary[language]}
             </a>
           </div>
-
-          {/* Bridge — što je Ani's Studio (interiors-first javni fokus) */}
-          <div
-            className="welcome-panel mx-auto mt-10 max-w-[min(100%,34rem)] space-y-4 border-t border-amethyst/10 px-1 pt-10 text-center dark:border-transparent sm:mt-12 sm:max-w-2xl sm:space-y-5 sm:pt-12"
-            aria-labelledby="welcome-bridge-heading"
-          >
-            <h2 id="welcome-bridge-heading" className="sr-only">
-              {language === 'hr' ? 'Što je Ani\'s Studio' : "What is Ani's Studio"}
-            </h2>
-            {translations.bridge[language].map((paragraph, i) => (
-              <p
-                key={i}
-                className="text-[0.9375rem] leading-relaxed text-plum/78 dark:text-pearl/75 sm:text-base sm:leading-relaxed"
-              >
-                {paragraph}
-              </p>
-            ))}
-          </div>
         </div>
       </div>
       <div className="mx-auto max-w-5xl px-4 pb-12 text-center sm:px-6 sm:pb-14">
@@ -161,13 +184,6 @@ export default function WelcomeSection({ language = 'hr' }: WelcomeSectionProps)
             onClick={() => trackEvent('homepage_line_click', { line: 'lrc' })}
             className="surface-premium group relative rounded-[2rem] p-6 sm:p-8 text-center
             hover:-translate-y-2 transition-all duration-300 will-change-transform">
-            {/* Project count badge */}
-            <div className="absolute top-4 right-4">
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold
-                bg-amethyst/10 dark:bg-lavender/15 text-amethyst dark:text-lavender border border-amethyst/20 dark:border-lavender/20">
-                50+
-              </span>
-            </div>
             <div className="flex flex-col items-center">
               <img src="/images/odjeli/poklon.webp" alt="" width="100" height="76" className="mb-4 h-[76px] w-[100px] object-contain" />
               <div>
@@ -188,13 +204,6 @@ export default function WelcomeSection({ language = 'hr' }: WelcomeSectionProps)
             onClick={() => trackEvent('homepage_line_click', { line: 'interijeri' })}
             className="surface-premium group relative rounded-[2rem] p-6 sm:p-8 text-center
             hover:-translate-y-2 transition-all duration-300 will-change-transform">
-            {/* Project count badge */}
-            <div className="absolute top-4 right-4">
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold
-                bg-amethyst/10 dark:bg-lavender/15 text-amethyst dark:text-lavender border border-amethyst/20 dark:border-lavender/20">
-                20+
-              </span>
-            </div>
             <div className="flex flex-col items-center">
               <img src="/images/odjeli/dnevni-boravak.webp" alt="" width="168" height="110" className="mb-4 h-auto w-[168px] max-w-full object-contain" />
               <div>
@@ -215,13 +224,6 @@ export default function WelcomeSection({ language = 'hr' }: WelcomeSectionProps)
             onClick={() => trackEvent('homepage_line_click', { line: 'web-atelier' })}
             className="surface-premium group relative rounded-[2rem] p-6 sm:p-8 text-center
             hover:-translate-y-2 transition-all duration-300 will-change-transform">
-            {/* Project count badge */}
-            <div className="absolute top-4 right-4">
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold
-                bg-amethyst/10 dark:bg-lavender/15 text-amethyst dark:text-lavender border border-amethyst/20 dark:border-lavender/20">
-                10+
-              </span>
-            </div>
             <div className="flex flex-col items-center">
               <img src="/images/odjeli/racunalo.webp" alt="" width="100" height="76" className="mb-4 h-[76px] w-[100px] object-contain" />
               <div>

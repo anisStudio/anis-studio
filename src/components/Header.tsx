@@ -149,10 +149,10 @@ export default function Header({ language, onLanguageChange, cartItemCount, onCa
             <img
               src="/logo-reference-purple.png"
               alt="Ani's Studio"
-              width={320}
-              height={132}
+              width={384}
+              height={158}
               decoding="async"
-              className="block h-12 w-auto max-w-[min(100%,320px)] object-contain object-left sm:h-[3.25rem] md:h-[3.75rem] lg:h-[4.25rem] lg:max-w-[400px]"
+              className="block h-11 w-auto max-w-[min(46vw,11.5rem)] object-contain object-left sm:h-12 sm:max-w-[min(48vw,15rem)] md:h-[4.5rem] md:max-w-[min(100%,24rem)] lg:h-[5.1rem] lg:max-w-[30rem]"
             />
           </span>
         </Link>
