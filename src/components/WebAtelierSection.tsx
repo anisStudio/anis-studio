@@ -176,12 +176,16 @@ export default function WebAtelierSection({
 
       <div className="relative z-10 mx-auto w-full min-w-0 max-w-6xl px-1 sm:px-0">
         <div className="text-center">
-          <header className="department-panorama wa-panorama mb-4">
-            <h1 className="font-heading font-bold tracking-tight text-plum dark:text-pearl">
-              {copy.h1[language]}
-            </h1>
-          </header>
-          <p className="text-sm font-bold text-plum dark:text-pearl">{copy.kicker[language]}</p>
+          <div className="mx-auto w-full max-w-[42rem] sm:max-w-none">
+            <header className="department-panorama wa-panorama mb-4">
+              <h1 className="font-heading font-bold tracking-tight text-plum dark:text-pearl">
+                {copy.h1[language]}
+              </h1>
+            </header>
+            <p className="mx-auto w-fit max-w-full text-balance text-center text-sm font-bold leading-snug text-plum dark:text-pearl">
+              {copy.kicker[language]}
+            </p>
+          </div>
           <p className="mx-auto mt-3 max-w-2xl px-2 text-base leading-relaxed text-plum dark:text-pearl">
             {copy.lead[language]}
           </p>

@@ -115,7 +115,7 @@ export interface DepartmentPreviewLink {
 export const DEPARTMENT_PREVIEW_LINKS: Record<PublicService, DepartmentPreviewLink[]> = {
   interiors: [
     { label: 'Glavna stranica', path: '/interijeri' },
-    { label: 'Cjenik', path: '/cjenici/interijeri' },
+    { label: 'Cjenik 3D idejnih rješenja', path: '/cjenici/interijeri' },
     {
       label: 'Upit za klijente',
       path: '/interijeri/klijenti',
@@ -138,7 +138,7 @@ export const DEPARTMENT_PREVIEW_LINKS: Record<PublicService, DepartmentPreviewLi
   webAtelier: [
     { label: 'Glavna stranica', path: '/web-atelier' },
     {
-      label: 'Upit / konfigurator',
+      label: 'Obrazac za upit',
       path: '/web-atelier/upit',
       createsProductionData: true,
     },

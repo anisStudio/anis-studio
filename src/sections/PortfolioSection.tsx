@@ -94,6 +94,9 @@ export default function PortfolioSection({ language }: PortfolioSectionProps) {
     [visibleFilterCategories],
   )
 
+  /** Hide the whole filter row when only one public category has items. */
+  const showCategoryFilters = enabledCategorySet.size > 1
+
   const filteredItems = useMemo(() => {
     const list =
       selectedCategory === 'all'
@@ -154,7 +157,8 @@ export default function PortfolioSection({ language }: PortfolioSectionProps) {
           </p>
         </div>
 
-        {/* Category Filters - with glow on active */}
+        {/* Category filters: “Svi” + LRC → Interijeri → Web Atelier when 2+ categories; hidden for a single category */}
+        {showCategoryFilters ? (
         <div className="mb-5 flex flex-wrap justify-center gap-2.5 sm:mb-6 sm:gap-3">
           {visibleFilterCategories.map((category) => (
             <button
@@ -173,6 +177,7 @@ export default function PortfolioSection({ language }: PortfolioSectionProps) {
             </button>
           ))}
         </div>
+        ) : null}
 
         {/* Portfolio Grid — compact cards, centered block under heading/filters */}
         <div className="mx-auto w-full max-w-6xl">

@@ -37,8 +37,8 @@ export default function ContactSection({ language = 'hr' }: ContactSectionProps)
     },
     socialProof: {
       projects: {
-        hr: '50+ projekata',
-        en: '50+ projects'
+        hr: '500+ projekata',
+        en: '500+ projects'
       },
       response: {
         hr: 'Najčešće u 24h',
